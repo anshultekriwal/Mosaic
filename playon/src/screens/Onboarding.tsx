@@ -1,18 +1,19 @@
 import { useState } from 'react'
 import { Wordmark } from '../App'
 import { Arrow, Button, Chips, cx, go } from '../components/ui'
-import { FREQUENCIES, GOALS, LEVELS, SPORTS } from '../lib/meta'
+import { FREQUENCIES, GOALS, LEVELS, PLAYER_TYPES, SPORTS } from '../lib/meta'
 import { actions, uid } from '../lib/store'
 import { seasonNameFor } from '../lib/dates'
-import type { Level, WellnessGoal } from '../lib/types'
+import type { Level, PlayerType, WellnessGoal } from '../lib/types'
 
-const STEPS = ['name', 'sport', 'level', 'frequency', 'goals', 'intention', 'ready'] as const
+const STEPS = ['name', 'why', 'sport', 'level', 'frequency', 'goals', 'intention', 'ready'] as const
 
 export default function Onboarding() {
   const [i, setI] = useState(0)
   const [name, setName] = useState('')
   const [sports, setSports] = useState<string[]>([])
   const [custom, setCustom] = useState('')
+  const [playerType, setPlayerType] = useState<PlayerType | null>(null)
   const [level, setLevel] = useState<Level | null>(null)
   const [freq, setFreq] = useState<string | null>(null)
   const [goals, setGoals] = useState<WellnessGoal[]>([])
@@ -21,6 +22,7 @@ export default function Onboarding() {
   const step = STEPS[i]
   const canNext =
     (step === 'name' && name.trim().length > 0) ||
+    (step === 'why' && !!playerType) ||
     (step === 'sport' && sports.length > 0) ||
     (step === 'level' && !!level) ||
     (step === 'frequency' && !!freq) ||
@@ -40,6 +42,7 @@ export default function Onboarding() {
         currentFrequency: freq!,
         weeklyGoal: weekly,
         wellnessGoal: goals,
+        playerType: playerType ?? undefined,
         createdAt: new Date().toISOString(),
         isDemo: false,
       })
@@ -96,10 +99,30 @@ export default function Onboarding() {
             </>
           )}
 
-          {step === 'sport' && (
+          {step === 'why' && (
             <>
               <Q
                 eyebrow={`Nice to meet you, ${name.trim()}`}
+                title="What brings you here?"
+                sub="This decides which patterns we show you first. You can change it any time."
+              />
+              <div className="mt-10">
+                <Chips
+                  label="What brings you here"
+                  hideLabel
+                  size="lg"
+                  options={PLAYER_TYPES.map((p) => ({ id: p.id, label: p.label, sub: p.hint }))}
+                  value={playerType}
+                  onChange={setPlayerType}
+                />
+              </div>
+            </>
+          )}
+
+          {step === 'sport' && (
+            <>
+              <Q
+                eyebrow="Your game"
                 title="What do you love to play?"
                 sub="Pick everything you play. Your first pick becomes your main sport."
               />

@@ -3,7 +3,7 @@ import { Arrow, Button, cx, DemoBadge, go, LinkArrow, Rule, Scale, Stars } from 
 import { actions, sortedSessions, uid, useData } from '../lib/store'
 import { daysBetween, greeting, relativeDay } from '../lib/dates'
 import { ENERGY_WORDS, MOODS, moodLabel, socialLabel, sessionTypeLabel } from '../lib/meta'
-import { computeInsights, daysSinceLastSession, MIN_SESSIONS } from '../lib/insights'
+import { computeInsights, daysSinceLastSession, MIN_SESSIONS, orderInsights } from '../lib/insights'
 import { seasonSummary } from '../lib/season'
 import { suggestionFor } from './Reset'
 import type { Mood } from '../lib/types'
@@ -14,7 +14,7 @@ export default function Home() {
   const sessions = sortedSessions(data)
   const last = sessions[sessions.length - 1]
   const summary = seasonSummary(data)
-  const insights = computeInsights(sessions)
+  const insights = orderInsights(computeInsights(sessions), user.playerType)
   const since = daysSinceLastSession(data)
   const todayCheckIn = [...data.checkins].reverse().find((c) => daysBetween(new Date(c.date), new Date()) === 0)
 

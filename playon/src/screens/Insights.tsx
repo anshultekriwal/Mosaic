@@ -7,6 +7,7 @@ import {
   headlineStats,
   lift,
   MIN_SESSIONS,
+  orderInsights,
   strongestPattern,
   type Insight,
 } from '../lib/insights'
@@ -18,7 +19,7 @@ import type { ActivitySession, Social } from '../lib/types'
 export default function Insights({ focus }: { focus?: string }) {
   const data = useData()
   const sessions = sortedSessions(data)
-  const insights = useMemo(() => computeInsights(sessions), [sessions])
+  const insights = useMemo(() => orderInsights(computeInsights(sessions), data.user!.playerType), [sessions, data.user])
   const [selected, setSelected] = useState<string | null>(focus ?? null)
   const mapRef = useRef<HTMLElement>(null)
 

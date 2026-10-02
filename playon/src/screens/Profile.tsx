@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Button, Chips, cx, DemoBadge, go, Rule, Stars } from '../components/ui'
 import { actions, sortedSessions, useData } from '../lib/store'
-import { GOALS, LEVELS, moodLabel, socialLabel } from '../lib/meta'
+import { GOALS, LEVELS, moodLabel, PLAYER_TYPES, socialLabel } from '../lib/meta'
 import { shortDate } from '../lib/dates'
 
 export default function Profile() {
@@ -82,6 +82,12 @@ export default function Profile() {
             options={[1, 2, 3, 4, 5].map((n) => ({ id: String(n), label: `${n}× a week` }))}
             value={String(user.weeklyGoal)}
             onChange={(n) => actions.updateUser({ weeklyGoal: Number(n) })}
+          />
+          <Chips
+            label="What brings you here"
+            options={PLAYER_TYPES.map((p) => ({ id: p.id, label: p.label }))}
+            value={user.playerType ?? null}
+            onChange={(p) => actions.updateUser({ playerType: p })}
           />
           <Chips
             label="Experience"
