@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Arrow, Button, cx, go, StarInput, useReducedMotion } from '../components/ui'
 import { actions, getData, sortedSessions, uid } from '../lib/store'
-import { BODIES, bodyLabel, ENERGY_WORDS, MOODS, RESULTS, resultLabel, STANDOUTS, socialLabel } from '../lib/meta'
+import { BODIES, bodyLabel, ENERGY_WORDS, moodLabel, MOODS, RESULTS, resultLabel, STANDOUTS, socialLabel } from '../lib/meta'
 import { avg, computeInsights, MIN_SESSIONS } from '../lib/insights'
 import { MILESTONES, milestoneLabel } from '../lib/season'
 import type { ActivitySession, BodyAfter, Mood, Result } from '../lib/types'
@@ -31,8 +31,9 @@ export default function PostGame({ draft }: { draft: Draft }) {
   }, [step, reduced])
 
   const finish = () => {
+    const { fromLive, ...fields } = draft
     const s: ActivitySession = {
-      ...draft,
+      ...fields,
       id: uid(),
       userId: getData().user!.id,
       enjoyment,
@@ -44,6 +45,7 @@ export default function PostGame({ draft }: { draft: Draft }) {
       ...(body ? { bodyAfter: body } : {}),
     }
     actions.addSession(s)
+    if (fromLive) actions.clearGame()
     setSaved(s)
     setI(STEPS.indexOf('done'))
   }
@@ -144,7 +146,8 @@ export default function PostGame({ draft }: { draft: Draft }) {
                       <span>High</span>
                     </div>
                     <p className="mt-6 text-sm text-paper/60">
-                      Going in you said: {ENERGY_WORDS[draft.energyBefore - 1].toLowerCase()}.
+                      Going in you said: {ENERGY_WORDS[draft.energyBefore - 1].toLowerCase()}
+                      {draft.feelingsBefore?.length ? `, feeling ${draft.feelingsBefore.map((f) => f.toLowerCase()).join(', ')}` : ''}.
                     </p>
                   </div>
                   <TapRow label="And your body?" options={BODIES} value={body} onChange={setBody} />
@@ -356,6 +359,9 @@ function Compare({ s }: { s: ActivitySession }) {
     a === b ? `same as last time` : `${Math.abs(a - b)} ${unit}${Math.abs(a - b) === 1 ? '' : 's'} ${a > b ? 'more' : 'less'} than last time`
   const rows: [string, string][] = [
     ['Energy', `${word(s.energyBefore)} going in, ${word(s.energyAfter)} now${d ? ` (${d > 0 ? '+' : '−'}${Math.abs(d)})` : ', holding steady'}`],
+    ...(s.feelingsBefore?.length
+      ? [['Feelings', `${s.feelingsBefore.map((f) => f.toLowerCase()).join(', ')} going in, ${moodLabel(s.moodAfter).toLowerCase()} now`] as [string, string]]
+      : []),
   ]
   if (prev) {
     rows.push(['Enjoyment', `${s.enjoyment}/5, ${diff(s.enjoyment, prev.enjoyment, 'star')}`])

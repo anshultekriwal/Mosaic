@@ -107,3 +107,6 @@ export const STANDOUTS = [
 ]
 
 export const ENERGY_WORDS = ['Running on empty', 'Low', 'Steady', 'Good', 'Buzzing']
+
+/** How you feel going into a game. Multi-select, all optional. */
+export const PRE_FEELINGS = ['Excited', 'Nervous', 'Focused', 'Relaxed', 'Tired', 'Stressed']

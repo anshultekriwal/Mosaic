@@ -6,6 +6,7 @@ import { ENERGY_WORDS, MOODS, moodLabel, socialLabel, sessionTypeLabel } from '.
 import { computeInsights, daysSinceLastSession, earlyWarning, MIN_SESSIONS, orderInsights } from '../lib/insights'
 import { seasonSummary } from '../lib/season'
 import { suggestionFor } from './Reset'
+import { LiveGameCard } from '../components/LiveGame'
 import type { BodyAfter, Mood } from '../lib/types'
 
 export default function Home() {
@@ -23,6 +24,8 @@ export default function Home() {
 
   return (
     <div className="space-y-14 lg:space-y-20">
+      {data.active && <LiveGameCard game={data.active} />}
+
       {since != null && since >= 7 && (
         <section className="rise rounded-3xl bg-lavender-soft px-6 py-7 sm:px-10" aria-label="Welcome back">
           <p className="font-serif text-3xl font-light">Welcome back.</p>
@@ -54,7 +57,8 @@ export default function Home() {
         <CheckInPanel existing={todayCheckIn?.mood} existingEnergy={todayCheckIn?.energy} />
       </section>
 
-      {/* Log CTA */}
+      {/* Log CTA: hidden while a game is live, since the card above covers it */}
+      {!data.active && (
       <section className="relative overflow-hidden rounded-[2rem] bg-forest px-7 py-8 text-paper sm:px-10 sm:py-10">
         <svg className="pointer-events-none absolute -right-10 -top-10 h-64 w-64 opacity-20" viewBox="0 0 200 200" aria-hidden>
           <circle cx="100" cy="100" r="90" fill="none" stroke="var(--color-sage)" />
@@ -63,15 +67,24 @@ export default function Home() {
         </svg>
         <div className="relative flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="eyebrow text-sage">Just played?</p>
+            <p className="eyebrow text-sage">About to play, or just played?</p>
             <p className="mt-3 font-serif text-3xl font-light sm:text-4xl">Remember how it felt.</p>
-            <p className="mt-2 text-sm text-paper/70">About thirty seconds, mostly taps. No judgement.</p>
+            <p className="mt-2 max-w-md text-sm text-paper/70">
+              Start a game now and we'll ask how you feel going in, then how it went when you finish. Or log one you've already
+              played. About thirty seconds, mostly taps.
+            </p>
           </div>
-          <Button variant="light" size="lg" onClick={() => go('play')}>
-            Log a game <Arrow />
-          </Button>
+          <div className="flex flex-col gap-3 sm:items-end">
+            <Button variant="light" size="lg" onClick={() => go('play', 'start')}>
+              Start a game <Arrow />
+            </Button>
+            <Button size="lg" className="border border-paper/30 bg-transparent hover:bg-paper/5" onClick={() => go('play')}>
+              Log a past game
+            </Button>
+          </div>
         </div>
       </section>
+      )}
 
       {warning && (
         <section aria-labelledby="h-warn" className="rise rounded-[2rem] border border-ember/25 bg-ember-soft/50 px-6 py-8 sm:px-10">

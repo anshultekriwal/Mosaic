@@ -48,6 +48,19 @@ export interface ActivitySession {
   result?: Result
   /** Optional: how the body felt afterwards. */
   bodyAfter?: BodyAfter
+  /** Optional: how the player felt going in, captured when a game is started live. */
+  feelingsBefore?: string[]
+}
+
+/** A game that has been started but not yet reflected on. Lives until Finish or Cancel. */
+export interface ActiveGame {
+  sport: string
+  startedAt: string // ISO
+  sessionType: SessionType
+  intensity: Intensity
+  socialContext: Social
+  energyBefore: number // 1-5
+  feelingsBefore: string[]
 }
 
 export interface CheckIn {
@@ -82,4 +95,6 @@ export interface AppData {
   checkins: CheckIn[]
   seasons: Season[]
   moments: Moment[]
+  /** Optional: the game currently being played. */
+  active?: ActiveGame | null
 }

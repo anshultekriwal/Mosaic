@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react'
-import type { ActivitySession, AppData, CheckIn, Moment, Season, User } from './types'
+import type { ActiveGame, ActivitySession, AppData, CheckIn, Moment, Season, User } from './types'
 import { addDays, seasonNameFor, startOfWeek } from './dates'
 
 const KEY = 'playon:v1'
@@ -34,10 +34,24 @@ export function normalize(parsed: Partial<AppData>): AppData {
       // Results only make sense for matches; drop unknown values.
       if (!(out.result && RESULTS.includes(out.result) && out.sessionType === 'match')) delete out.result
       if (!(out.bodyAfter && BODIES.includes(out.bodyAfter))) delete out.bodyAfter
+      if (out.feelingsBefore !== undefined) {
+        const f = arr<string>(out.feelingsBefore).filter((x) => typeof x === 'string')
+        if (f.length) out.feelingsBefore = f
+        else delete out.feelingsBefore
+      }
       return out
     })
   const user = parsed.user ? { ...parsed.user } : null
   if (user && user.playerType && !PLAYER_TYPES.includes(user.playerType)) delete user.playerType
+  const a = parsed.active
+  const active: ActiveGame | null =
+    a && typeof a.sport === 'string' && typeof a.startedAt === 'string' && !Number.isNaN(Date.parse(a.startedAt))
+      ? {
+          ...a,
+          energyBefore: Math.min(5, Math.max(1, Number(a.energyBefore) || 3)),
+          feelingsBefore: arr<string>(a.feelingsBefore),
+        }
+      : null
   return {
     version: 1,
     user,
@@ -45,6 +59,7 @@ export function normalize(parsed: Partial<AppData>): AppData {
     checkins: arr(parsed.checkins),
     seasons: arr(parsed.seasons),
     moments: arr(parsed.moments),
+    active,
   }
 }
 
@@ -111,6 +126,13 @@ export const actions = {
   },
   addSession(s: ActivitySession) {
     commit({ ...state, sessions: [...state.sessions, s] })
+  },
+  startGame(a: ActiveGame) {
+    commit({ ...state, active: a })
+  },
+  /** Ends the live game, either because it was logged or because it was cancelled. */
+  clearGame() {
+    commit({ ...state, active: null })
   },
   updateSession(id: string, patch: Partial<ActivitySession>) {
     commit({ ...state, sessions: state.sessions.map((s) => (s.id === id ? { ...s, ...patch } : s)) })

@@ -2,6 +2,7 @@ import { useEffect, type ReactNode } from 'react'
 import { useData, actions } from './lib/store'
 import { Button, currentRoute, cx, DemoBadge, go, navTo, replace, useRoute, type Route } from './components/ui'
 import { buildDemo } from './lib/demo'
+import { LivePill } from './components/LiveGame'
 import Welcome from './screens/Welcome'
 import Onboarding from './screens/Onboarding'
 import Home from './screens/Home'
@@ -79,6 +80,7 @@ export default function App() {
         <button onClick={() => go('home')} className="press text-left" aria-label="PLAY ON home">
           <Wordmark />
         </button>
+        {data.active && <LivePill game={data.active} className="mt-6 self-start" />}
         <nav className="mt-8 flex shrink-0 flex-col gap-1" aria-label="Primary">
           {NAV.map((n) => (
             <a
@@ -111,7 +113,9 @@ export default function App() {
           <button onClick={() => go('home')} className="press" aria-label="PLAY ON home">
             <Wordmark small />
           </button>
-          {data.user.isDemo ? (
+          {data.active ? (
+            <LivePill game={data.active} />
+          ) : data.user.isDemo ? (
             <button onClick={() => go('profile')} aria-label="You're viewing sample data. Open profile to start fresh.">
               <DemoBadge />
             </button>
