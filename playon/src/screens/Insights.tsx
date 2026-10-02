@@ -214,7 +214,7 @@ export default function Insights({ focus, query = '' }: { focus?: string; query?
 
           <div className="grid gap-16 lg:grid-cols-2">
             <MoodSection sessions={sessions} />
-            <AskSection sessions={sessions} all={all} filtered={filtered} />
+            <AskSection key={query} sessions={sessions} all={all} filtered={filtered} />
           </div>
         </>
       )}
