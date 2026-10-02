@@ -69,7 +69,7 @@ export default function PostGame({ draft }: { draft: Draft }) {
 
       <header className="relative z-10 mx-auto w-full max-w-3xl px-4 pt-4 sm:px-6">
         <div className="flex items-center justify-between gap-3">
-          <BackButton light onClick={() => (step === 'done' ? go('home') : i <= 1 ? back() : setI(i - 1))} />
+          <BackButton light onClick={() => (step === 'done' ? go('home') : i <= 1 ? (draft.fromLive ? go('play', 'finish') : back()) : setI(i - 1))} />
           <Wordmark small light />
           <span className="min-w-0 flex-1 truncate text-right text-sm text-paper/60">
             {draft.sport} · {draft.duration}m

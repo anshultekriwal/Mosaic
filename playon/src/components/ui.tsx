@@ -56,12 +56,7 @@ export function useRoute() {
   return loc
 }
 
-// In-app history, so Back works even where the browser history can't be used.
-const backStack: Loc[] = []
-
 export const go = (route: Route, param?: string, query = '') => {
-  backStack.push(current)
-  if (backStack.length > 50) backStack.shift()
   current = { route, param, query }
   try {
     history.pushState(null, '', hashFor(current))
@@ -94,23 +89,20 @@ export const setQuery = (query: string) => {
   emit(false)
 }
 
-/** Where Back goes when there's no earlier screen in this visit. */
+/**
+ * Back is hierarchical, not history-based, so it can never loop: a sub-screen goes to
+ * its section's first page, and a section's first page goes to Home.
+ */
 function parentOf(l: Loc): Loc {
-  if (l.route === 'play' && l.param === 'reflect') return { route: 'play', query: '' }
   if (l.route === 'reset' && l.param) return { route: 'reset', query: '' }
-  if (l.route === 'insights' && (l.param || l.query)) return { route: 'insights', query: '' }
+  if (l.route === 'play' && l.param === 'reflect') return { route: 'play', query: '' }
   if (l.route === 'home' || l.route === 'onboarding') return { route: 'welcome', query: '' }
-  if (l.route === 'welcome') return { route: 'home', query: '' }
+  // play (incl. start and finish), season, insights (any filter), reset, profile, welcome
   return { route: 'home', query: '' }
 }
 
-/** Go to the previous screen in this visit, or to the screen's parent. */
 export const back = () => {
-  let prev = backStack.pop()
-  // Skip entries that are the same screen (e.g. filter changes) or a finished reflection.
-  while (prev && ((prev.route === current.route && prev.param === current.param) || (prev.route === 'play' && prev.param === 'reflect')))
-    prev = backStack.pop()
-  current = prev ?? parentOf(current)
+  current = parentOf(current)
   try {
     history.replaceState(null, '', hashFor(current))
   } catch {
