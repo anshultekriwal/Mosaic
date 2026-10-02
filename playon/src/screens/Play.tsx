@@ -5,6 +5,7 @@ import { addDays, toLocalInput } from '../lib/dates'
 import { ENERGY_WORDS, INTENSITIES, SESSION_TYPES, SOCIALS } from '../lib/meta'
 import type { ActivitySession, Intensity, SessionType, Social } from '../lib/types'
 import PostGame from './PostGame'
+import TimeDial from '../components/TimeDial'
 
 export type Draft = Pick<
   ActivitySession,
@@ -51,6 +52,12 @@ function LogForm() {
   const [energyBefore, setEnergyBefore] = useState(3)
   const [day, setDay] = useState<'today' | 'yesterday' | 'other'>('today')
   const [otherDate, setOtherDate] = useState(toLocalInput(addDays(new Date(), -2)))
+  // Until the dial is touched, guess the start: today it's "now minus the game length",
+  // for an earlier day it's the time of the last game (or 6:30 pm).
+  const [pickedStart, setPickedStart] = useState<number | null>(null)
+  const lastStart = last ? new Date(last.date).getHours() * 60 + Math.floor(new Date(last.date).getMinutes() / 15) * 15 : 18 * 60 + 30
+  const nowMin = new Date().getHours() * 60 + new Date().getMinutes()
+  const start = pickedStart ?? (day === 'today' ? Math.max(0, Math.floor((nowMin - duration) / 15) * 15) : lastStart)
 
   const finalSport = sport === '__other' ? other.trim() : sport
   const valid = finalSport.length > 0 && duration > 0
@@ -58,13 +65,12 @@ function LogForm() {
   const submit = () => {
     if (!valid) return
     let date = new Date()
-    if (day === 'yesterday') {
-      date = addDays(date, -1)
-      date.setHours(18, 0, 0, 0)
-    } else if (day === 'other') {
+    if (day === 'yesterday') date = addDays(date, -1)
+    else if (day === 'other') {
       const [y, m, d] = otherDate.split('-').map(Number)
-      date = new Date(y, m - 1, d, 18)
+      date = new Date(y, m - 1, d)
     }
+    date.setHours(Math.floor(start / 60), start % 60, 0, 0)
     pending = {
       sport: finalSport,
       date: date.toISOString(),
@@ -199,6 +205,9 @@ function LogForm() {
                 />
               </label>
             )}
+          </div>
+          <div className="mt-6">
+            <TimeDial value={start} onChange={setPickedStart} />
           </div>
         </fieldset>
 

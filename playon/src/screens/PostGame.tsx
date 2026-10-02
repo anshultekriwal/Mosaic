@@ -306,7 +306,8 @@ function H({ children }: { children: string }) {
 function Complete({ s }: { s: ActivitySession }) {
   const note = useMemo(() => encouragement(s), [s])
   const leave = (to: 'home' | 'insights' | 'reset', param?: string) => go(to, param)
-  const reset = s.moodAfter === 'frustrated' ? 'tough-game' : s.moodAfter === 'drained' ? 'clear-head' : null
+  const reset =
+    s.moodAfter === 'frustrated' ? 'tough-game' : s.bodyAfter === 'sore' ? 'recovery' : s.moodAfter === 'drained' ? 'clear-head' : null
 
   return (
     <div className="flex flex-1 flex-col justify-center py-14">
@@ -331,7 +332,7 @@ function Complete({ s }: { s: ActivitySession }) {
         </Button>
         {reset ? (
           <Button size="lg" className="border border-paper/30 bg-transparent hover:bg-paper/5" onClick={() => leave('reset', reset)}>
-            Take a 60-second reset
+            {reset === 'recovery' ? 'Do some easy stretches' : 'Take a 60-second reset'}
           </Button>
         ) : (
           <Button size="lg" className="border border-paper/30 bg-transparent hover:bg-paper/5" onClick={() => leave('insights')}>

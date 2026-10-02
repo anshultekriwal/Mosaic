@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent, type RefObject } from 'react'
+import { createPortal } from 'react-dom'
 import { Button, cx } from './ui'
 import { activeCount, DEFAULT_FILTERS, PERIODS, toggle, type Facet, type Filters, type MultiKey, type Period } from '../lib/filters'
 
@@ -175,17 +176,19 @@ function Sheet({
     }
   }
 
-  return (
-    <div className="fixed inset-0 z-50 md:hidden" onKeyDown={onKeyDown}>
+  // Portal to <body>: the page's fade-in creates a stacking context that would put the
+  // bottom nav on top of the sheet and hide the Apply button.
+  return createPortal(
+    <div className="fixed inset-0 z-[60] md:hidden" onKeyDown={onKeyDown}>
       <div className="fade absolute inset-0 bg-ink/40" onClick={onClose} aria-hidden />
       <div
         ref={panel}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="sheet-up absolute inset-x-0 bottom-0 flex max-h-[88dvh] flex-col rounded-t-[1.75rem] bg-paper shadow-[0_-20px_50px_-20px_rgba(30,58,45,0.4)]"
+        className="sheet-up absolute inset-x-0 bottom-0 flex max-h-[88vh] flex-col supports-[height:100dvh]:max-h-[88dvh] rounded-t-[1.75rem] bg-paper shadow-[0_-20px_50px_-20px_rgba(30,58,45,0.4)]"
       >
-        <div className="flex items-center justify-between border-b border-line px-5 py-4">
+        <div className="flex shrink-0 items-center justify-between border-b border-line px-5 py-4">
           <h2 id={titleId} className="font-serif text-2xl">
             Filters
           </h2>
@@ -193,13 +196,13 @@ function Sheet({
             Close
           </button>
         </div>
-        <div className="flex-1 space-y-6 overflow-y-auto px-5 py-5">
+        <div className="min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain px-5 py-5">
           <PeriodControl value={draft.period} onChange={(p) => setDraft({ ...draft, period: p })} />
           {facets.map((fc) => (
             <FacetGroup key={fc.key} facet={fc} wrap onToggle={(id) => setDraft(toggle(draft, fc.key as MultiKey, id))} />
           ))}
         </div>
-        <div className="flex items-center justify-between gap-3 border-t border-line px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div className="flex shrink-0 items-center justify-between gap-3 border-t border-line bg-paper px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
           <button onClick={() => setDraft(DEFAULT_FILTERS)} className="press text-sm text-ink-2 underline underline-offset-4">
             Clear all
           </button>
@@ -208,7 +211,8 @@ function Sheet({
           </Button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 

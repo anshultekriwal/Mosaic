@@ -6,7 +6,7 @@ import { ENERGY_WORDS, MOODS, moodLabel, socialLabel, sessionTypeLabel } from '.
 import { computeInsights, daysSinceLastSession, earlyWarning, MIN_SESSIONS, orderInsights } from '../lib/insights'
 import { seasonSummary } from '../lib/season'
 import { suggestionFor } from './Reset'
-import type { Mood } from '../lib/types'
+import type { BodyAfter, Mood } from '../lib/types'
 
 export default function Home() {
   const data = useData()
@@ -213,15 +213,15 @@ export default function Home() {
             Need a reset?
           </h2>
           <Rule className="mt-3" />
-          <ResetTeaser mood={todayCheckIn?.mood ?? last?.moodAfter} />
+          <ResetTeaser mood={todayCheckIn?.mood ?? last?.moodAfter} body={todayCheckIn ? undefined : last?.bodyAfter} />
         </section>
       </div>
     </div>
   )
 }
 
-function ResetTeaser({ mood }: { mood?: Mood }) {
-  const s = suggestionFor(mood)
+function ResetTeaser({ mood, body }: { mood?: Mood; body?: BodyAfter }) {
+  const s = suggestionFor(mood, body)
   return (
     <div className="mt-6">
       <p className="font-serif text-3xl font-light">{s.title}</p>

@@ -13,11 +13,11 @@ Recreational athletes: the Sunday pickleball crowd, office table-tennis regulars
 1. **Welcome**: start your own season, or explore a labelled sample season for "Alex". `#demo` opens the demo in one click.
 2. **Onboarding**: one question per screen, including "What brings you here?"
 3. **Home**: a mood check-in, your week, your last game, a gentle **Worth noticing** card when enjoyment is drifting (or heavy weeks or soreness are a pattern) with one thing to try, and one pattern we've noticed. Before 5 games it shows "3 of 5 games logged".
-4. **Play + Post-game**: about 30 seconds, mostly taps. Play is prefilled from your last game. Post-game asks for energy, how your body feels, mood (plus the score for matches), enjoyment, and an optional note. The summary compares energy in and out, and this game with your last one.
+4. **Play + Post-game**: about 30 seconds, mostly taps. Play is prefilled from your last game, and a 24-hour time dial (or one-tap Morning, Afternoon, Evening, Night) sets when you started. Post-game asks for energy, how your body feels, mood (plus the score for matches), enjoyment, and an optional note. The summary compares energy in and out, and this game with your last one.
 5. **Season**: a 12-week landscape. Each game is a tree, and quiet weeks are meadows. No streaks.
 6. **Game Map**: headline numbers, your strongest pattern, a scatter of every game, patterns with the games behind them, moods, a table view, and **filters** (sport, enjoyment, played with, session type, intensity, time of day, length, result, body after, period). Filters drive every section, show counts, sync to the URL (`#/insights?sport=pickleball&enjoy=5`) and use a bottom sheet on mobile. Picking only "Loved it" or "Not great" shows **what your best (or toughest) games have in common**.
 7. **Ask PLAY ON**: fixed rules over your own log (respecting active filters). No AI model.
-8. **Reset Room**: "Reset after a tough game" and a box-breathing exercise.
+8. **Reset Room**: "Reset after a tough game", box breathing, and five easy recovery stretches (suggested after a game that left you sore or tired).
 
 ## Principles in the code
 

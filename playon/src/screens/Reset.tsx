@@ -3,7 +3,7 @@ import { Arrow, Button, cx, go, useReducedMotion } from '../components/ui'
 import { actions, sortedSessions, uid, useData } from '../lib/store'
 import { moodLabel } from '../lib/meta'
 import { shortDate } from '../lib/dates'
-import type { Mood } from '../lib/types'
+import type { BodyAfter, Mood } from '../lib/types'
 
 type ExerciseId = 'tough-game' | 'clear-head' | 'capture' | 'recovery'
 
@@ -47,7 +47,7 @@ const EXERCISES: Exercise[] = [
   },
   {
     id: 'recovery',
-    when: 'If you’re physically tired',
+    when: 'If your body feels tired or sore',
     title: 'Recovery mode',
     length: '2½ minutes',
     blurb: 'Five gentle stretches, thirty seconds each.',
@@ -56,13 +56,13 @@ const EXERCISES: Exercise[] = [
   },
 ]
 
-// The room is kept to two exercises. Capture and Recovery stay in the code but are
-// no longer reachable from navigation or by URL.
-const IN_ROOM: ExerciseId[] = ['tough-game', 'clear-head']
+// The room is kept focused. Capture stays in the code but is no longer reachable.
+const IN_ROOM: ExerciseId[] = ['tough-game', 'clear-head', 'recovery']
 const ROOM = EXERCISES.filter((e) => IN_ROOM.includes(e.id))
 
-export function suggestionFor(mood?: Mood): Exercise {
-  const id: ExerciseId = mood === 'frustrated' ? 'tough-game' : 'clear-head'
+export function suggestionFor(mood?: Mood, body?: BodyAfter): Exercise {
+  const id: ExerciseId =
+    mood === 'frustrated' ? 'tough-game' : body === 'sore' || body === 'tired' || mood === 'calm' ? 'recovery' : 'clear-head'
   return EXERCISES.find((e) => e.id === id)!
 }
 
@@ -76,8 +76,9 @@ function RoomIndex() {
   const data = useData()
   const latest = [...data.checkins].sort((a, b) => a.date.localeCompare(b.date)).pop()
   const lastSession = sortedSessions(data).pop()
-  const mood = latest && (!lastSession || latest.date > lastSession.date) ? latest.mood : lastSession?.moodAfter
-  const rec = suggestionFor(mood)
+  const fromCheckIn = latest && (!lastSession || latest.date > lastSession.date)
+  const mood = fromCheckIn ? latest.mood : lastSession?.moodAfter
+  const rec = suggestionFor(mood, fromCheckIn ? undefined : lastSession?.bodyAfter)
 
   return (
     <div className="space-y-14">
@@ -88,7 +89,7 @@ function RoomIndex() {
           <span className="block italic text-ink-2">That's all this takes.</span>
         </h1>
         <p className="mt-5 max-w-xl text-ink-2">
-          Two short things to do after a game, or any time. Not therapy, not training. Just a short pause.
+          A few short things to do after a game, or any time. Not therapy, not training. Just a short pause.
         </p>
       </header>
 
