@@ -187,17 +187,22 @@ export default function Home() {
             </>
           ) : (
             <>
-              <p className="mt-6 font-serif text-3xl font-light leading-snug text-ink-2">
-                {sessions.length === 0
-                  ? 'Patterns appear after a few sessions.'
-                  : sessions.length < MIN_SESSIONS
-                    ? `${MIN_SESSIONS - sessions.length} more session${MIN_SESSIONS - sessions.length === 1 ? '' : 's'} until your Game Map opens.`
-                    : 'Nothing stands out yet — your sessions look pretty even.'}
-              </p>
-              <p className="mt-3 text-sm text-ink-2">
-                We only point out patterns that are actually in your data. Until then, we'll stay quiet.
-              </p>
-              <ProgressDots n={Math.min(sessions.length, MIN_SESSIONS)} of={MIN_SESSIONS} />
+              {sessions.length < MIN_SESSIONS ? (
+                <>
+                  <p className="mt-6 font-serif text-3xl font-light leading-snug">
+                    {sessions.length} of {MIN_SESSIONS} games logged.
+                  </p>
+                  <p className="mt-3 text-sm text-ink-2">
+                    Your first patterns unlock at {MIN_SESSIONS}. We only point out what is really in your log, so until then we stay quiet.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="mt-6 font-serif text-3xl font-light leading-snug text-ink-2">Nothing stands out yet. Your games look pretty even.</p>
+                  <p className="mt-3 text-sm text-ink-2">We only point out patterns that are really in your log.</p>
+                </>
+              )}
+              {sessions.length < MIN_SESSIONS && <ProgressDots n={sessions.length} of={MIN_SESSIONS} />}
             </>
           )}
         </section>
@@ -255,7 +260,7 @@ function WeekTiles({ done, goal }: { done: number; goal: number }) {
 
 function ProgressDots({ n, of }: { n: number; of: number }) {
   return (
-    <div className="mt-5 flex items-center gap-2" aria-label={`${n} of ${of} sessions logged`}>
+    <div className="mt-5 flex items-center gap-2" role="img" aria-label={`${n} of ${of} games logged`}>
       {Array.from({ length: of }).map((_, i) => (
         <span key={i} className={cx('h-2.5 w-2.5 rounded-full', i < n ? 'bg-forest' : 'bg-line-2')} />
       ))}

@@ -745,13 +745,14 @@ function NotYet({ n }: { n: number }) {
     <div className="mx-auto max-w-3xl py-6">
       <p className="eyebrow">Your Game Map</p>
       <h1 className="mt-4 font-serif text-[clamp(2.6rem,6vw,4.5rem)] font-light leading-[1.02]">
-        {n === 0 ? 'Your map starts with one session.' : `${MIN_SESSIONS - n} more session${MIN_SESSIONS - n === 1 ? '' : 's'} to go.`}
+        {n} of {MIN_SESSIONS} games logged.
+        <span className="block italic text-ink-2">Your first patterns unlock at {MIN_SESSIONS}.</span>
       </h1>
       <p className="mt-5 max-w-xl text-lg text-ink-2">
-        Your Game Map shows how playing affects you — when you enjoy it most, what lifts your energy, who you like playing
-        with. We won't invent patterns, so it opens once you've logged {MIN_SESSIONS} sessions.
+        Your Game Map shows how playing affects you: when you enjoy it most, what lifts your energy, and the slow drift
+        that makes a game stop feeling fun. We won't invent patterns, so it opens once you've logged {MIN_SESSIONS} games.
       </p>
-      <div className="mt-10 flex items-center gap-3" aria-label={`${n} of ${MIN_SESSIONS} sessions logged`}>
+      <div className="mt-10 flex items-center gap-3" role="img" aria-label={`${n} of ${MIN_SESSIONS} games logged`}>
         {Array.from({ length: MIN_SESSIONS }).map((_, i) => (
           <span key={i} className={cx('grid h-12 w-12 place-items-center rounded-full border font-serif text-lg', i < n ? 'border-forest bg-forest text-paper' : 'border-dashed border-line-2 text-ink-3')}>
             {i + 1}
@@ -760,11 +761,11 @@ function NotYet({ n }: { n: number }) {
       </div>
       <div className="mt-12 flex flex-col gap-3 sm:flex-row">
         <Button size="lg" onClick={() => go('play')}>
-          Log a session <Arrow />
+          Log a game <Arrow />
         </Button>
       </div>
       <figure className="mt-16 rounded-[2rem] border border-dashed border-line-2 p-6 sm:p-8">
-        <figcaption className="eyebrow">What it will look like — illustration, not your data</figcaption>
+        <figcaption className="eyebrow">What it will look like. An illustration, not your data</figcaption>
         <svg viewBox="0 0 600 200" className="mt-6 w-full opacity-60" aria-hidden>
           <rect x="1" y="1" width="598" height="198" fill="none" stroke="var(--color-line-2)" />
           <line x1="300" x2="300" y1="0" y2="200" stroke="var(--color-line)" />

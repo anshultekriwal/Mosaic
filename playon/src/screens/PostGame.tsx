@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Arrow, Button, cx, go, StarInput, useReducedMotion } from '../components/ui'
 import { actions, getData, sortedSessions, uid } from '../lib/store'
-import { BODIES, ENERGY_WORDS, MOODS, RESULTS, STANDOUTS, socialLabel } from '../lib/meta'
+import { BODIES, bodyLabel, ENERGY_WORDS, MOODS, RESULTS, resultLabel, STANDOUTS, socialLabel } from '../lib/meta'
 import { avg, computeInsights, MIN_SESSIONS } from '../lib/insights'
 import { MILESTONES, milestoneLabel } from '../lib/season'
 import type { ActivitySession, BodyAfter, Mood, Result } from '../lib/types'
@@ -316,6 +316,7 @@ function Complete({ s }: { s: ActivitySession }) {
         <Stat big={s.sport} label={socialLabel(s.socialContext)} serif />
         <Stat big={`${s.enjoyment}`} unit="/5" label="Enjoyment" />
       </div>
+      <Compare s={s} />
       <p className="rise mt-10 max-w-2xl font-serif text-3xl font-light leading-snug sm:text-4xl" style={{ animationDelay: '300ms' }}>
         {note.headline}
       </p>
@@ -338,6 +339,46 @@ function Complete({ s }: { s: ActivitySession }) {
           </Button>
         )}
       </div>
+    </div>
+  )
+}
+
+/** Useful from game one: energy in vs out, and how this game compares with the last. */
+function Compare({ s }: { s: ActivitySession }) {
+  const prev = useMemo(
+    () => sortedSessions(getData()).filter((x) => x.id !== s.id && x.date <= s.date).pop(),
+    [s],
+  )
+  const d = s.energyAfter - s.energyBefore
+  const word = (n: number) => ENERGY_WORDS[n - 1].toLowerCase()
+  const diff = (a: number, b: number, unit: string) =>
+    a === b ? `same as last time` : `${Math.abs(a - b)} ${unit}${Math.abs(a - b) === 1 ? '' : 's'} ${a > b ? 'more' : 'less'} than last time`
+  const rows: [string, string][] = [
+    ['Energy', `${word(s.energyBefore)} going in, ${word(s.energyAfter)} now${d ? ` (${d > 0 ? '+' : '−'}${Math.abs(d)})` : ', holding steady'}`],
+  ]
+  if (prev) {
+    rows.push(['Enjoyment', `${s.enjoyment}/5, ${diff(s.enjoyment, prev.enjoyment, 'star')}`])
+    const pd = prev.energyAfter - prev.energyBefore
+    rows.push(['Energy change', d === pd ? 'same as last time' : `${d > pd ? 'better' : 'lower'} than last time (${pd >= 0 ? '+' : '−'}${Math.abs(pd)} then)`])
+  }
+  const extras = [s.result && resultLabel(s.result), s.bodyAfter && `body ${bodyLabel(s.bodyAfter).toLowerCase()}`].filter(Boolean)
+  return (
+    <div className="rise mt-8 max-w-2xl" style={{ animationDelay: '200ms' }}>
+      <dl className="space-y-2 text-[15px]">
+        {rows.map(([k, v]) => (
+          <div key={k} className="grid grid-cols-[120px_1fr] gap-3">
+            <dt className="text-paper/55">{k}</dt>
+            <dd className="text-paper/90">{v}</dd>
+          </div>
+        ))}
+        {extras.length > 0 && (
+          <div className="grid grid-cols-[120px_1fr] gap-3">
+            <dt className="text-paper/55">Also</dt>
+            <dd className="text-paper/90">{extras.join(', ')}</dd>
+          </div>
+        )}
+      </dl>
+      {!prev && <p className="mt-3 text-sm text-paper/55">Your first game. Next time you'll see how it compares.</p>}
     </div>
   )
 }
