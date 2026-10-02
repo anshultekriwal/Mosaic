@@ -129,6 +129,29 @@ function RoomIndex() {
         </ul>
       </section>
 
+      <section aria-labelledby="h-stretches">
+        <h2 id="h-stretches" className="eyebrow">
+          The five stretches
+        </h2>
+        <p className="mt-2 max-w-xl text-sm text-ink-2">
+          What Recovery mode walks you through. Tap an arrow to watch how each one is done (videos open on YouTube).
+        </p>
+        <ol className="mt-4 grid border-t border-line sm:grid-cols-2 sm:gap-x-10">
+          {STRETCHES.map(([n, how, url], k) => (
+            <li key={n} className="flex items-center justify-between gap-4 border-b border-line py-4">
+              <span className="min-w-0">
+                <span className="block font-serif text-xl">
+                  <span className="mr-2 font-sans text-sm tabular text-ink-3">0{k + 1}</span>
+                  {n}
+                </span>
+                <span className="mt-0.5 block text-sm text-ink-2">{how}</span>
+              </span>
+              <TutorialLink name={n} url={url} />
+            </li>
+          ))}
+        </ol>
+      </section>
+
       {data.moments.length > 0 && (
         <section aria-labelledby="h-moments">
           <h2 id="h-moments" className="eyebrow">

@@ -75,11 +75,11 @@ export default function App() {
       </a>
 
       {/* desktop sidebar */}
-      <aside className="sticky top-0 hidden h-dvh flex-col overflow-y-auto overscroll-contain border-r border-line bg-paper/60 px-6 py-8 lg:flex">
+      <aside className="sticky top-0 hidden h-screen max-h-screen flex-col overflow-y-auto overscroll-contain border-r border-line bg-paper/60 px-6 py-6 supports-[height:100dvh]:h-dvh supports-[height:100dvh]:max-h-dvh lg:flex">
         <button onClick={() => go('home')} className="press text-left" aria-label="PLAY ON home">
           <Wordmark />
         </button>
-        <nav className="mt-12 flex shrink-0 flex-col gap-1" aria-label="Primary">
+        <nav className="mt-8 flex shrink-0 flex-col gap-1" aria-label="Primary">
           {NAV.map((n) => (
             <a
               key={n.id}
