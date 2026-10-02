@@ -3,7 +3,7 @@ import { Arrow, Button, cx, DemoBadge, go, LinkArrow, Rule, Scale, Stars } from 
 import { actions, sortedSessions, uid, useData } from '../lib/store'
 import { daysBetween, greeting, relativeDay } from '../lib/dates'
 import { ENERGY_WORDS, MOODS, moodLabel, socialLabel, sessionTypeLabel } from '../lib/meta'
-import { computeInsights, daysSinceLastSession, MIN_SESSIONS, orderInsights } from '../lib/insights'
+import { computeInsights, daysSinceLastSession, earlyWarning, MIN_SESSIONS, orderInsights } from '../lib/insights'
 import { seasonSummary } from '../lib/season'
 import { suggestionFor } from './Reset'
 import type { Mood } from '../lib/types'
@@ -15,6 +15,9 @@ export default function Home() {
   const last = sessions[sessions.length - 1]
   const summary = seasonSummary(data)
   const insights = orderInsights(computeInsights(sessions), user.playerType)
+  const warning = earlyWarning(insights, sessions)
+  // Don't repeat the warning's pattern in "Something we've noticed".
+  const noticed = insights.find((i) => i.id !== warning?.insight.id)
   const since = daysSinceLastSession(data)
   const todayCheckIn = [...data.checkins].reverse().find((c) => daysBetween(new Date(c.date), new Date()) === 0)
 
@@ -69,6 +72,29 @@ export default function Home() {
           </Button>
         </div>
       </section>
+
+      {warning && (
+        <section aria-labelledby="h-warn" className="rise rounded-[2rem] border border-ember/25 bg-ember-soft/50 px-6 py-8 sm:px-10">
+          <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr] lg:items-end lg:gap-12">
+            <div>
+              <h2 id="h-warn" className="eyebrow flex items-center gap-2 text-[#8a3a12]">
+                <span className="h-1.5 w-1.5 rounded-full bg-ember" aria-hidden />
+                Worth noticing
+              </h2>
+              <p className="mt-4 font-serif text-3xl font-light leading-snug sm:text-4xl">{warning.title}</p>
+              <p className="mt-3 text-sm text-ink-2">{warning.insight.basis}</p>
+              {warning.bounce && <p className="mt-2 text-sm font-medium text-forest">{warning.bounce}</p>}
+            </div>
+            <div className="rounded-2xl bg-paper/80 p-5">
+              <p className="eyebrow text-[10px]">One thing to try</p>
+              <p className="mt-2 font-serif text-xl leading-snug">{warning.suggestion}</p>
+              <LinkArrow className="mt-4" onClick={() => go('insights', warning.insight.id, 'period=all')}>
+                See the games behind this
+              </LinkArrow>
+            </div>
+          </div>
+        </section>
+      )}
 
       <div className="grid gap-14 lg:grid-cols-2 lg:gap-x-16 lg:gap-y-16">
         {/* season */}
@@ -151,11 +177,11 @@ export default function Home() {
             Something we've noticed
           </h2>
           <Rule className="mt-3" />
-          {insights[0] ? (
+          {noticed ? (
             <>
-              <p className="mt-6 font-serif text-3xl font-light leading-snug">{insights[0].headline}</p>
-              <p className="mt-3 text-sm text-ink-2">{insights[0].basis}</p>
-              <LinkArrow className="mt-5" onClick={() => go('insights')}>
+              <p className="mt-6 font-serif text-3xl font-light leading-snug">{noticed.headline}</p>
+              <p className="mt-3 text-sm text-ink-2">{noticed.basis}</p>
+              <LinkArrow className="mt-5" onClick={() => go('insights', noticed.id, 'period=all')}>
                 Explore your patterns
               </LinkArrow>
             </>

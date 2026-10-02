@@ -49,7 +49,10 @@ export default function Insights({ focus, query = '' }: { focus?: string; query?
     const r = rememberedFilters()
     if (!query && r && !isDefault(r)) setQuery(encodeFilters(r))
     // Normalise unknown or messy values in a pasted link.
-    else if (query && encodeFilters(filters) !== query) setQuery(encodeFilters(filters))
+    else if (query) {
+      rememberFilters(filters)
+      if (encodeFilters(filters) !== query) setQuery(encodeFilters(filters))
+    }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
   const setFilters = (f: Filters) => {
     rememberFilters(f)

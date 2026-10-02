@@ -668,3 +668,50 @@ export function commonTraits(
   }
   return picked
 }
+
+/* ------------------------------------------------------------------ */
+/* Early warning: one gentle flag and one thing to try.               */
+/* ------------------------------------------------------------------ */
+
+export interface EarlyWarning {
+  insight: Insight
+  title: string
+  suggestion: string
+  /** Optional good news: the last few games are already better. */
+  bounce?: string
+}
+
+/** Picks the most useful warning pattern (drift, then heavy weeks, then soreness), if any fired. */
+export function earlyWarning(insights: Insight[], sessions: ActivitySession[]): EarlyWarning | null {
+  const pick = ['trend', 'load', 'body'].map((id) => insights.find((i) => i.id === id && i.warning)).find(Boolean)
+  if (!pick) return null
+
+  const social = insights.find((i) => i.id === 'social')
+  const bestWho = social?.groups.find((g) => g.highlight)?.key as Social | undefined
+  const rest = insights.find((i) => i.id === 'rest' && i.groups.find((g) => g.key === 'rested')?.highlight)
+  const socialTip =
+    bestWho && bestWho !== 'tournament' && bestWho !== 'solo' ? `Try a relaxed game ${socialPhrase(bestWho)} this week, just for fun.` : null
+  const restTip = rest ? 'Take a rest day before your next game. Your games after a break have felt better.' : null
+
+  let title: string
+  let suggestion: string
+  if (pick.id === 'trend') {
+    title = 'Your games have been feeling less fun lately.'
+    suggestion = socialTip ?? restTip ?? 'Mix in one game this week that is purely for fun.'
+  } else if (pick.id === 'load') {
+    title = 'Your busiest weeks have felt less fun.'
+    suggestion = restTip ?? 'Try a lighter week, with a rest day between games.'
+  } else {
+    title = pick.headline
+    suggestion = 'Next time, try a shorter or easier game and notice how your body feels after.'
+  }
+
+  let bounce: string | undefined
+  const recent = pick.groups.find((g) => g.key === 'recent')
+  const last3 = [...sessions].sort((a, b) => a.date.localeCompare(b.date)).slice(-3)
+  if (recent && last3.length === 3) {
+    const l3 = avg(last3.map((s) => s.enjoyment))
+    if (l3 - recent.enjoyment >= 0.5) bounce = `Your last 3 games averaged ${fmt1(l3)}/5, so something you changed already seems to be helping.`
+  }
+  return { insight: pick, title, suggestion, bounce }
+}
