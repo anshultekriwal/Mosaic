@@ -20,7 +20,7 @@ const NAV: { id: Route; label: string; icon: ReactNode }[] = [
 
 export default function App() {
   const data = useData()
-  const { route, param } = useRoute()
+  const { route, param, query } = useRoute()
 
   const needsUser = !data.user && route !== 'welcome' && route !== 'onboarding'
   useEffect(() => {
@@ -42,7 +42,7 @@ export default function App() {
       case 'season':
         return <Season />
       case 'insights':
-        return <Insights focus={param} />
+        return <Insights focus={param} query={query} />
       case 'reset':
         return <Reset exercise={param} />
       case 'profile':

@@ -25,7 +25,7 @@ function describeDiff(a: ActivitySession[], b: ActivitySession[], labelA: string
  * Answers questions by reading the user's own log. Keyword-routed and deterministic:
  * no model, no guessing, and it says so when there isn't enough to go on.
  */
-export function ask(question: string, all: ActivitySession[], now = new Date()): Answer {
+export function ask(question: string, all: ActivitySession[], _opts: { all?: ActivitySession[] } = {}, now = new Date()): Answer {
   const q = question.toLowerCase()
   const sports = [...new Set(all.map((s) => s.sport))]
   const sport = sports.find((sp) => q.includes(sp.toLowerCase()))

@@ -122,6 +122,18 @@ body {
   }
 }
 
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+.sheet-up {
+  animation: sheet-up 0.42s var(--ease-out-soft) both;
+}
+
 .rise {
   animation: rise 0.7s var(--ease-out-soft) both;
 }

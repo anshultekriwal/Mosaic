@@ -593,7 +593,7 @@ export function commonTraits(
       dim: 'type' as const,
       key: t.id,
       label: sessionTypeLabel(t.id),
-      phrase: `${t.label.toLowerCase()}${t.id === 'match' ? 'es' : 's'}`,
+      phrase: { match: 'matches', casual: 'casual hits', practice: 'practice sessions', lesson: 'lessons' }[t.id],
       test: (s: ActivitySession) => s.sessionType === t.id,
     })),
     ...INTENSITIES.map((i) => ({
@@ -662,7 +662,7 @@ export function commonTraits(
       of: subset.length,
       baseCount: x.baseCount,
       baseOf: baseline.length,
-      basis: `${x.count} of ${noun} (${Math.round(x.share * 100)}%) were ${x.d.phrase}, compared with ${x.baseCount} of ${baseline.length} games (${Math.round(x.baseShare * 100)}%) across the period.`,
+      basis: `${x.count} of ${noun} (${Math.round(x.share * 100)}%) were ${x.d.phrase}, compared with ${x.baseCount} of ${baseline.length} games overall (${Math.round(x.baseShare * 100)}%).`,
     })
     if (picked.length === 3) break
   }

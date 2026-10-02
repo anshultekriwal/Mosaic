@@ -6,10 +6,11 @@ export function cx(...xs: (string | false | null | undefined)[]) {
 
 /* ---------- routing ---------- */
 
-export type Route = 'welcome' | 'onboarding' | 'home' | 'play' | 'season' | 'insights' | 'reset' | 'profile'
+export type Route = 'welcome' | 'onboarding' | 'home' | 'play' | 'season' | 'insights' | 'reset' | 'profile' | 'demo'
 
-type Loc = { route: Route; param?: string }
+type Loc = { route: Route; param?: string; query: string }
 
+/** Accepts "#/insights/trend?sport=pickleball", "#insights?enjoy=5" and "#demo". */
 const parseHash = (): Loc => {
   let h = ''
   try {
@@ -17,17 +18,20 @@ const parseHash = (): Loc => {
   } catch {
     /* sandboxed frame */
   }
-  const [r, param] = h.replace(/^#\/?/, '').split('/')
-  return { route: (r || 'home') as Route, param }
+  const [path, query = ''] = h.replace(/^#\/?/, '').split('?')
+  const [r, param] = path.split('/')
+  return { route: (r || 'home') as Route, param: param || undefined, query }
 }
+
+const hashFor = (l: Loc) => `#/${l.route}${l.param ? `/${l.param}` : ''}${l.query ? `?${l.query}` : ''}`
 
 // The in-memory location is the source of truth; the URL hash is synced when the
 // host allows it, so routing also works inside sandboxed frames.
 let current: Loc = parseHash()
 const routeListeners = new Set<(l: Loc) => void>()
-const emit = () => {
+const emit = (scroll = true) => {
   routeListeners.forEach((l) => l(current))
-  window.scrollTo({ top: 0 })
+  if (scroll) window.scrollTo({ top: 0 })
 }
 
 export const currentRoute = () => current.route
@@ -38,9 +42,10 @@ export function useRoute() {
     routeListeners.add(setLoc)
     const onHash = () => {
       const next = parseHash()
-      if (next.route === current.route && next.param === current.param) return
+      if (next.route === current.route && next.param === current.param && next.query === current.query) return
+      const sameScreen = next.route === current.route && next.param === current.param
       current = next
-      emit()
+      emit(!sameScreen)
     }
     window.addEventListener('hashchange', onHash)
     return () => {
@@ -51,14 +56,37 @@ export function useRoute() {
   return loc
 }
 
-export const go = (route: Route, param?: string) => {
-  current = { route, param }
+export const go = (route: Route, param?: string, query = '') => {
+  current = { route, param, query }
   try {
-    history.pushState(null, '', `#/${route}${param ? `/${param}` : ''}`)
+    history.pushState(null, '', hashFor(current))
   } catch {
     /* URL updates blocked; in-memory routing still works */
   }
   emit()
+}
+
+/** Swap the current screen for another without adding a history entry. */
+export const replace = (route: Route, param?: string, query = '') => {
+  current = { route, param, query }
+  try {
+    history.replaceState(null, '', hashFor(current))
+  } catch {
+    /* URL updates blocked */
+  }
+  emit()
+}
+
+/** Update the query of the current screen (e.g. filters) without scrolling or adding history. */
+export const setQuery = (query: string) => {
+  if (query === current.query) return
+  current = { ...current, query }
+  try {
+    history.replaceState(null, '', hashFor(current))
+  } catch {
+    /* URL updates blocked */
+  }
+  emit(false)
 }
 
 /** onClick for <a href="#/x"> links so they route in-app. */
