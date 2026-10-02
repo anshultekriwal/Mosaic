@@ -75,11 +75,11 @@ export default function App() {
       </a>
 
       {/* desktop sidebar */}
-      <aside className="sticky top-0 hidden h-dvh flex-col border-r border-line bg-paper/60 px-6 py-8 lg:flex">
+      <aside className="sticky top-0 hidden h-dvh flex-col overflow-y-auto overscroll-contain border-r border-line bg-paper/60 px-6 py-8 lg:flex">
         <button onClick={() => go('home')} className="press text-left" aria-label="PLAY ON home">
           <Wordmark />
         </button>
-        <nav className="mt-12 flex flex-col gap-1" aria-label="Primary">
+        <nav className="mt-12 flex shrink-0 flex-col gap-1" aria-label="Primary">
           {NAV.map((n) => (
             <a
               key={n.id}
@@ -96,7 +96,7 @@ export default function App() {
             </a>
           ))}
         </nav>
-        <div className="mt-auto space-y-4">
+        <div className="mt-auto space-y-4 pt-6">
           <a href="#/reset" onClick={navTo('reset')} className="press block rounded-2xl border border-line bg-lavender-soft/70 p-4 text-sm hover:border-lavender">
             <span className="eyebrow block text-[10px]">Reset Room</span>
             <span className="mt-1 block font-serif text-lg leading-snug">Need a minute?</span>

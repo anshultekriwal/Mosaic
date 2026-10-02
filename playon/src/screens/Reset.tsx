@@ -392,13 +392,37 @@ function Capture({ onDone }: { onDone: () => void }) {
 
 /* ---------- recovery ---------- */
 
+// [name, how, tutorial]. Tutorials are from named clinicians or established teachers:
+// Dr. Katherine Coyner (orthopaedic surgeon), Mike Reinold (PT), Ask Doctor Jo (DPT),
+// Dr. Sam Schroetke (DPT) and Yoga With Adriene.
 const STRETCHES = [
-  ['Calf stretch', 'Hands on a wall, one leg back, heel down. Switch halfway.'],
-  ['Hip flexor lunge', 'Low lunge, back knee down, hips gently forward. Switch halfway.'],
-  ['Hamstring fold', 'Soft knees, fold forward, let your head hang heavy.'],
-  ['Shoulder cross-body', 'Draw one arm across your chest. Switch halfway.'],
-  ['Child’s pose', 'Knees wide, arms long, forehead down. Just breathe.'],
+  ['Calf stretch', 'Hands on a wall, one leg back, heel down. Switch halfway.', 'https://www.youtube.com/watch?v=usQDLsgsMx4'],
+  ['Hip flexor lunge', 'Low lunge, back knee down, hips gently forward. Switch halfway.', 'https://www.youtube.com/watch?v=Hmec1bQBQOE'],
+  ['Hamstring fold', 'Soft knees, fold forward, let your head hang heavy.', 'https://www.youtube.com/watch?v=oRdXgERlSag'],
+  ['Shoulder cross-body', 'Draw one arm across your chest. Switch halfway.', 'https://www.youtube.com/watch?v=KrBCD8Hv-fk'],
+  ['Child’s pose', 'Knees wide, arms long, forehead down. Just breathe.', 'https://www.youtube.com/watch?v=eqVMAPM00DM'],
 ] as const
+
+/** A north-east arrow that opens the stretch's video tutorial. Only the arrow is the link. */
+function TutorialLink({ name, url, size = 'sm' }: { name: string; url: string; size?: 'sm' | 'lg' }) {
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`Watch a ${name.toLowerCase()} tutorial on YouTube (opens in a new tab)`}
+      title="Watch a tutorial on YouTube"
+      className={cx(
+        'press inline-grid shrink-0 place-items-center rounded-full border border-line-2 text-forest hover:border-forest hover:bg-forest hover:text-paper',
+        size === 'lg' ? 'h-11 w-11' : 'h-8 w-8',
+      )}
+    >
+      <svg width={size === 'lg' ? 18 : 14} height={size === 'lg' ? 18 : 14} viewBox="0 0 16 16" fill="none" aria-hidden>
+        <path d="M4.5 11.5l7-7M5.5 4.5h6v6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </a>
+  )
+}
 
 function Recovery({ onDone }: { onDone: () => void }) {
   const [i, setI] = useState(-1)
@@ -412,13 +436,17 @@ function Recovery({ onDone }: { onDone: () => void }) {
         <p className="mt-4 max-w-md text-ink-2">
           Thirty seconds each. Ease in, never push into pain. If anything hurts, stop.
         </p>
-        <ol className="mt-8 space-y-1 text-ink-2">
-          {STRETCHES.map(([n], k) => (
-            <li key={n}>
-              <span className="tabular text-ink-3">0{k + 1}</span> {n}
+        <ol className="mt-8 max-w-sm divide-y divide-line border-y border-line text-ink-2">
+          {STRETCHES.map(([n, , url], k) => (
+            <li key={n} className="flex items-center justify-between gap-4 py-2.5">
+              <span>
+                <span className="tabular text-ink-3">0{k + 1}</span> {n}
+              </span>
+              <TutorialLink name={n} url={url} />
             </li>
           ))}
         </ol>
+        <p className="mt-3 text-xs text-ink-3">Tap an arrow to watch how it's done. Videos open on YouTube.</p>
         <div className="mt-10">
           <Button size="lg" onClick={() => setI(0)}>
             Start
@@ -437,13 +465,16 @@ function Stretch({ i, onNext }: { i: number; onNext: () => void }) {
     if (elapsed >= 30) onNext()
   }, [elapsed, onNext])
 
-  const [name, how] = STRETCHES[i]
+  const [name, how, url] = STRETCHES[i]
   return (
     <div className="rise flex flex-1 flex-col justify-center">
       <p className="eyebrow">
         Stretch {i + 1} of {STRETCHES.length}
       </p>
-      <h1 className="mt-4 font-serif text-5xl font-light sm:text-7xl">{name}</h1>
+      <div className="mt-4 flex items-center gap-4">
+        <h1 className="font-serif text-5xl font-light sm:text-7xl">{name}</h1>
+        <TutorialLink name={name} url={url} size="lg" />
+      </div>
       <p className="mt-4 max-w-md text-lg text-ink-2">{how}</p>
       <div className="mt-12 h-1 w-full max-w-md rounded-full bg-line" aria-hidden>
         <div className="h-1 rounded-full bg-forest" style={{ width: `${(elapsed / 30) * 100}%` }} />
