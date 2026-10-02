@@ -1,3 +1,5 @@
+> This repo has two apps: **PLAY ON** (in [`playon/`](playon/), a wellness companion for recreational athletes) and **Steady** (below, at the repo root).
+
 # Steady
 
 A calm, mobile-first web app that guides someone through a panic response,
