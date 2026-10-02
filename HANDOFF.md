@@ -16,7 +16,7 @@ Mosaic Wellness, CEO's Office, Builder Round. Build a consumer health and wellne
 
 | App | Folder | Live Artifact (private until shared) |
 |---|---|---|
-| **PLAY ON** (the main submission) | `playon/` | https://claude.ai/artifact/TDawQSWrGPqYKirvP5czn1 |
+| **PLAY ON** (the main submission) | `playon/` | https://claude.ai/artifact/6y4PtXDvX8sUFGfPDPMnkG (decluttered version, 2 Oct; the older link TDawQSWrGPqYKirvP5czn1 is no longer reachable) |
 | **Steady** (earlier idea) | repo root | https://claude.ai/artifact/PttNmQj3BFWcX69LLk5g7n |
 
 Neither app has a public deployment yet. **This is the main open task.**
