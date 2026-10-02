@@ -28,7 +28,7 @@ export default function Welcome() {
 
           <div className="mt-auto max-w-3xl pt-24">
             <p className="eyebrow rise text-sage" style={{ animationDelay: '80ms' }}>
-              A wellness companion for people who love to play
+              For people who play for the love of it
             </p>
             <h1 className="mt-6 font-serif text-[clamp(3.2rem,9vw,7.5rem)] font-light leading-[0.92]">
               <span className="rise block" style={{ animationDelay: '160ms' }}>
@@ -39,8 +39,8 @@ export default function Welcome() {
               </span>
             </h1>
             <p className="rise mt-8 max-w-xl text-lg leading-relaxed text-paper/80" style={{ animationDelay: '480ms' }}>
-              Your game. Your pace. Your well-being. PLAY ON helps you understand how playing makes you feel — and
-              build a routine around the sports you love that actually lasts.
+              Adults rarely quit sport because they get unfit. They quit because it slowly stops being fun. PLAY ON
+              keeps a 30-second memory of every game, so you can catch that drift early and keep playing.
             </p>
             <div className="rise mt-10 flex flex-col gap-3 sm:flex-row" style={{ animationDelay: '620ms' }}>
               <Button variant="light" size="lg" onClick={() => go('onboarding')}>
@@ -55,8 +55,8 @@ export default function Welcome() {
               </Button>
             </div>
             <p className="rise mt-4 text-xs text-paper/55" style={{ animationDelay: '700ms' }}>
-              The demo loads a clearly-labelled sample season for Alex, a recreational pickleball player. Everything stays on
-              this device.
+              The demo loads a clearly labelled sample season for Alex, who played so much that pickleball stopped being
+              fun, then found the fun again. Everything stays on this device.
             </p>
           </div>
         </div>
@@ -68,26 +68,26 @@ export default function Welcome() {
           <div>
             <p className="eyebrow">Why PLAY ON?</p>
             <h2 className="mt-4 font-serif text-4xl font-light leading-tight sm:text-5xl">
-              Wellness isn't always about doing <em>more</em>.
+              Your post-game chat, <em>remembered</em>.
             </h2>
           </div>
           <div className="space-y-6 text-lg leading-relaxed text-ink-2">
             <p>
-              Most fitness apps ask how much you did. Steps, streaks, personal bests. But you didn't pick up a paddle to
-              close a ring — you did it because it felt good.
+              After a game you talk it over: the rally that wouldn't end, the loss that stung, how your knees feel. Then
+              the conversation is gone. PLAY ON keeps those thirty seconds, game after game.
             </p>
             <p>
-              PLAY ON asks a different question: <span className="font-serif italic text-ink">how did playing affect you?</span>{' '}
-              Over a season, your answers turn into something useful — a map of what keeps you coming back.
+              Over a season they show you <span className="font-serif italic text-ink">what keeps the game fun</span>, and
+              the slow drift that makes people quit, while there's still time to play differently.
             </p>
           </div>
         </div>
 
         <ol className="mt-20 grid gap-px overflow-hidden rounded-3xl border border-line bg-line sm:grid-cols-3">
           {[
-            ['01', 'How you play', 'Log a session in under a minute. Sport, time, who you played with.'],
-            ['02', 'How you feel', 'A short, honest reflection afterwards. Energy, mood, enjoyment.'],
-            ['03', 'What keeps you coming back', 'Your Game Map shows the patterns — drawn only from what you logged.'],
+            ['01', 'Play', 'Log a game in about 30 seconds, mostly taps. Sport, who you played with, how long.'],
+            ['02', 'Remember', 'A short, honest check afterwards: energy, mood, enjoyment, the score, how your body feels.'],
+            ['03', 'Notice the drift', 'Your Game Map shows what makes your games fun, and gently flags when they start to feel less so.'],
           ].map(([n, t, d]) => (
             <li key={n} className="bg-paper p-8">
               <span className="font-serif text-sm italic text-ember">{n}</span>
@@ -99,16 +99,16 @@ export default function Welcome() {
 
         <div className="mt-20 grid gap-8 border-t border-line pt-10 text-sm text-ink-2 sm:grid-cols-3">
           <p>
-            <span className="block font-medium text-ink">No punishing streaks.</span>
+            <span className="block font-medium text-ink">No streaks.</span>
             Miss a week? Your season is still here when you come back.
           </p>
           <p>
             <span className="block font-medium text-ink">No guesswork.</span>
-            Every insight shows the sessions it came from. Not enough data? We'll say so.
+            Every insight shows the games it came from. Not enough data? We'll say so.
           </p>
           <p>
             <span className="block font-medium text-ink">Not a medical app.</span>
-            Observations about your own play — never diagnoses or advice.
+            Observations about your own play. Never diagnoses or advice.
           </p>
         </div>
       </section>

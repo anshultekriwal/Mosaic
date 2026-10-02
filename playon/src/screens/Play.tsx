@@ -79,7 +79,7 @@ function LogForm() {
 
   return (
     <div className="mx-auto max-w-3xl">
-      <p className="eyebrow">Log a session</p>
+      <p className="eyebrow">Log a game</p>
       <h1 className="mt-3 font-serif text-5xl font-light leading-tight sm:text-6xl">What did you play?</h1>
 
       <form
@@ -204,7 +204,7 @@ function LogForm() {
 
         <div className="sticky bottom-24 z-10 flex justify-end lg:bottom-6">
           <Button type="submit" size="lg" disabled={!valid} className="shadow-[0_10px_30px_-10px_rgba(30,58,45,0.5)]">
-            Game over — reflect <Arrow />
+            Game over. Reflect <Arrow />
           </Button>
         </div>
       </form>

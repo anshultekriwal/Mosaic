@@ -27,7 +27,7 @@ export default function Home() {
         <section className="rise rounded-3xl bg-lavender-soft px-6 py-7 sm:px-10" aria-label="Welcome back">
           <p className="font-serif text-3xl font-light">Welcome back.</p>
           <p className="mt-2 max-w-lg text-ink-2">
-            Sometimes the best part of the long game is coming back. Your season is still here — pick up wherever feels
+            Sometimes the best part of the long game is coming back. Your season is still here. Pick up wherever feels
             right.
           </p>
         </section>
@@ -64,11 +64,11 @@ export default function Home() {
         <div className="relative flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="eyebrow text-sage">Just played?</p>
-            <p className="mt-3 font-serif text-3xl font-light sm:text-4xl">Tell us how it felt.</p>
-            <p className="mt-2 text-sm text-paper/70">About thirty seconds. No scores, no judgement.</p>
+            <p className="mt-3 font-serif text-3xl font-light sm:text-4xl">Remember how it felt.</p>
+            <p className="mt-2 text-sm text-paper/70">About thirty seconds, mostly taps. No judgement.</p>
           </div>
           <Button variant="light" size="lg" onClick={() => go('play')}>
-            Log a session <Arrow />
+            Log a game <Arrow />
           </Button>
         </div>
       </section>
@@ -125,8 +125,8 @@ export default function Home() {
               {summary.thisWeek >= summary.season.weeklyGoal
                 ? 'Intention met. Anything else this week is a bonus.'
                 : summary.thisWeek === 0
-                  ? 'A fresh week. No rush — whenever you get on court.'
-                  : `${summary.season.weeklyGoal - summary.thisWeek} more would meet your intention. Or not — it's your season.`}
+                  ? 'A fresh week. No rush, whenever you get on court.'
+                  : `${summary.season.weeklyGoal - summary.thisWeek} more would meet your intention. Or not. It's your season.`}
             </p>
             <LinkArrow className="mt-5" onClick={() => go('season')}>
               View season
@@ -166,7 +166,7 @@ export default function Home() {
           ) : (
             <div className="mt-6">
               <p className="font-serif text-3xl font-light text-ink-2">Nothing logged yet.</p>
-              <p className="mt-2 text-sm text-ink-2">Your first session plants the first tree in your season.</p>
+              <p className="mt-2 text-sm text-ink-2">Log your first game and PLAY ON starts remembering how it felt.</p>
             </div>
           )}
         </section>

@@ -35,10 +35,10 @@ export default function Season() {
         <Fact label="This week" value={`${summary.thisWeek} / ${season.weeklyGoal}`} sub="sessions" />
         <Fact label="Season" value={`${summary.sessions.length}`} sub="sessions" />
         <Fact label="Time on court" value={`${Math.round(summary.minutes / 60)}`} sub="hours" />
-        <Fact label="Favourite" value={summary.favorite ?? '—'} serifSmall />
+        <Fact label="Favourite" value={summary.favorite ?? '-'} serifSmall />
         <Fact
           label="Avg enjoyment"
-          value={summary.sessions.length ? fmt1(summary.enjoyment) : '—'}
+          value={summary.sessions.length ? fmt1(summary.enjoyment) : '-'}
           sub={summary.sessions.length ? '/ 5' : ''}
         />
       </dl>
@@ -52,7 +52,7 @@ export default function Season() {
           </h2>
           <p className="mt-3 text-sm text-ink-2">
             You've played in {summary.playedWeeks} of {Math.min(summary.weekNumber, 12)} weeks, and met your intention in{' '}
-            {summary.metIntentionWeeks}. Both numbers are just context — not a score.
+            {summary.metIntentionWeeks}. Both numbers are just context, not a score.
           </p>
           {ended && (
             <Button className="mt-6" onClick={() => actions.startNewSeason()}>
@@ -229,7 +229,7 @@ function Landscape({ weeks }: { weeks: WeekSlot[] }) {
             <line x1="6" x2="6" y1="16" y2="6" stroke="var(--color-forest)" />
             <ellipse cx="6" cy="6" rx="5" ry="6" fill="var(--color-forest)" />
           </svg>
-          A session — taller means more enjoyed
+          A game. Taller means more enjoyed
         </span>
         <span className="flex items-center gap-2">
           <svg width="12" height="12" aria-hidden>
@@ -363,7 +363,7 @@ function Timeline({ weeks, goal }: { weeks: WeekSlot[]; goal: number }) {
                 </ul>
               ) : (
                 <p className="font-serif text-sm italic text-ink-3">
-                  {w.isCurrent ? 'Nothing yet — plenty of week left.' : 'A rest week. Recovery is part of the season.'}
+                  {w.isCurrent ? 'Nothing yet. Plenty of week left.' : 'A rest week. Recovery is part of the season.'}
                 </p>
               )}
               {ms.map((m) => (

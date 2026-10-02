@@ -1,6 +1,7 @@
 import { useEffect, type ReactNode } from 'react'
 import { useData, actions } from './lib/store'
-import { currentRoute, cx, DemoBadge, go, navTo, useRoute, type Route } from './components/ui'
+import { Button, currentRoute, cx, DemoBadge, go, navTo, replace, useRoute, type Route } from './components/ui'
+import { buildDemo } from './lib/demo'
 import Welcome from './screens/Welcome'
 import Onboarding from './screens/Onboarding'
 import Home from './screens/Home'
@@ -22,11 +23,23 @@ export default function App() {
   const data = useData()
   const { route, param, query } = useRoute()
 
-  const needsUser = !data.user && route !== 'welcome' && route !== 'onboarding'
+  // #demo is a shareable one-click demo. It only replaces data that is already a demo
+  // (or empty); a real season gets asked first.
+  const hasRealData = !!data.user && !data.user.isDemo
+  useEffect(() => {
+    if (route === 'demo' && !hasRealData) {
+      actions.replaceAll(buildDemo())
+      replace('home')
+    }
+  }, [route, hasRealData])
+
+  const needsUser = !data.user && route !== 'welcome' && route !== 'onboarding' && route !== 'demo'
   useEffect(() => {
     // Read the live route: a reset may already have navigated to onboarding.
     if (needsUser && currentRoute() !== 'welcome' && currentRoute() !== 'onboarding') go('welcome')
   }, [needsUser])
+
+  if (route === 'demo') return hasRealData ? <DemoConfirm /> : null
 
   if (!data.user || route === 'welcome' || route === 'onboarding') {
     return route === 'onboarding' ? <Onboarding /> : <Welcome />
@@ -141,6 +154,36 @@ export default function App() {
         </ul>
       </nav>
     </div>
+  )
+}
+
+function DemoConfirm() {
+  return (
+    <main className="grid min-h-dvh place-items-center bg-cream px-6">
+      <div className="max-w-md">
+        <Wordmark />
+        <h1 className="mt-10 font-serif text-4xl font-light leading-tight">Open the sample season?</h1>
+        <p className="mt-4 text-ink-2">
+          This link loads Alex's sample season. It would replace the season saved on this device, so we wanted to check
+          first.
+        </p>
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <Button size="lg" onClick={() => replace('home')}>
+            Keep my season
+          </Button>
+          <Button
+            size="lg"
+            variant="ghost"
+            onClick={() => {
+              actions.replaceAll(buildDemo())
+              replace('home')
+            }}
+          >
+            Replace with the demo
+          </Button>
+        </div>
+      </div>
+    </main>
   )
 }
 

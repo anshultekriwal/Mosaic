@@ -404,21 +404,21 @@ function encouragement(s: ActivitySession): { headline: string; sub?: string } {
 
   if (MILESTONES.includes(n))
     return n === 1
-      ? { headline: 'First tree planted. Your season has begun.', sub: 'Every session you log grows the landscape on your Season page.' }
+      ? { headline: 'First game remembered. Your season has begun.', sub: 'Every game you log grows the landscape on your Season page, and teaches PLAY ON what keeps it fun.' }
       : {
           headline: `${milestoneLabel(n)}. A new landmark on your season.`,
-          sub: n === MIN_SESSIONS ? 'That’s enough for your Game Map to start showing patterns.' : undefined,
+          sub: n === MIN_SESSIONS ? 'That’s enough for your Game Map to start showing patterns, including the slow drift that makes a game stop feeling fun.' : undefined,
         }
 
   if (s.moodAfter === 'frustrated')
     return {
       headline: 'Tough ones count too.',
-      sub: 'You showed up and you noticed how it felt — that’s the part that matters here. A short reset can help it settle.',
+      sub: 'You showed up and you noticed how it felt. That’s the part that matters here. A short reset can help it settle.',
     }
   if (s.moodAfter === 'drained')
     return { headline: 'That took something out of you.', sub: 'Rest is part of the long game. Go easy on yourself tonight.' }
 
-  if (lift >= 2) return { headline: `You came off court with more energy than you brought — up ${lift} points.` }
+  if (lift >= 2) return { headline: `You came off court with more energy than you brought: up ${lift} points.` }
 
   if (prior.length >= 3) {
     const ctx = prior.filter((x) => x.socialContext === s.socialContext)
@@ -432,7 +432,7 @@ function encouragement(s: ActivitySession): { headline: string; sub?: string } {
 
   const ins = computeInsights(all)
   if (ins[0]) return { headline: 'Logged. Your Game Map just got a little clearer.', sub: ins[0].headline }
-  return { headline: s.enjoyment >= 4 ? 'Sounds like a good one.' : 'Logged — thanks for noticing how it went.' }
+  return { headline: s.enjoyment >= 4 ? 'Sounds like a good one.' : 'Logged. Thanks for noticing how it went.' }
 }
 
 function Rings({ step }: { step: number }) {

@@ -29,11 +29,11 @@ const EXERCISES: Exercise[] = [
   },
   {
     id: 'clear-head',
-    when: 'If you’re mentally drained',
+    when: 'Any time you need a pause',
     title: 'Clear your head',
     length: '90 seconds',
     blurb: 'Box breathing. Nothing to think about but the square.',
-    nudge: 'Ninety seconds of slow breathing might help.',
+    nudge: 'Ninety seconds of slow breathing is here whenever you want it.',
     tone: 'bg-lavender-soft',
   },
   {
@@ -56,20 +56,18 @@ const EXERCISES: Exercise[] = [
   },
 ]
 
+// The room is kept to two exercises. Capture and Recovery stay in the code but are
+// no longer reachable from navigation or by URL.
+const IN_ROOM: ExerciseId[] = ['tough-game', 'clear-head']
+const ROOM = EXERCISES.filter((e) => IN_ROOM.includes(e.id))
+
 export function suggestionFor(mood?: Mood): Exercise {
-  const id: ExerciseId =
-    mood === 'frustrated'
-      ? 'tough-game'
-      : mood === 'energized' || mood === 'happy'
-        ? 'capture'
-        : mood === 'calm'
-          ? 'recovery'
-          : 'clear-head'
+  const id: ExerciseId = mood === 'frustrated' ? 'tough-game' : 'clear-head'
   return EXERCISES.find((e) => e.id === id)!
 }
 
 export default function Reset({ exercise }: { exercise?: string }) {
-  const ex = EXERCISES.find((e) => e.id === exercise)
+  const ex = ROOM.find((e) => e.id === exercise)
   if (ex) return <ExerciseScreen ex={ex} />
   return <RoomIndex />
 }
@@ -90,7 +88,7 @@ function RoomIndex() {
           <span className="block italic text-ink-2">That's all this takes.</span>
         </h1>
         <p className="mt-5 max-w-xl text-ink-2">
-          Small things to do after a game, or any time. Not therapy, not training — just a short pause.
+          Two short things to do after a game, or any time. Not therapy, not training. Just a short pause.
         </p>
       </header>
 
@@ -109,10 +107,10 @@ function RoomIndex() {
 
       <section aria-labelledby="h-all">
         <h2 id="h-all" className="eyebrow">
-          Everything in the room
+          In the room
         </h2>
         <ul className="mt-4 border-t border-line">
-          {EXERCISES.map((e) => (
+          {ROOM.map((e) => (
             <li key={e.id} className="border-b border-line">
               <button onClick={() => go('reset', e.id)} className="press group grid w-full gap-1 py-6 text-left sm:grid-cols-[220px_1fr_auto] sm:items-center sm:gap-6">
                 <span className="text-sm text-ink-3">{e.when}</span>
@@ -411,7 +409,7 @@ function Recovery({ onDone }: { onDone: () => void }) {
         <p className="eyebrow">Recovery mode</p>
         <h1 className="mt-4 font-serif text-5xl font-light leading-tight sm:text-6xl">Five easy stretches.</h1>
         <p className="mt-4 max-w-md text-ink-2">
-          Thirty seconds each. Ease in, never push into pain — if anything hurts, stop.
+          Thirty seconds each. Ease in, never push into pain. If anything hurts, stop.
         </p>
         <ol className="mt-8 space-y-1 text-ink-2">
           {STRETCHES.map(([n], k) => (

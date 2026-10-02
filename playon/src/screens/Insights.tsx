@@ -730,7 +730,7 @@ function AskSection({ sessions, all, filtered }: { sessions: ActivitySession[]; 
             ))}
           </div>
           <p className="mt-5 text-xs text-ink-3">
-            An observation from {answer.basedOn} logged session{answer.basedOn === 1 ? '' : 's'} — not medical or coaching advice.
+            An observation from {answer.basedOn} logged game{answer.basedOn === 1 ? '' : 's'}. Not medical or coaching advice.
           </p>
         </div>
       )}
