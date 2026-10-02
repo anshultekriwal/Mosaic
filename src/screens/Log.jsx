@@ -23,12 +23,13 @@ const pair = (a, b) => (a || b ? `${a ?? '—'} → ${b ?? '—'}` : null)
 
 export default function Log({ onBack }) {
   const [episodes, setEpisodes] = useState(() => loadEpisodes().sort((a, b) => b.start - a.start))
+  const [confirming, setConfirming] = useState(false)
   const lines = patternLines(episodes)
 
   function clear() {
-    if (!confirm('Delete every saved episode from this device?')) return
     clearEpisodes()
     setEpisodes([])
+    setConfirming(false)
   }
 
   return (
@@ -38,7 +39,7 @@ export default function Log({ onBack }) {
       ) : (
         <>
           {lines.length > 0 && (
-            <div className="mb-8 rounded-3xl bg-deep p-5">
+            <div className="mb-8 flex flex-col gap-3 rounded-3xl bg-deep p-5">
               {lines.map((l) => (
                 <p key={l} className="text-xl leading-snug">
                   {l}
@@ -82,8 +83,22 @@ export default function Log({ onBack }) {
               )
             })}
           </ul>
-          <div className="mt-10 text-center">
-            <QuietLink onClick={clear}>Delete all episodes</QuietLink>
+          <div className="mt-10 flex flex-col items-center gap-2 text-center">
+            {confirming ? (
+              <>
+                <p className="text-lg">Delete every saved episode from this device?</p>
+                <div className="flex gap-2">
+                  <button type="button" onClick={clear} className="min-h-11 rounded-full bg-ember px-5 text-night">
+                    Delete all
+                  </button>
+                  <button type="button" onClick={() => setConfirming(false)} className="min-h-11 rounded-full bg-tide px-5">
+                    Keep them
+                  </button>
+                </div>
+              </>
+            ) : (
+              <QuietLink onClick={() => setConfirming(true)}>Delete all episodes</QuietLink>
+            )}
           </div>
         </>
       )}
