@@ -56,9 +56,9 @@ export default function Pulse({ onDone }) {
   const progress = 1 - left / DURATION_MS
 
   return (
-    <div className="flex h-full w-full flex-col items-center justify-between py-4 text-center">
+    <div className="flex h-full w-full flex-col items-center justify-between py-4 text-center short:py-1">
       <div>
-        <h1 className="text-4xl leading-tight font-semibold">Tap in time with your heartbeat.</h1>
+        <h1 className="text-4xl leading-tight font-semibold short:text-3xl">Tap in time with your heartbeat.</h1>
         <p className="mt-3 text-lg text-haze">
           {started ? `${Math.ceil(left / 1000)} seconds` : 'Feel it at your wrist or neck.'}
         </p>
@@ -68,7 +68,7 @@ export default function Pulse({ onDone }) {
         type="button"
         onPointerDown={tap}
         aria-label="Heartbeat tap"
-        className="relative my-6 aspect-square w-[min(68vw,40vh)] select-none rounded-full bg-tide/70"
+        className="relative my-6 aspect-square w-[min(68vw,40vh)] short:my-3 short:w-[min(60vw,30vh)] select-none rounded-full bg-tide/70"
       >
         <svg className="absolute inset-0 -rotate-90" viewBox="0 0 100 100" aria-hidden="true">
           <circle

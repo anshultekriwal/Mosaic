@@ -1,5 +1,8 @@
 @import 'tailwindcss';
 
+/* Phones with short screens (e.g. iPhone SE) get a tighter layout. */
+@custom-variant short (@media (max-height: 700px));
+
 @theme {
   --color-night: #081423;
   --color-deep: #0d1f33;

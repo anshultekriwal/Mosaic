@@ -15,7 +15,7 @@ const SECTIONS = [
   ],
   [
     'Your data',
-    'Everything stays in this browser on this device. There is no account and nothing is sent anywhere. Clearing your browser data removes it.',
+    'Everything stays in this browser on this device, including your trusted contact. There is no account and nothing is sent anywhere. Calls and texts go through your phone’s own apps. Clearing your browser data removes it all.',
   ],
 ]
 

@@ -5,6 +5,7 @@ import Home from './screens/Home.jsx'
 import Log from './screens/Log.jsx'
 import Wearable from './screens/Wearable.jsx'
 import About from './screens/About.jsx'
+import Settings from './screens/Settings.jsx'
 
 export default function App() {
   const [view, setView] = useState('home')
@@ -43,6 +44,8 @@ export default function App() {
       return <Wearable onBack={goHome} onStart={startHelp} />
     case 'about':
       return <About onBack={goHome} />
+    case 'settings':
+      return <Settings onBack={goHome} />
     default:
       return <Home onHelp={startHelp} onNavigate={navigate} />
   }

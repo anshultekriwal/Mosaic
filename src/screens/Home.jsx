@@ -18,6 +18,7 @@ export default function Home({ onHelp, onNavigate }) {
           <QuietLink onClick={() => onNavigate('log')}>My log</QuietLink>
           <QuietLink onClick={() => onNavigate('wearable')}>Wearable preview</QuietLink>
           <QuietLink onClick={() => onNavigate('about')}>How this works</QuietLink>
+          <QuietLink onClick={() => onNavigate('settings')}>Settings</QuietLink>
         </div>
         <p className="mt-3 text-sm text-haze/80">Nothing you enter leaves this device.</p>
       </nav>

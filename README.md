@@ -37,6 +37,12 @@ only, nothing saved).
 
 Every session screen carries "Severe chest pain or feel faint? Call 112".
 
+**Settings** holds one trusted contact (name, number, and a ready-written text
+message). Once set, "Call" and "Text" links for them sit beside the 112 link on
+every session screen, and become the first options on the "Call someone you
+trust" screen. Calls and texts open the phone's own dialer and messages app via
+`tel:` and `sms:` links; Steady sends nothing itself.
+
 ## Notes
 
 - Tremor thresholds (`src/lib/motion.js`) are heuristics for a hand-held phone,

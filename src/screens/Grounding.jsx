@@ -20,10 +20,10 @@ export default function Grounding({ onDone }) {
   }
 
   return (
-    <div key={i} className="settle flex w-full flex-col items-center gap-12 text-center">
+    <div key={i} className="settle flex w-full flex-col items-center gap-12 text-center short:gap-6">
       <p className="text-lg text-haze">Look around you. Take your time.</p>
       <div>
-        <p className="text-[7rem] leading-none font-semibold text-calm">{n}</p>
+        <p className="text-[7rem] leading-none font-semibold text-calm short:text-[5rem]">{n}</p>
         <p className="mt-4 text-4xl font-medium">{text}</p>
       </div>
       <BigButton onClick={next}>Next</BigButton>

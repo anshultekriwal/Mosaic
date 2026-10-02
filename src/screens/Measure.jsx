@@ -42,14 +42,14 @@ export default function Measure({ title = 'Tap each time you breathe in.', onDon
   }
 
   return (
-    <div className="flex h-full w-full flex-col items-center justify-between py-4">
-      <h1 className="max-w-sm text-center text-4xl leading-tight font-semibold">{title}</h1>
+    <div className="flex h-full w-full flex-col items-center justify-between py-4 short:py-1">
+      <h1 className="max-w-sm text-center text-4xl leading-tight font-semibold short:text-3xl">{title}</h1>
 
       <button
         type="button"
         onPointerDown={tap}
         aria-label={`Breath tap ${Math.min(times.length + 1, TAPS)} of ${TAPS}`}
-        className="relative my-6 aspect-square w-[min(72vw,42vh)] select-none rounded-full bg-tide/70 outline-none"
+        className="relative my-6 aspect-square w-[min(72vw,42vh)] short:my-3 short:w-[min(64vw,32vh)] select-none rounded-full bg-tide/70 outline-none"
       >
         <span className="glow absolute inset-0 rounded-full border-2 border-calm/50" />
         {ripples.map((r) => (
@@ -58,7 +58,7 @@ export default function Measure({ title = 'Tap each time you breathe in.', onDon
         <span className="relative text-2xl text-mist/90">{times.length >= TAPS ? 'Thank you' : 'Tap'}</span>
       </button>
 
-      <div className="flex flex-col items-center gap-3">
+      <div className="flex flex-col items-center gap-3 short:gap-1">
         <div className="flex gap-4" aria-hidden="true">
           {Array.from({ length: TAPS }, (_, i) => (
             <span

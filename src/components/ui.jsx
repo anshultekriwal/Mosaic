@@ -1,3 +1,5 @@
+import { loadContact } from '../lib/storage.js'
+
 // Shared layout and controls.
 
 // When Steady runs inside a frame (an embed or preview), a tel: link would
@@ -12,28 +14,51 @@ const framed = (() => {
   }
 })()
 
+const frameSafe = framed ? { target: '_blank', rel: 'noopener' } : {}
+
 export function CallLink({ number, ...rest }) {
-  return (
-    <a href={`tel:${number}`} {...(framed ? { target: '_blank', rel: 'noopener' } : {})} {...rest} />
-  )
+  return <a href={`tel:${number}`} {...frameSafe} {...rest} />
 }
 
-export function EmergencyLink() {
+// `sms:NUMBER?&body=` is the form both iOS Messages and Android accept.
+export function TextLink({ number, body, ...rest }) {
+  const query = body ? `?&body=${encodeURIComponent(body)}` : ''
+  return <a href={`sms:${number}${query}`} {...frameSafe} {...rest} />
+}
+
+export const contactName = (c) => c?.name?.trim() || 'my contact'
+
+const footLink =
+  'flex min-h-11 items-center justify-center px-3 text-center text-sm text-haze underline decoration-haze/40 underline-offset-4'
+
+/** Bottom of every session screen: trusted contact (if set) and 112. */
+export function EmergencyLink({ showContact = true }) {
+  const contact = showContact ? loadContact() : null
   return (
-    <CallLink
-      number="112"
-      className="flex min-h-11 items-center justify-center px-4 text-center text-sm text-haze underline decoration-haze/40 underline-offset-4"
-    >
-      Severe chest pain or feel faint? Call 112
-    </CallLink>
+    <div className="flex flex-col items-center">
+      {contact && (
+        <div className="flex flex-wrap justify-center">
+          <CallLink number={contact.phone} className={footLink}>
+            Call {contactName(contact)}
+          </CallLink>
+          <TextLink number={contact.phone} body={contact.message} className={footLink}>
+            Text {contactName(contact)}
+          </TextLink>
+        </div>
+      )}
+      <CallLink number="112" className={footLink}>
+        Severe chest pain or feel faint? Call 112
+      </CallLink>
+    </div>
   )
 }
 
 /**
  * Full-height session screen: never scrolls. `onLeave` shows a quiet exit
- * link top-left; `emergency` pins the 112 link to the bottom.
+ * link top-left; `emergency` pins the 112 link (and the trusted contact,
+ * unless `showContact` is false) to the bottom.
  */
-export function SessionScreen({ children, onLeave, emergency = true, stepKey }) {
+export function SessionScreen({ children, onLeave, emergency = true, showContact = true, stepKey }) {
   return (
     <div className="flex h-dvh flex-col overflow-hidden pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
       <div className="flex h-12 shrink-0 items-center px-3">
@@ -50,7 +75,7 @@ export function SessionScreen({ children, onLeave, emergency = true, stepKey }) 
       <main key={stepKey} className="settle flex min-h-0 flex-1 flex-col items-center justify-center px-6">
         {children}
       </main>
-      {emergency && <EmergencyLink />}
+      {emergency && <EmergencyLink showContact={showContact} />}
     </div>
   )
 }
@@ -80,7 +105,7 @@ export function BigButton({ children, onClick, variant = 'primary', className = 
     <button
       type="button"
       onClick={onClick}
-      className={`min-h-16 w-full max-w-sm rounded-3xl px-6 py-5 text-2xl font-semibold transition-transform duration-300 active:scale-[0.98] ${styles[variant]} ${className}`}
+      className={`min-h-16 w-full max-w-sm rounded-3xl px-6 py-5 text-2xl short:min-h-14 short:py-3 font-semibold transition-transform duration-300 active:scale-[0.98] ${styles[variant]} ${className}`}
       {...rest}
     >
       {children}

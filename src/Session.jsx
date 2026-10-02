@@ -125,7 +125,7 @@ export default function Session({ practice = false, onExit }) {
   const leave = step === 'summary' || step === 'practiceDone' ? null : onExit
 
   return (
-    <SessionScreen onLeave={leave} stepKey={step === 'pacer' ? `pacer-${round}` : step}>
+    <SessionScreen onLeave={leave} showContact={step !== 'support'} stepKey={step === 'pacer' ? `pacer-${round}` : step}>
       {content}
     </SessionScreen>
   )
