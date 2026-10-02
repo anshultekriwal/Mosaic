@@ -42,15 +42,17 @@ function FinishGame() {
   const [duration, setDuration] = useState(() =>
     stale ? (last?.duration ?? 60) : Math.max(5, Math.round(startedMs / 60000 / 5) * 5),
   )
+  const [intensity, setIntensity] = useState<Intensity | null>(() => game?.intensity ?? null)
   if (!game) return null
 
   const reflect = () => {
+    if (!intensity) return
     pending = {
       sport: game.sport,
       date: game.startedAt,
       duration,
       sessionType: game.sessionType,
-      intensity: game.intensity,
+      intensity,
       socialContext: game.socialContext,
       energyBefore: game.energyBefore,
       ...(game.feelingsBefore.length ? { feelingsBefore: game.feelingsBefore } : {}),
@@ -71,11 +73,17 @@ function FinishGame() {
           ? `This game was started ${fmtMinutes(Math.round(startedMs / 60000))} ago, so the timer probably kept running. Pick the real length below.`
           : 'Worked out from when you started. Adjust it if you need to, then tell us how it felt.'}
       </p>
-      <div className="mt-10">
+      <div className="mt-10 space-y-10">
         <DurationPicker value={duration} onChange={setDuration} />
+        <Chips
+          label="How hard was it?"
+          options={INTENSITIES.map((i) => ({ id: i.id, label: i.label, sub: i.hint }))}
+          value={intensity}
+          onChange={setIntensity}
+        />
       </div>
       <div className="mt-12 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <Button size="lg" disabled={duration <= 0} onClick={reflect}>
+        <Button size="lg" disabled={duration <= 0 || !intensity} onClick={reflect}>
           Game over. Reflect <Arrow />
         </Button>
         <Button variant="quiet" onClick={() => go('home')}>
@@ -176,7 +184,6 @@ function LogForm({ startLive }: { startLive: boolean }) {
         sport: finalSport,
         startedAt: new Date().toISOString(),
         sessionType: type,
-        intensity,
         socialContext: social,
         energyBefore,
         feelingsBefore: feelings,
@@ -289,12 +296,15 @@ function LogForm({ startLive }: { startLive: boolean }) {
           <Chips label="Played with" options={SOCIALS.map((s) => ({ id: s.id, label: s.label }))} value={social} onChange={setSocial} />
         </div>
 
-        <Chips
-          label="Intensity"
-          options={INTENSITIES.map((i) => ({ id: i.id, label: i.label, sub: i.hint }))}
-          value={intensity}
-          onChange={setIntensity}
-        />
+        {/* For a live game, intensity is asked when it ends: you only know how hard it was afterwards. */}
+        {mode === 'after' && (
+          <Chips
+            label="Intensity"
+            options={INTENSITIES.map((i) => ({ id: i.id, label: i.label, sub: i.hint }))}
+            value={intensity}
+            onChange={setIntensity}
+          />
+        )}
 
         <div className="max-w-md">
           <Scale label="Energy going in" value={energyBefore} onChange={setEnergyBefore} words={ENERGY_WORDS} />

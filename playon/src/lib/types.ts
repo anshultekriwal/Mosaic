@@ -57,10 +57,11 @@ export interface ActiveGame {
   sport: string
   startedAt: string // ISO
   sessionType: SessionType
-  intensity: Intensity
   socialContext: Social
   energyBefore: number // 1-5
   feelingsBefore: string[]
+  /** Asked when the game ends, not before. Older stored games may still carry one. */
+  intensity?: Intensity
 }
 
 export interface CheckIn {
