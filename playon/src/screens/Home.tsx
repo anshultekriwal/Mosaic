@@ -238,7 +238,16 @@ function LastGame({ last }: { last?: ActivitySession }) {
       <h2 id="h-last" className="eyebrow">
         Last time you played · {relativeDay(last.date)}
       </h2>
-      <p className="mt-4 text-4xl">{last.sport}</p>
+      <button
+        onClick={() => go('game', last.id)}
+        className="press group mt-4 inline-flex items-center gap-3 rounded-2xl px-3 py-1 hover:bg-cream"
+        aria-label={`${last.sport}: see everything about this game`}
+      >
+        <span className="text-4xl underline decoration-line-2 decoration-2 underline-offset-[10px] group-hover:decoration-forest">{last.sport}</span>
+        <span className="grid h-10 w-10 place-items-center rounded-full border border-line-2 text-forest transition-colors group-hover:border-forest group-hover:bg-forest group-hover:text-paper">
+          <Arrow />
+        </span>
+      </button>
       <p className="mt-2 text-ink-2">
         {sessionTypeLabel(last.sessionType)} · {socialLabel(last.socialContext)}
         {last.result && <> · {resultLabel(last.result)}</>}
@@ -262,6 +271,9 @@ function LastGame({ last }: { last?: ActivitySession }) {
           </span>
         </blockquote>
       )}
+      <LinkArrow className="mt-8" onClick={() => go('game', last.id)}>
+        See everything about this game
+      </LinkArrow>
     </section>
   )
 }

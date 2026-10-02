@@ -11,6 +11,7 @@ import Season from './screens/Season'
 import Insights from './screens/Insights'
 import Reset from './screens/Reset'
 import Profile from './screens/Profile'
+import Game from './screens/Game'
 
 const NAV: { id: Route; label: string; icon: ReactNode }[] = [
   { id: 'home', label: 'Home', icon: <IconHome /> },
@@ -59,6 +60,8 @@ export default function App() {
         return <Insights focus={param} query={query} />
       case 'reset':
         return <Reset exercise={param} />
+      case 'game':
+        return <Game id={param} />
       case 'profile':
         return <Profile />
       default:
@@ -68,7 +71,7 @@ export default function App() {
 
   if (immersive) return <main key={route + param}>{screen}</main>
 
-  const active = route === 'reset' ? 'home' : route
+  const active = route === 'reset' ? 'home' : route === 'game' ? (query.includes('from=profile') ? 'profile' : 'home') : route
   // The Finish screen shows the stopped clock, so the ticking pill would contradict it.
   const livePill = !!data.active && !(route === 'play' && param === 'finish')
   return (

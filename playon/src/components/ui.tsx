@@ -6,7 +6,7 @@ export function cx(...xs: (string | false | null | undefined)[]) {
 
 /* ---------- routing ---------- */
 
-export type Route = 'welcome' | 'onboarding' | 'home' | 'play' | 'season' | 'insights' | 'reset' | 'profile' | 'demo'
+export type Route = 'welcome' | 'onboarding' | 'home' | 'play' | 'season' | 'insights' | 'reset' | 'profile' | 'game' | 'demo'
 
 type Loc = { route: Route; param?: string; query: string }
 
@@ -95,6 +95,8 @@ export const setQuery = (query: string) => {
  */
 function parentOf(l: Loc): Loc {
   if (l.route === 'reset' && l.param) return { route: 'reset', query: '' }
+  // A game's page goes back to where it was opened from (Profile's history), else Home.
+  if (l.route === 'game') return { route: l.query.includes('from=profile') ? 'profile' : 'home', query: '' }
   if (l.route === 'play' && l.param === 'reflect') return { route: 'play', query: '' }
   if (l.route === 'home' || l.route === 'onboarding') return { route: 'welcome', query: '' }
   // play (incl. start and finish), season, insights (any filter), reset, profile, welcome

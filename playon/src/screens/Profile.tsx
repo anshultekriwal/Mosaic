@@ -125,14 +125,18 @@ export default function Profile() {
             <ul className="border-t border-line">
               {(showAll ? sessions : sessions.slice(0, 8)).map((s) => (
                 <li key={s.id} className="flex flex-wrap items-center justify-between gap-3 border-b border-line py-4">
-                  <div className="min-w-0">
-                    <p className="text-xl">
+                  <button
+                    onClick={() => go('game', s.id, 'from=profile')}
+                    className="press group min-w-0 rounded-xl text-left"
+                    aria-label={`${s.sport} on ${shortDate(s.date)}: see everything about this game`}
+                  >
+                    <p className="text-xl underline decoration-transparent underline-offset-4 group-hover:decoration-forest">
                       {s.sport} <span className="font-sans text-sm text-ink-3">· {s.duration} min · {socialLabel(s.socialContext)}</span>
                     </p>
                     <p className="text-xs text-ink-3">
                       {shortDate(s.date)} · felt {moodLabel(s.moodAfter).toLowerCase()}
                     </p>
-                  </div>
+                  </button>
                   <div className="flex items-center gap-4">
                     <Stars value={s.enjoyment} size={14} />
                     {pendingDelete === s.id ? (
