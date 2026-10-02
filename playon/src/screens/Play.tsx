@@ -1,59 +1,56 @@
-import { useEffect, useState } from 'react'
-import { Arrow, Button, Chips, cx, go, PageHeader } from '../components/ui'
-import { getData, useData } from '../lib/store'
+import { useState, type ReactNode } from 'react'
+import { Arrow, Button, Chips, cx, PageHeader, StarInput } from '../components/ui'
+import { actions, getData, uid, useData } from '../lib/store'
 import { addDays, toLocalInput } from '../lib/dates'
-import { INTENSITIES, SESSION_TYPES, SOCIALS } from '../lib/meta'
-import type { ActivitySession, Intensity, SessionType, Social } from '../lib/types'
-import PostGame from './PostGame'
-
-export type Draft = Pick<
-  ActivitySession,
-  'sport' | 'date' | 'duration' | 'sessionType' | 'intensity' | 'socialContext'
->
-
-// Survives the hop from the form to the full-screen reflection.
-let pending: Draft | null = null
+import { ENERGY_WORDS, INTENSITIES, MOODS, SESSION_TYPES, SOCIALS, socialLabel } from '../lib/meta'
+import type { ActivitySession, Intensity, Mood, SessionType, Social } from '../lib/types'
+import { Complete } from './PostGame'
 
 const DURATIONS = [30, 45, 60, 75, 90, 120]
 const snap = (m: number) => DURATIONS.reduce((a, d) => (Math.abs(d - m) < Math.abs(a - m) ? d : a))
+const fmtDuration = (d: number) => (d < 60 ? `${d} min` : d % 60 ? `${Math.floor(d / 60)}h ${d % 60}` : `${d / 60}h`)
 
-export default function Play({ step }: { step?: string }) {
-  return step === 'reflect' ? <Reflect /> : <LogForm />
+// Said back as soon as someone names a feeling, before anything else is asked.
+const AFTER: Partial<Record<Mood, string>> = {
+  frustrated: 'That’s a normal way to feel after a game. Let’s note it, then you can let it go.',
+  drained: 'Sounds like it took a lot out of you. Be gentle with yourself tonight.',
+  neutral: 'Not every game has to be a big one.',
 }
 
-function Reflect() {
-  // Take the draft once; clearing it means Back/refresh can't log the same session twice.
-  const [draft] = useState(() => {
-    const d = pending
-    pending = null
-    return d
-  })
-  useEffect(() => {
-    if (!draft) go('play')
-  }, [draft])
-  return draft ? <PostGame draft={draft} /> : null
-}
-
-function LogForm() {
+export default function Play() {
   const data = useData()
   const user = data.user!
   const sports = [...new Set([...user.sports, ...data.sessions.map((s) => s.sport)])]
   const lastOf = (sp: string) => [...getData().sessions].reverse().find((s) => s.sport === sp)
+  const prev = lastOf(user.primarySport)
 
+  // How it felt
+  const [mood, setMood] = useState<Mood | null>(null)
+  const [note, setNote] = useState('')
+  const [enjoyment, setEnjoyment] = useState(0)
+  const [energyBefore, setEnergyBefore] = useState(3)
+  const [energyAfter, setEnergyAfter] = useState(3)
+
+  // The game, pre-filled from last time
+  const [editing, setEditing] = useState(false)
   const [sport, setSport] = useState(user.primarySport)
   const [other, setOther] = useState('')
-  const [duration, setDuration] = useState(snap(lastOf(user.primarySport)?.duration ?? 60))
+  const [duration, setDuration] = useState(snap(prev?.duration ?? 60))
+  const [social, setSocial] = useState<Social>(prev?.socialContext ?? 'friends')
   const [type, setType] = useState<SessionType>('match')
-  const [social, setSocial] = useState<Social>(lastOf(user.primarySport)?.socialContext ?? 'friends')
   const [intensity, setIntensity] = useState<Intensity>('moderate')
   const [day, setDay] = useState<'today' | 'yesterday' | 'other'>('today')
   const [otherDate, setOtherDate] = useState(toLocalInput(addDays(new Date(), -2)))
 
-  const finalSport = sport === '__other' ? other.trim() : sport
-  const valid = finalSport.length > 0 && duration > 0
+  const [saved, setSaved] = useState<ActivitySession | null>(null)
 
-  const submit = () => {
-    if (!valid) return
+  const finalSport = sport === '__other' ? other.trim() : sport
+  const ready = !!mood && enjoyment > 0 && finalSport.length > 0
+
+  if (saved) return <Complete s={saved} />
+
+  const save = () => {
+    if (!ready) return
     let date = new Date()
     if (day === 'yesterday') {
       date = addDays(date, -1)
@@ -62,130 +59,215 @@ function LogForm() {
       const [y, m, d] = otherDate.split('-').map(Number)
       date = new Date(y, m - 1, d, 18)
     }
-    pending = {
+    const s: ActivitySession = {
+      id: uid(),
+      userId: user.id,
       sport: finalSport,
       date: date.toISOString(),
       duration,
       sessionType: type,
       intensity,
       socialContext: social,
+      enjoyment,
+      energyBefore,
+      energyAfter,
+      moodAfter: mood!,
+      standouts: [],
+      reflection: note.trim(),
     }
-    go('play', 'reflect')
+    actions.addSession(s)
+    setSaved(s)
+    window.scrollTo({ top: 0 })
   }
-
-  const [more, setMore] = useState(false)
 
   return (
     <div className="mx-auto max-w-2xl">
-      <PageHeader title="Log a session" sub="Four quick taps, then tell us how it felt." />
+      <PageHeader title="How did playing feel?" sub="Take a moment. Start with how you feel; the game details come last." />
 
       <form
-        className="mt-8 space-y-8"
+        className="mt-8 space-y-9"
         onSubmit={(e) => {
           e.preventDefault()
-          submit()
+          save()
         }}
       >
-        <div>
-          <Chips
-            label="What did you play?"
-            options={[...sports.map((s) => ({ id: s, label: s })), { id: '__other', label: '+ Other' }]}
-            value={sport}
-            onChange={(s) => {
-              setSport(s)
-              const l = lastOf(s)
-              if (l) {
-                setDuration(snap(l.duration))
-                setSocial(l.socialContext)
-              }
-            }}
-          />
-          {sport === '__other' && (
-            <div className="rise mt-3 max-w-sm">
-              <label htmlFor="other-sport" className="sr-only">
-                Activity name
-              </label>
-              <input
-                id="other-sport"
-                autoFocus
-                value={other}
-                onChange={(e) => setOther(e.target.value)}
-                placeholder="e.g. Bouldering"
-                className="h-11 w-full rounded-full border border-line-2 bg-paper/60 px-5 outline-none focus:border-forest"
-              />
-            </div>
-          )}
-        </div>
-
-        <Chips
-          label="How long?"
-          options={DURATIONS.map((d) => ({ id: String(d), label: d < 60 ? `${d} min` : d % 60 ? `${Math.floor(d / 60)}h ${d % 60}` : `${d / 60}h` }))}
-          value={String(duration)}
-          onChange={(d) => setDuration(Number(d))}
-        />
-
-        <Chips label="Who with?" options={SOCIALS.map((s) => ({ id: s.id, label: s.label }))} value={social} onChange={setSocial} />
-
-        <fieldset>
-          <legend className="eyebrow mb-3">When?</legend>
-          <div className="flex flex-wrap items-center gap-2">
-            {(['today', 'yesterday', 'other'] as const).map((d) => (
+        <Q label="How do you feel right now?">
+          <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="How you feel">
+            {MOODS.map((m) => (
               <button
-                key={d}
+                key={m.id}
                 type="button"
-                aria-pressed={day === d}
-                onClick={() => setDay(d)}
+                role="radio"
+                aria-checked={mood === m.id}
+                onClick={() => setMood(m.id)}
                 className={cx(
-                  'press rounded-full border px-4 py-2 text-sm capitalize',
-                  day === d ? 'border-forest bg-forest text-paper' : 'border-line-2 bg-paper/60 hover:border-ink-3',
+                  'press flex flex-col items-center gap-1 rounded-2xl border py-3 text-sm',
+                  mood === m.id ? 'border-forest bg-sage-soft' : 'border-line bg-paper/60 hover:border-ink-3',
                 )}
               >
-                {d === 'other' ? 'Earlier' : d}
+                <span className="text-2xl" aria-hidden>
+                  {m.glyph}
+                </span>
+                {m.label}
               </button>
             ))}
-            {day === 'other' && (
-              <label className="rise">
-                <span className="sr-only">Date played</span>
-                <input
-                  type="date"
-                  value={otherDate}
-                  max={toLocalInput(new Date())}
-                  onChange={(e) => setOtherDate(e.target.value)}
-                  className="h-10 rounded-full border border-line-2 bg-transparent px-4 text-sm outline-none focus:border-forest"
+          </div>
+          {mood && AFTER[mood] && (
+            <p className="rise mt-3 text-sm text-ink-2" aria-live="polite">
+              {AFTER[mood]}
+            </p>
+          )}
+        </Q>
+
+        <Q label="What's on your mind?" hint="Optional. Only you will see this.">
+          <textarea
+            id="note"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            maxLength={280}
+            rows={3}
+            placeholder="A moment you liked, a worry, something you’re proud of…"
+            className="w-full resize-none rounded-2xl border border-line-2 bg-paper/60 px-4 py-3 outline-none focus:border-forest"
+          />
+        </Q>
+
+        <Q label="Did you enjoy it?">
+          <StarInput value={enjoyment} onChange={setEnjoyment} />
+        </Q>
+
+        <Q label="Your energy, before and after">
+          <div className="space-y-2">
+            <EnergyRow label="Before" value={energyBefore} onChange={setEnergyBefore} />
+            <EnergyRow label="After" value={energyAfter} onChange={setEnergyAfter} />
+          </div>
+        </Q>
+
+        <Q label="The game">
+          <div className="rounded-2xl border border-line bg-paper/60">
+            <div className="flex items-center justify-between gap-3 px-4 py-3">
+              <p className="min-w-0 text-ink-2">
+                <span className="font-semibold text-ink">{finalSport || 'Something else'}</span> · {fmtDuration(duration)} ·{' '}
+                {social === 'solo' ? 'solo' : `with ${socialLabel(social).toLowerCase()}`} · {day === 'other' ? 'earlier' : day}
+              </p>
+              <button
+                type="button"
+                aria-expanded={editing}
+                onClick={() => setEditing((x) => !x)}
+                className="shrink-0 text-sm font-medium text-forest underline underline-offset-4"
+              >
+                {editing ? 'Done' : 'Change'}
+              </button>
+            </div>
+            {editing && (
+              <div className="rise space-y-6 border-t border-line px-4 py-5">
+                <div>
+                  <Chips
+                    label="What did you play?"
+                    options={[...sports.map((s) => ({ id: s, label: s })), { id: '__other', label: '+ Other' }]}
+                    value={sport}
+                    onChange={(s) => {
+                      setSport(s)
+                      const l = lastOf(s)
+                      if (l) {
+                        setDuration(snap(l.duration))
+                        setSocial(l.socialContext)
+                      }
+                    }}
+                  />
+                  {sport === '__other' && (
+                    <input
+                      id="other-sport"
+                      aria-label="Activity name"
+                      autoFocus
+                      value={other}
+                      onChange={(e) => setOther(e.target.value)}
+                      placeholder="e.g. Bouldering"
+                      className="rise mt-3 h-11 w-full max-w-sm rounded-full border border-line-2 bg-paper px-5 outline-none focus:border-forest"
+                    />
+                  )}
+                </div>
+                <Chips
+                  label="How long?"
+                  options={DURATIONS.map((d) => ({ id: String(d), label: fmtDuration(d) }))}
+                  value={String(duration)}
+                  onChange={(d) => setDuration(Number(d))}
                 />
-              </label>
+                <Chips label="Who with?" options={SOCIALS.map((s) => ({ id: s.id, label: s.label }))} value={social} onChange={setSocial} />
+                <div>
+                  <Chips
+                    label="When?"
+                    options={[
+                      { id: 'today', label: 'Today' },
+                      { id: 'yesterday', label: 'Yesterday' },
+                      { id: 'other', label: 'Earlier' },
+                    ]}
+                    value={day}
+                    onChange={setDay}
+                  />
+                  {day === 'other' && (
+                    <input
+                      type="date"
+                      aria-label="Date played"
+                      value={otherDate}
+                      max={toLocalInput(new Date())}
+                      onChange={(e) => setOtherDate(e.target.value)}
+                      className="rise mt-3 h-10 rounded-full border border-line-2 bg-transparent px-4 text-sm outline-none focus:border-forest"
+                    />
+                  )}
+                </div>
+                <Chips label="Type" options={SESSION_TYPES} value={type} onChange={setType} />
+                <Chips label="Intensity" options={INTENSITIES.map((i) => ({ id: i.id, label: i.label }))} value={intensity} onChange={setIntensity} />
+              </div>
             )}
           </div>
-        </fieldset>
+        </Q>
 
-        <div className="rounded-2xl border border-line">
-          <button
-            type="button"
-            aria-expanded={more}
-            onClick={() => setMore((m) => !m)}
-            className="flex w-full items-center justify-between px-4 py-3 text-sm font-medium text-ink-2"
-          >
-            <span>
-              More details <span className="font-normal text-ink-3">· {SESSION_TYPES.find((t) => t.id === type)?.label}, {INTENSITIES.find((i) => i.id === intensity)?.label.toLowerCase()}</span>
-            </span>
-            <span className={cx('transition-transform', more && 'rotate-45')} aria-hidden>
-              +
-            </span>
-          </button>
-          {more && (
-            <div className="rise space-y-6 border-t border-line px-4 py-5">
-              <Chips label="Type" options={SESSION_TYPES} value={type} onChange={setType} />
-              <Chips label="Intensity" options={INTENSITIES.map((i) => ({ id: i.id, label: i.label }))} value={intensity} onChange={setIntensity} />
-            </div>
-          )}
-        </div>
-
-        <div className="flex justify-end">
-          <Button type="submit" size="lg" disabled={!valid} className="w-full sm:w-auto">
-            Next: how did it feel? <Arrow />
+        <div>
+          <Button type="submit" size="lg" disabled={!ready} className="w-full sm:w-auto">
+            Save reflection <Arrow />
           </Button>
+          {!ready && <p className="mt-3 text-xs text-ink-3">Choose how you feel and whether you enjoyed it to save.</p>}
         </div>
       </form>
+    </div>
+  )
+}
+
+function Q({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
+  return (
+    <fieldset>
+      <legend className="mb-3">
+        <span className="block font-semibold">{label}</span>
+        {hint && <span className="block text-sm text-ink-3">{hint}</span>}
+      </legend>
+      {children}
+    </fieldset>
+  )
+}
+
+function EnergyRow({ label, value, onChange }: { label: string; value: number; onChange: (n: number) => void }) {
+  return (
+    <div className="grid grid-cols-[56px_1fr] items-center gap-3">
+      <span className="text-sm text-ink-2">{label}</span>
+      <div className="grid grid-cols-5 gap-1.5" role="radiogroup" aria-label={`Energy ${label.toLowerCase()}, 1 to 5`}>
+        {ENERGY_WORDS.map((w, k) => (
+          <button
+            key={w}
+            type="button"
+            role="radio"
+            aria-checked={value === k + 1}
+            aria-label={w}
+            title={w}
+            onClick={() => onChange(k + 1)}
+            className={cx(
+              'press h-10 rounded-xl border text-sm tabular',
+              value === k + 1 ? 'border-forest bg-forest text-paper' : 'border-line-2 bg-paper/60 hover:border-ink-3',
+            )}
+          >
+            {k + 1}
+          </button>
+        ))}
+      </div>
     </div>
   )
 }

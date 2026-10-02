@@ -37,8 +37,8 @@ export function ask(question: string, all: ActivitySession[], now = new Date()):
       basedOn: pool.length,
       lines: [
         sport
-          ? `You've logged ${plural(pool.length, `${sport} session`)} so far — not quite enough to see a pattern yet.`
-          : `You've logged ${plural(pool.length, 'session')} so far — not quite enough to see a pattern yet.`,
+          ? `You've logged ${plural(pool.length, `${sport} session`)} so far. That's not quite enough to see a pattern yet.`
+          : `You've logged ${plural(pool.length, 'session')} so far. That's not quite enough to see a pattern yet.`,
         'A few more sessions and this will start to say something useful.',
       ],
     }
@@ -55,7 +55,7 @@ export function ask(question: string, all: ActivitySession[], now = new Date()):
       lines.push(
         `In the last three weeks you've logged ${plural(recent.length, subject.replace(/s$/, ''))}, averaging ${fmt1(r)}/5 enjoyment. Before that you averaged ${fmt1(e)}/5.`,
       )
-      if (r >= e - 0.15) lines.push(`So on paper, your enjoyment hasn't dropped — it's ${r > e + 0.15 ? 'actually up' : 'about the same'}.`)
+      if (r >= e - 0.15) lines.push(`So on paper, your enjoyment hasn't dropped. It's ${r > e + 0.15 ? 'actually up' : 'about the same'}.`)
     }
     const low = pool.filter((s) => s.enjoyment <= 3)
     if (low.length) {
@@ -70,7 +70,7 @@ export function ask(question: string, all: ActivitySession[], now = new Date()):
         `Your ${plural(low.length, 'lower-rated session')} (3/5 or below)${reasons.length ? ` have something in common: ${reasons.join(', ')}.` : ' don’t share an obvious pattern yet.'}`,
       )
     } else {
-      lines.push(`None of your ${subject} have been rated below 4/5 — which is worth noticing too.`)
+      lines.push(`None of your ${subject} have been rated below 4/5, which is worth noticing too.`)
     }
     return { lines, basedOn: pool.length }
   }
@@ -114,7 +114,7 @@ export function ask(question: string, all: ActivitySession[], now = new Date()):
     const soc = mode(top.map((s) => s.socialContext))
     const median = top.map((s) => s.duration).sort((a, b) => a - b)[Math.floor(top.length / 2)]
     lines.push(
-      `Your ${plural(top.length, 'five-star session')} were most often with ${soc === 'solo' ? 'nobody else — solo' : soc}, and typically around ${median} minutes.`,
+      `Your ${plural(top.length, 'five-star session')} were most often with ${soc === 'solo' ? 'nobody else (solo)' : soc}, and typically around ${median} minutes.`,
     )
   }
   const insights = pool.length >= MIN_SESSIONS ? computeInsights(pool) : []

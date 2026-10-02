@@ -31,7 +31,7 @@ const ROWS: Row[] = [
   [31, 'Pickleball', 75, 'practice', 'solo', 'moderate', 3, 3, 3, 'neutral', ['I learned something'], 'Drilled third-shot drops. Useful, a bit lonely.'],
   [27, 'Table Tennis', 50, 'match', 'club', 'moderate', 4, 3, 4, 'energized', ['I played really well']],
   [26, 'Pickleball', 60, 'casual', 'family', 'easy', 5, 2, 4, 'happy', ['I had fun with friends'], 'Taught my sister to serve. She is already better than me.'],
-  // a quiet stretch — a deliberate recovery gap
+  // a quiet stretch: a deliberate recovery gap
   [16, 'Pickleball', 105, 'match', 'tournament', 'hard', 2, 4, 2, 'frustrated', ['I felt competitive', 'It was challenging'], 'Played to win, not to play. Noted.'],
   [13, 'Pickleball', 60, 'casual', 'friends', 'moderate', 5, 3, 5, 'energized', ['I had fun with friends']],
   [12, 'Table Tennis', 40, 'casual', 'friends', 'easy', 4, 2, 4, 'calm', ['I needed a break']],

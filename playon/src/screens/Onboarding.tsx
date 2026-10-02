@@ -157,7 +157,7 @@ export default function Onboarding() {
               <Q
                 eyebrow="Your weekly intention"
                 title="How many times a week would feel good?"
-                sub="An intention, not a rule. Miss it and nothing breaks — your season carries on."
+                sub="An intention, not a rule. Miss it and nothing breaks. Your season carries on."
               />
               <div className="mt-12 flex items-center gap-6">
                 <div className="flex gap-2" role="radiogroup" aria-label="Sessions per week">
@@ -208,8 +208,8 @@ export default function Onboarding() {
                 </div>
               </dl>
               <p className="mt-10 max-w-md text-ink-2">
-                After every session, take thirty seconds to notice how it felt. After five, your insights start to show
-                what keeps you coming back.
+                After you play, take a moment to notice how it felt. Feeling nervous or flat? The Calm tab is always one
+                tap away.
               </p>
             </div>
           )}

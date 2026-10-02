@@ -28,7 +28,7 @@ function commit(next: AppData) {
   try {
     localStorage.setItem(KEY, JSON.stringify(next))
   } catch {
-    /* storage unavailable (private mode) — keep working in memory */
+    /* storage unavailable (private mode); keep working in memory */
   }
   listeners.forEach((l) => l())
 }

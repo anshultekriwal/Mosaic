@@ -12,7 +12,7 @@ export const moodLabel = (m: Mood) => MOODS.find((x) => x.id === m)?.label ?? m
 export const moodGlyph = (m: Mood) => MOODS.find((x) => x.id === m)?.glyph ?? ''
 export const POSITIVE_MOODS: Mood[] = ['happy', 'calm', 'energized']
 
-// Fixed order — colour follows the entity, never its rank.
+// Fixed order: colour follows the entity, never its rank.
 export const SOCIALS: { id: Social; label: string; color: string }[] = [
   { id: 'friends', label: 'Friends', color: 'var(--c-friends)' },
   { id: 'club', label: 'Club', color: 'var(--c-club)' },

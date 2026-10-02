@@ -17,14 +17,9 @@ export default function Season() {
     <div className="space-y-8">
       <PageHeader
         title={ended ? 'Season complete' : `Week ${summary.weekNumber} of 12`}
-        sub={`Your ${season.name}. No streaks to break: every session plants a tree, and quiet weeks are part of the landscape too.`}
+        sub={`Your ${season.name}. Every game you reflect on plants a tree. Quiet weeks are part of the landscape too, and nothing here can be broken.`}
       />
 
-      <dl className="grid grid-cols-3 gap-3">
-        <Fact label="This week" value={`${summary.thisWeek}/${season.weeklyGoal}`} />
-        <Fact label="Sessions" value={`${summary.sessions.length}`} />
-        <Fact label="Hours played" value={`${Math.round(summary.minutes / 60)}`} />
-      </dl>
 
       <Landscape weeks={weeks} />
 
@@ -44,15 +39,6 @@ export default function Season() {
         </div>
         <Timeline weeks={weeks} goal={season.weeklyGoal} />
       </section>
-    </div>
-  )
-}
-
-function Fact({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-2xl border border-line bg-paper px-4 py-3">
-      <dt className="text-xs text-ink-3">{label}</dt>
-      <dd className="mt-1 text-2xl font-bold leading-none tabular">{value}</dd>
     </div>
   )
 }
@@ -208,7 +194,7 @@ function Landscape({ weeks }: { weeks: WeekSlot[] }) {
             <line x1="6" x2="6" y1="16" y2="6" stroke="var(--color-forest)" />
             <ellipse cx="6" cy="6" rx="5" ry="6" fill="var(--color-forest)" />
           </svg>
-          A session — taller means more enjoyed
+          A game. Taller means more enjoyed
         </span>
         <span className="flex items-center gap-2">
           <svg width="12" height="12" aria-hidden>
@@ -342,7 +328,7 @@ function Timeline({ weeks, goal }: { weeks: WeekSlot[]; goal: number }) {
                 </ul>
               ) : (
                 <p className="text-sm text-ink-3">
-                  {w.isCurrent ? 'Nothing yet — plenty of week left.' : 'A rest week. Recovery is part of the season.'}
+                  {w.isCurrent ? 'Nothing yet, and there’s plenty of week left.' : 'A rest week. Recovery is part of the season.'}
                 </p>
               )}
               {ms.map((m) => (

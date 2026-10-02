@@ -85,13 +85,13 @@ export default function Profile() {
       <section aria-labelledby="h-history" className="grid gap-6 lg:grid-cols-[1fr_2fr]">
         <div>
           <h2 id="h-history" className="text-xl font-bold">
-            Activity history
+            Your reflections
           </h2>
-          <p className="mt-2 text-sm text-ink-2">{sessions.length} sessions logged.</p>
+          <p className="mt-2 text-sm text-ink-2">{sessions.length} games reflected on.</p>
         </div>
         <div>
           {sessions.length === 0 ? (
-            <p className="text-ink-3">Nothing yet. Your first session will show up here.</p>
+            <p className="text-ink-3">Nothing yet. Your first reflection will show up here.</p>
           ) : (
             <ul className="border-t border-line">
               {(showAll ? sessions : sessions.slice(0, 5)).map((s) => (

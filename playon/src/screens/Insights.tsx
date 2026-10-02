@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Arrow, Button, cx, go, PageHeader, Rule, useCountUp } from '../components/ui'
+import { Arrow, Button, cx, go, PageHeader, Rule } from '../components/ui'
 import { sortedSessions, useData } from '../lib/store'
 import {
   computeInsights,
@@ -35,18 +35,12 @@ export default function Insights({ focus }: { focus?: string }) {
 
   return (
     <div className="space-y-10">
-      <PageHeader title="Insights" sub="What your logged sessions say about how playing affects you." />
-
-      <dl className="grid grid-cols-3 gap-3">
-        <Hero value={stats.count} label="Sessions" decimals={0} />
-        <Hero value={stats.enjoyment} label="Avg enjoyment" decimals={1} suffix="/5" />
-        <Hero value={stats.energyChangePct} label="Energy change" decimals={0} suffix="%" signed />
-      </dl>
+      <PageHeader title="Patterns" sub={`What seems to lift your mood and what wears you down, from ${stats.count} reflections.`} />
 
       {strongest && (
         <section aria-labelledby="h-strong" className="rounded-3xl bg-forest p-6 text-paper sm:p-8">
           <h2 id="h-strong" className="text-sm font-semibold text-sage">
-            Your strongest pattern
+            What seems to help you most
           </h2>
           <p className="rise mt-3 text-2xl font-bold leading-snug sm:text-3xl">{strongest}</p>
           <button
@@ -60,7 +54,7 @@ export default function Insights({ focus }: { focus?: string }) {
 
       <section aria-labelledby="h-patterns">
         <h2 id="h-patterns" className="text-xl font-bold">
-          Patterns
+          Everything we've noticed
         </h2>
         <p className="mt-1 text-sm text-ink-3">Tap one to see where it comes from.</p>
         <Rule className="mt-4" />
@@ -80,20 +74,6 @@ export default function Insights({ focus }: { focus?: string }) {
       </section>
 
       <AskSection sessions={sessions} />
-    </div>
-  )
-}
-
-function Hero({ value, label, decimals, suffix, signed }: { value: number; label: string; decimals: number; suffix?: string; signed?: boolean }) {
-  const v = useCountUp(value)
-  const shown = `${signed && value >= 0 ? '+' : signed ? '−' : ''}${Math.abs(v).toFixed(decimals)}`
-  return (
-    <div className="rounded-2xl border border-line bg-paper px-4 py-3">
-      <dt className="text-xs text-ink-3">{label}</dt>
-      <dd className="mt-1 text-2xl font-bold leading-none tabular" aria-label={`${signed && value >= 0 ? '+' : ''}${value.toFixed(decimals)}${suffix ?? ''}`}>
-        {shown}
-        {suffix && <span className="text-sm font-semibold text-ink-3">{suffix}</span>}
-      </dd>
     </div>
   )
 }
@@ -146,7 +126,7 @@ function MapChart({ sessions, insight, onClear }: { sessions: ActivitySession[];
       <div className="flex flex-wrap items-end justify-between gap-6">
         <div>
           <h2 id="h-map" className="text-xl font-bold">
-            Every session
+            How each game felt
           </h2>
           <p className="mt-1 max-w-md text-sm text-ink-3">One dot per session. Bigger dots were harder.</p>
         </div>
@@ -180,7 +160,7 @@ function MapChart({ sessions, insight, onClear }: { sessions: ActivitySession[];
       </div>
 
       {/* legend = filter */}
-      <div className="mt-6 flex flex-wrap items-center gap-2" role="group" aria-label="Who you played with — toggle to filter">
+      <div className="mt-6 flex flex-wrap items-center gap-2" role="group" aria-label="Who you played with. Toggle to filter.">
         {present.map((so) => {
           const off = hidden.includes(so.id)
           return (
@@ -435,7 +415,7 @@ function AskSection({ sessions }: { sessions: ActivitySession[] }) {
       <h2 id="h-ask" className="text-xl font-bold">
         Ask PLAY ON
       </h2>
-      <p className="mt-1 text-sm text-ink-2">Answers come from your logged sessions only.</p>
+      <p className="mt-1 text-sm text-ink-2">Ask about how playing affects you. Answers come only from your own reflections.</p>
       <form
         className="mt-6 flex gap-2"
         onSubmit={(e) => {
@@ -473,7 +453,7 @@ function AskSection({ sessions }: { sessions: ActivitySession[] }) {
             ))}
           </div>
           <p className="mt-5 text-xs text-ink-3">
-            An observation from {answer.basedOn} logged session{answer.basedOn === 1 ? '' : 's'} — not medical or coaching advice.
+            Based on {answer.basedOn} reflection{answer.basedOn === 1 ? '' : 's'}. This is an observation, not medical or coaching advice.
           </p>
         </div>
       )}

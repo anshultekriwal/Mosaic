@@ -195,7 +195,7 @@ export function StarInput({ value, onChange }: { value: number; onChange: (n: nu
             type="button"
             role="radio"
             aria-checked={value === i}
-            aria-label={`${i} — ${words[i - 1]}`}
+            aria-label={`${i}: ${words[i - 1]}`}
             onClick={() => onChange(i)}
             className="press grid h-12 w-12 place-items-center rounded-full hover:bg-ember-soft"
           >

@@ -99,7 +99,7 @@ export function computeInsights(sessions: ActivitySession[]): Insight[] {
   if (sessions.length < MIN_SESSIONS) return []
   const out: Insight[] = []
 
-  // 1 — who you play with
+  // 1. who you play with
   const social = groupBy(sessions, 'social').filter((g) => g.sessions.length >= MIN_GROUP)
   if (social.length >= 2) {
     const best = [...social].sort((a, b) => b.enjoyment - a.enjoyment)[0]
@@ -120,7 +120,7 @@ export function computeInsights(sessions: ActivitySession[]): Insight[] {
     }
   }
 
-  // 2 — session length and energy
+  // 2. session length and energy
   const short = sessions.filter((s) => durationBucket(s.duration) === 'short')
   const long = sessions.filter((s) => durationBucket(s.duration) === 'long')
   if (short.length >= MIN_GROUP && long.length >= MIN_GROUP) {
@@ -161,7 +161,7 @@ export function computeInsights(sessions: ActivitySession[]): Insight[] {
     }
   }
 
-  // 3 — competitive sessions and frustration
+  // 3. competitive sessions and frustration
   const comp = sessions.filter(isCompetitive)
   const compLow = comp.filter((s) => s.moodAfter === 'frustrated' || s.moodAfter === 'drained')
   if (compLow.length >= 2) {
@@ -180,7 +180,7 @@ export function computeInsights(sessions: ActivitySession[]): Insight[] {
     })
   }
 
-  // 4 — weekends
+  // 4. weekends
   const days = groupBy(sessions, 'day')
   if (days.length === 2 && days.every((g) => g.sessions.length >= MIN_GROUP)) {
     const [wd, we] = days
@@ -199,7 +199,7 @@ export function computeInsights(sessions: ActivitySession[]): Insight[] {
     }
   }
 
-  // 5 — low-energy days
+  // 5. low-energy days
   const lowStart = sessions.filter((s) => s.energyBefore <= 2)
   if (lowStart.length >= MIN_GROUP) {
     const l = avg(lowStart.map(lift))
@@ -219,7 +219,7 @@ export function computeInsights(sessions: ActivitySession[]): Insight[] {
     }
   }
 
-  // 6 — intensity
+  // 6. intensity
   const ints = groupBy(sessions, 'intensity').filter((g) => g.sessions.length >= MIN_GROUP)
   const hard = ints.find((g) => g.key === 'hard')
   const softer = sessions.filter((s) => s.intensity !== 'hard')

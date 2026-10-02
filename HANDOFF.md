@@ -29,6 +29,15 @@ Neither app has a public deployment yet. **This is the main open task.**
 
 **Stack:** TypeScript, React 19, Vite 8, Tailwind 4, and hand-built SVG charts with no chart library. Data lives in `localStorage` under the key `playon:v1`. Routing is hash-based with an in-memory fallback, so the app also works inside sandboxed frames such as Artifacts.
 
+**Direction change (2 Oct, later): mental health first, not a tracker.** PLAY ON is now positioned as mental wellbeing for people who play sport: settle pre-game nerves, let tough games go, learn what lifts your mood.
+- Tabs renamed: Today, Season, **Reflect**, Patterns, **Calm** (route ids unchanged: home, season, play, insights, reset).
+- Today opens with "How's your head today?" and gives a kind reply to each mood plus one exercise. It adds a "Nervous before a game?" card and a daily thought. The "2 / 3" score is gone; this week is a plain sentence.
+- Reflect is one screen, feelings first: mood (with a gentle reply for hard moods), "What's on your mind?", enjoyment, energy before/after, and the game details last as one pre-filled line with a Change toggle.
+- After saving: a kind message instead of a stats grid. Frustrated or drained leads to a reset and the support card.
+- Calm adds **Settle pre-game nerves** (60 s, 4 in / 6 out) and a support card with Tele-MANAS 14416 / 1-800-891-4416 and 112 for emergencies (`SupportCard` in `Reset.tsx`).
+- Patterns and Season dropped the big number tiles.
+- Copy rule from the user: **no em dashes anywhere** in app text, docs or replies.
+
 **Navigation (after the declutter pass, 2 Oct):** five tabs: Home, Season, **Log** (raised centre button), Insights and Reset. Profile is the avatar in the top bar (mobile) or the name at the bottom of the sidebar (desktop). Reset is now a top-level tab rather than a hidden link.
 
 **Screens** (`playon/src/screens/`). Several were simplified in the declutter pass; the notes in brackets describe the current state:

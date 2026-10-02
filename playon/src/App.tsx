@@ -11,11 +11,11 @@ import Reset from './screens/Reset'
 import Profile from './screens/Profile'
 
 const NAV: { id: Route; label: string; icon: ReactNode }[] = [
-  { id: 'home', label: 'Home', icon: <IconHome /> },
+  { id: 'home', label: 'Today', icon: <IconHome /> },
   { id: 'season', label: 'Season', icon: <IconSeason /> },
-  { id: 'play', label: 'Log', icon: <IconPlus /> },
-  { id: 'insights', label: 'Insights', icon: <IconMap /> },
-  { id: 'reset', label: 'Reset', icon: <IconReset /> },
+  { id: 'play', label: 'Reflect', icon: <IconPlus /> },
+  { id: 'insights', label: 'Patterns', icon: <IconMap /> },
+  { id: 'reset', label: 'Calm', icon: <IconReset /> },
 ]
 
 export default function App() {
@@ -32,13 +32,13 @@ export default function App() {
     return route === 'onboarding' ? <Onboarding /> : <Welcome />
   }
 
-  // Post-game and the Reset Room exercises are full-bleed moments.
-  const immersive = (route === 'play' && param === 'reflect') || (route === 'reset' && !!param)
+  // The Calm exercises are full-bleed moments.
+  const immersive = route === 'reset' && !!param
 
   const screen = (() => {
     switch (route) {
       case 'play':
-        return <Play step={param} />
+        return <Play />
       case 'season':
         return <Season />
       case 'insights':
@@ -79,7 +79,7 @@ export default function App() {
               )}
             >
               {n.icon}
-              {n.id === 'play' ? 'Log a session' : n.label}
+              {n.id === 'play' ? 'Reflect on a game' : n.label}
             </a>
           ))}
         </nav>
@@ -200,7 +200,7 @@ export function Wordmark({ small, light }: { small?: boolean; light?: boolean })
   )
 }
 
-/* nav icons — 20px line icons */
+/* nav icons: 20px line icons */
 function I({ d }: { d: string }) {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>

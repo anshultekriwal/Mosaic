@@ -5,7 +5,7 @@ import { moodLabel } from '../lib/meta'
 import { shortDate } from '../lib/dates'
 import type { Mood } from '../lib/types'
 
-type ExerciseId = 'tough-game' | 'clear-head' | 'capture' | 'recovery'
+type ExerciseId = 'pre-game' | 'tough-game' | 'clear-head' | 'capture' | 'recovery'
 
 interface Exercise {
   id: ExerciseId
@@ -18,6 +18,15 @@ interface Exercise {
 }
 
 const EXERCISES: Exercise[] = [
+  {
+    id: 'pre-game',
+    when: 'If you’re nervous before playing',
+    title: 'Settle pre-game nerves',
+    length: '60 seconds',
+    blurb: 'Long, slow breaths out to calm your body before you start.',
+    nudge: 'Nerves mean you care. A minute of slow breathing can take the edge off.',
+    tone: 'bg-sky-soft',
+  },
   {
     id: 'tough-game',
     when: 'If you’re frustrated',
@@ -52,9 +61,11 @@ const EXERCISES: Exercise[] = [
     length: '2½ minutes',
     blurb: 'Five gentle stretches, thirty seconds each.',
     nudge: 'Your body might like a gentle stretch.',
-    tone: 'bg-sky-soft',
+    tone: 'bg-[#ebe4d4]',
   },
 ]
+
+export const exerciseById = (id: ExerciseId) => EXERCISES.find((e) => e.id === id)!
 
 export function suggestionFor(mood?: Mood): Exercise {
   const id: ExerciseId =
@@ -83,7 +94,7 @@ function RoomIndex() {
 
   return (
     <div className="space-y-8">
-      <PageHeader title="Reset" sub="A minute for yourself, after a game or any time." />
+      <PageHeader title="Calm" sub="Short exercises for your mind. Before a game, after one, or any time you need a minute." />
 
       <ul className="grid gap-3 sm:grid-cols-2">
         {[rec, ...EXERCISES.filter((e) => e.id !== rec.id)].map((e) => (
@@ -124,11 +135,30 @@ function RoomIndex() {
         </section>
       )}
 
-      <p className="max-w-xl text-xs text-ink-3">
-        If you're struggling with more than a tough game, please talk to someone you trust or a professional. PLAY ON
-        isn't a substitute for care.
-      </p>
+      <SupportCard />
     </div>
+  )
+}
+
+/** Shown wherever someone might need more than a breathing exercise. */
+export function SupportCard() {
+  return (
+    <section aria-labelledby="h-support" className="rounded-3xl border border-line bg-paper p-5 sm:p-6">
+      <h2 id="h-support" className="font-semibold">
+        Need to talk to someone?
+      </h2>
+      <p className="mt-1 max-w-xl text-sm text-ink-2">
+        If it's more than a tough game, you don't have to handle it alone. Tele-MANAS is India's free mental health line,
+        open 24 hours in many languages.
+      </p>
+      <p className="mt-3 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+        <a href="tel:14416" className="select-all text-2xl font-bold tabular text-forest">
+          14416
+        </a>
+        <span className="select-all text-sm text-ink-2 tabular">or 1-800-891-4416</span>
+      </p>
+      <p className="mt-3 text-xs text-ink-3">In an emergency, call 112. PLAY ON is not a substitute for professional care.</p>
+    </section>
   )
 }
 
@@ -136,18 +166,20 @@ function RoomIndex() {
 
 function ExerciseScreen({ ex }: { ex: Exercise }) {
   const [done, setDone] = useState(false)
-  const dark = ex.id === 'clear-head' || ex.id === 'tough-game'
+  const dark = ex.id === 'clear-head' || ex.id === 'tough-game' || ex.id === 'pre-game'
   return (
     <div className={cx('relative flex min-h-dvh flex-col', dark ? 'bg-forest text-paper' : 'bg-cream text-ink')}>
       <header className="mx-auto flex w-full max-w-3xl items-center justify-between px-6 pt-6">
         <button onClick={() => go('reset')} className={cx('press text-sm', dark ? 'text-paper/70 hover:text-paper' : 'text-ink-2 hover:text-ink')}>
-          ← Reset
+          ← Calm
         </button>
         <span className={cx('text-sm', dark ? 'text-paper/60' : 'text-ink-3')}>{ex.length}</span>
       </header>
       <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-6 pb-12 pt-10">
         {done ? (
           <Finished ex={ex} dark={dark} />
+        ) : ex.id === 'pre-game' ? (
+          <PreGame onDone={() => setDone(true)} />
         ) : ex.id === 'tough-game' ? (
           <ToughGame onDone={() => setDone(true)} />
         ) : ex.id === 'clear-head' ? (
@@ -164,6 +196,7 @@ function ExerciseScreen({ ex }: { ex: Exercise }) {
 
 function Finished({ ex, dark }: { ex: Exercise; dark: boolean }) {
   const lines: Record<ExerciseId, string> = {
+    'pre-game': 'You’re ready enough. Go and enjoy it.',
     'tough-game': 'Game’s over. You don’t have to keep playing it.',
     'clear-head': 'A little more room up there.',
     capture: 'Saved. It’ll be here when you need a reminder.',
@@ -183,7 +216,7 @@ function Finished({ ex, dark }: { ex: Exercise; dark: boolean }) {
           className={dark ? 'border border-paper/30 bg-transparent hover:bg-paper/5' : ''}
           onClick={() => go('reset')}
         >
-          More resets
+          More exercises
         </Button>
       </div>
     </div>
@@ -281,6 +314,20 @@ function BoxBreath({ onDone }: { onDone: () => void }) {
         ['Hold', 4, 0],
       ]}
       total={90}
+      onDone={onDone}
+    />
+  )
+}
+
+function PreGame({ onDone }: { onDone: () => void }) {
+  return (
+    <Breather
+      intro="Nerves mean you care. Breathe in for four, out for six, and let your shoulders drop."
+      phases={[
+        ['Breathe in', 4, 1],
+        ['Breathe out', 6, 0],
+      ]}
+      total={60}
       onDone={onDone}
     />
   )
@@ -389,7 +436,7 @@ function Recovery({ onDone }: { onDone: () => void }) {
         <p className="eyebrow">Recovery mode</p>
         <h1 className="mt-4 text-4xl font-bold leading-tight">Five easy stretches.</h1>
         <p className="mt-4 max-w-md text-ink-2">
-          Thirty seconds each. Ease in, never push into pain — if anything hurts, stop.
+          Thirty seconds each. Ease in and never push into pain. If anything hurts, stop.
         </p>
         <ol className="mt-8 space-y-1 text-ink-2">
           {STRETCHES.map(([n], k) => (
