@@ -1,0 +1,74 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-night: #081423;
+  --color-deep: #0d1f33;
+  --color-tide: #13304a;
+  --color-mist: #dbe7ee;
+  --color-haze: #8fa6b8;
+  --color-calm: #6cc4bb;
+  --color-calm-deep: #2f7f7a;
+  --color-ember: #e7a07a;
+  --font-sans: ui-rounded, 'SF Pro Rounded', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  background: var(--color-night);
+  color: var(--color-mist);
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+button,
+a {
+  touch-action: manipulation;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-calm);
+  outline-offset: 4px;
+}
+
+@keyframes settle {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes ripple {
+  from { opacity: 0.45; transform: scale(0.6); }
+  to { opacity: 0; transform: scale(1.25); }
+}
+
+@keyframes glow {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 0.9; }
+}
+
+.settle {
+  animation: settle 900ms ease-out both;
+}
+
+.ripple {
+  animation: ripple 1100ms ease-out both;
+}
+
+.glow {
+  animation: glow 6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settle,
+  .ripple,
+  .glow {
+    animation: none;
+  }
+}
