@@ -1,30 +1,23 @@
 import { useState } from 'react'
 import { Wordmark } from '../App'
-import { Arrow, Button, Chips, cx, go } from '../components/ui'
-import { FREQUENCIES, GOALS, LEVELS, SPORTS } from '../lib/meta'
+import { Arrow, Button, cx, go } from '../components/ui'
+import { SPORTS } from '../lib/meta'
 import { actions, uid } from '../lib/store'
 import { seasonNameFor } from '../lib/dates'
-import type { Level, WellnessGoal } from '../lib/types'
 
-const STEPS = ['name', 'sport', 'level', 'frequency', 'goals', 'intention', 'ready'] as const
+const STEPS = ['name', 'sport', 'intention', 'ready'] as const
 
 export default function Onboarding() {
   const [i, setI] = useState(0)
   const [name, setName] = useState('')
   const [sports, setSports] = useState<string[]>([])
   const [custom, setCustom] = useState('')
-  const [level, setLevel] = useState<Level | null>(null)
-  const [freq, setFreq] = useState<string | null>(null)
-  const [goals, setGoals] = useState<WellnessGoal[]>([])
   const [weekly, setWeekly] = useState(2)
 
   const step = STEPS[i]
   const canNext =
     (step === 'name' && name.trim().length > 0) ||
     (step === 'sport' && sports.length > 0) ||
-    (step === 'level' && !!level) ||
-    (step === 'frequency' && !!freq) ||
-    (step === 'goals' && goals.length > 0) ||
     step === 'intention' ||
     step === 'ready'
 
@@ -36,10 +29,10 @@ export default function Onboarding() {
         name: name.trim(),
         primarySport: sports[0],
         sports,
-        experienceLevel: level!,
-        currentFrequency: freq!,
+        experienceLevel: 'casual',
+        currentFrequency: '',
         weeklyGoal: weekly,
-        wellnessGoal: goals,
+        wellnessGoal: [],
         createdAt: new Date().toISOString(),
         isDemo: false,
       })
@@ -91,7 +84,7 @@ export default function Onboarding() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your first name"
-                className="mt-10 w-full border-0 border-b border-line-2 bg-transparent pb-3 font-serif text-4xl font-light outline-none placeholder:text-ink-3/50 focus:border-forest sm:text-5xl"
+                className="mt-10 w-full border-0 border-b border-line-2 bg-transparent pb-3 text-4xl font-bold outline-none placeholder:text-ink-3/50 focus:border-forest sm:text-5xl"
               />
             </>
           )}
@@ -159,55 +152,6 @@ export default function Onboarding() {
             </>
           )}
 
-          {step === 'level' && (
-            <>
-              <Q eyebrow={sports[0]} title="How would you describe yourself as a player?" sub="There's no wrong answer. PLAY ON works the same for everyone." />
-              <div className="mt-10">
-                <Chips
-                  label="Experience"
-                  hideLabel
-                  size="lg"
-                  options={LEVELS.map((l) => ({ id: l.id, label: l.label, sub: l.hint }))}
-                  value={level}
-                  onChange={setLevel}
-                />
-              </div>
-            </>
-          )}
-
-          {step === 'frequency' && (
-            <>
-              <Q eyebrow="Right now" title="How often do you play these days?" />
-              <div className="mt-10">
-                <Chips
-                  label="Frequency"
-                  hideLabel
-                  size="lg"
-                  options={FREQUENCIES.map((f) => ({ id: f, label: f }))}
-                  value={freq}
-                  onChange={setFreq}
-                />
-              </div>
-            </>
-          )}
-
-          {step === 'goals' && (
-            <>
-              <Q eyebrow="What you're here for" title="What do you want from PLAY ON?" sub="Choose as many as feel true." />
-              <div className="mt-10">
-                <Chips
-                  label="Goals"
-                  hideLabel
-                  multi
-                  size="lg"
-                  options={GOALS.map((g) => ({ id: g.id, label: g.label }))}
-                  value={goals}
-                  onChange={(g) => setGoals((xs) => (xs.includes(g) ? xs.filter((x) => x !== g) : [...xs, g]))}
-                />
-              </div>
-            </>
-          )}
-
           {step === 'intention' && (
             <>
               <Q
@@ -226,7 +170,7 @@ export default function Onboarding() {
                       aria-label={`${n} per week`}
                       onClick={() => setWeekly(n)}
                       className={cx(
-                        'press grid h-16 w-14 place-items-center rounded-2xl border font-serif text-2xl sm:h-20 sm:w-16 sm:text-3xl',
+                        'press grid h-16 w-14 place-items-center rounded-2xl border text-2xl sm:h-20 sm:w-16 sm:text-3xl',
                         weekly === n ? 'border-forest bg-forest text-paper' : 'border-line-2 bg-paper/60 hover:border-ink-3',
                       )}
                     >
@@ -245,31 +189,27 @@ export default function Onboarding() {
           {step === 'ready' && (
             <div className="pt-6">
               <p className="eyebrow">You're all set</p>
-              <h1 className="mt-5 font-serif text-[clamp(2.8rem,8vw,5.5rem)] font-light leading-[0.95]">
+              <h1 className="mt-5 text-[clamp(2.4rem,6vw,4rem)] tracking-tight font-bold leading-[1.05]">
                 Your {season} Season
-                <span className="block italic text-forest-2">starts now.</span>
+                <span className="block text-forest-2">starts now.</span>
               </h1>
               <dl className="mt-12 grid max-w-xl grid-cols-2 gap-y-6 border-t border-line pt-6 text-sm">
                 <div>
                   <dt className="text-ink-3">Playing</dt>
-                  <dd className="mt-1 font-serif text-xl">{sports.join(' · ')}</dd>
+                  <dd className="mt-1 text-xl">{sports.join(' · ')}</dd>
                 </div>
                 <div>
                   <dt className="text-ink-3">Intention</dt>
-                  <dd className="mt-1 font-serif text-xl">{weekly}× a week</dd>
+                  <dd className="mt-1 text-xl">{weekly}× a week</dd>
                 </div>
                 <div>
                   <dt className="text-ink-3">Season length</dt>
-                  <dd className="mt-1 font-serif text-xl">12 weeks</dd>
-                </div>
-                <div>
-                  <dt className="text-ink-3">Focus</dt>
-                  <dd className="mt-1 font-serif text-xl">{GOALS.find((g) => g.id === goals[0])?.label}</dd>
+                  <dd className="mt-1 text-xl">12 weeks</dd>
                 </div>
               </dl>
               <p className="mt-10 max-w-md text-ink-2">
-                After every session, take thirty seconds to notice how it felt. After five, your Game Map starts to
-                show what keeps you coming back.
+                After every session, take thirty seconds to notice how it felt. After five, your insights start to show
+                what keeps you coming back.
               </p>
             </div>
           )}
@@ -289,7 +229,7 @@ function Q({ eyebrow, title, sub }: { eyebrow: string; title: string; sub?: stri
   return (
     <>
       <p className="eyebrow">{eyebrow}</p>
-      <h1 className="mt-4 font-serif text-4xl font-light leading-[1.05] sm:text-6xl">{title}</h1>
+      <h1 className="mt-4 text-3xl font-bold leading-tight tracking-tight sm:text-4xl">{title}</h1>
       {sub && <p className="mt-4 max-w-lg text-ink-2">{sub}</p>}
     </>
   )

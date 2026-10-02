@@ -1,20 +1,21 @@
 import { useEffect, useState } from 'react'
-import { Arrow, Button, Chips, cx, go, Scale } from '../components/ui'
+import { Arrow, Button, Chips, cx, go, PageHeader } from '../components/ui'
 import { getData, useData } from '../lib/store'
 import { addDays, toLocalInput } from '../lib/dates'
-import { ENERGY_WORDS, INTENSITIES, SESSION_TYPES, SOCIALS } from '../lib/meta'
+import { INTENSITIES, SESSION_TYPES, SOCIALS } from '../lib/meta'
 import type { ActivitySession, Intensity, SessionType, Social } from '../lib/types'
 import PostGame from './PostGame'
 
 export type Draft = Pick<
   ActivitySession,
-  'sport' | 'date' | 'duration' | 'sessionType' | 'intensity' | 'socialContext' | 'energyBefore'
+  'sport' | 'date' | 'duration' | 'sessionType' | 'intensity' | 'socialContext'
 >
 
 // Survives the hop from the form to the full-screen reflection.
 let pending: Draft | null = null
 
 const DURATIONS = [30, 45, 60, 75, 90, 120]
+const snap = (m: number) => DURATIONS.reduce((a, d) => (Math.abs(d - m) < Math.abs(a - m) ? d : a))
 
 export default function Play({ step }: { step?: string }) {
   return step === 'reflect' ? <Reflect /> : <LogForm />
@@ -41,11 +42,10 @@ function LogForm() {
 
   const [sport, setSport] = useState(user.primarySport)
   const [other, setOther] = useState('')
-  const [duration, setDuration] = useState(lastOf(user.primarySport)?.duration ?? 60)
+  const [duration, setDuration] = useState(snap(lastOf(user.primarySport)?.duration ?? 60))
   const [type, setType] = useState<SessionType>('match')
   const [social, setSocial] = useState<Social>(lastOf(user.primarySport)?.socialContext ?? 'friends')
   const [intensity, setIntensity] = useState<Intensity>('moderate')
-  const [energyBefore, setEnergyBefore] = useState(3)
   const [day, setDay] = useState<'today' | 'yesterday' | 'other'>('today')
   const [otherDate, setOtherDate] = useState(toLocalInput(addDays(new Date(), -2)))
 
@@ -69,18 +69,18 @@ function LogForm() {
       sessionType: type,
       intensity,
       socialContext: social,
-      energyBefore,
     }
     go('play', 'reflect')
   }
 
+  const [more, setMore] = useState(false)
+
   return (
-    <div className="mx-auto max-w-3xl">
-      <p className="eyebrow">Log a session</p>
-      <h1 className="mt-3 font-serif text-5xl font-light leading-tight sm:text-6xl">What did you play?</h1>
+    <div className="mx-auto max-w-2xl">
+      <PageHeader title="Log a session" sub="Four quick taps, then tell us how it felt." />
 
       <form
-        className="mt-10 space-y-10"
+        className="mt-8 space-y-8"
         onSubmit={(e) => {
           e.preventDefault()
           submit()
@@ -88,15 +88,14 @@ function LogForm() {
       >
         <div>
           <Chips
-            label="Sport"
-            size="lg"
-            options={[...sports.map((s) => ({ id: s, label: s })), { id: '__other', label: '+ Something else' }]}
+            label="What did you play?"
+            options={[...sports.map((s) => ({ id: s, label: s })), { id: '__other', label: '+ Other' }]}
             value={sport}
             onChange={(s) => {
               setSport(s)
               const l = lastOf(s)
               if (l) {
-                setDuration(l.duration)
+                setDuration(snap(l.duration))
                 setSocial(l.socialContext)
               }
             }}
@@ -112,63 +111,23 @@ function LogForm() {
                 value={other}
                 onChange={(e) => setOther(e.target.value)}
                 placeholder="e.g. Bouldering"
-                className="h-12 w-full rounded-full border border-line-2 bg-paper/60 px-5 outline-none focus:border-forest"
+                className="h-11 w-full rounded-full border border-line-2 bg-paper/60 px-5 outline-none focus:border-forest"
               />
             </div>
           )}
         </div>
 
-        <fieldset>
-          <legend className="eyebrow mb-3">How long</legend>
-          <div className="flex flex-wrap items-center gap-2">
-            {DURATIONS.map((d) => (
-              <button
-                key={d}
-                type="button"
-                aria-pressed={duration === d}
-                onClick={() => setDuration(d)}
-                className={cx(
-                  'press h-12 min-w-16 rounded-full border px-4 text-[15px] tabular',
-                  duration === d ? 'border-forest bg-forest text-paper' : 'border-line-2 bg-paper/60 hover:border-ink-3',
-                )}
-              >
-                {d < 60 ? `${d}m` : d % 60 ? `${Math.floor(d / 60)}h ${d % 60}` : `${d / 60}h`}
-              </button>
-            ))}
-            <label className="ml-1 flex items-center gap-2 text-sm text-ink-2">
-              <span className="sr-only">Custom minutes</span>
-              <input
-                type="number"
-                min={5}
-                max={480}
-                inputMode="numeric"
-                value={duration}
-                onChange={(e) => setDuration(Math.max(0, Math.min(480, Number(e.target.value) || 0)))}
-                className="h-12 w-20 rounded-full border border-line-2 bg-transparent text-center tabular outline-none focus:border-forest"
-              />
-              min
-            </label>
-          </div>
-        </fieldset>
-
-        <div className="grid gap-10 sm:grid-cols-2">
-          <Chips label="Type" options={SESSION_TYPES} value={type} onChange={setType} />
-          <Chips label="Played with" options={SOCIALS.map((s) => ({ id: s.id, label: s.label }))} value={social} onChange={setSocial} />
-        </div>
-
         <Chips
-          label="Intensity"
-          options={INTENSITIES.map((i) => ({ id: i.id, label: i.label, sub: i.hint }))}
-          value={intensity}
-          onChange={setIntensity}
+          label="How long?"
+          options={DURATIONS.map((d) => ({ id: String(d), label: d < 60 ? `${d} min` : d % 60 ? `${Math.floor(d / 60)}h ${d % 60}` : `${d / 60}h` }))}
+          value={String(duration)}
+          onChange={(d) => setDuration(Number(d))}
         />
 
-        <div className="max-w-md">
-          <Scale label="Energy going in" value={energyBefore} onChange={setEnergyBefore} words={ENERGY_WORDS} />
-        </div>
+        <Chips label="Who with?" options={SOCIALS.map((s) => ({ id: s.id, label: s.label }))} value={social} onChange={setSocial} />
 
         <fieldset>
-          <legend className="eyebrow mb-3">When</legend>
+          <legend className="eyebrow mb-3">When?</legend>
           <div className="flex flex-wrap items-center gap-2">
             {(['today', 'yesterday', 'other'] as const).map((d) => (
               <button
@@ -178,7 +137,7 @@ function LogForm() {
                 onClick={() => setDay(d)}
                 className={cx(
                   'press rounded-full border px-4 py-2 text-sm capitalize',
-                  day === d ? 'border-forest bg-forest text-paper' : 'border-line-2 hover:border-ink-3',
+                  day === d ? 'border-forest bg-forest text-paper' : 'border-line-2 bg-paper/60 hover:border-ink-3',
                 )}
               >
                 {d === 'other' ? 'Earlier' : d}
@@ -199,9 +158,31 @@ function LogForm() {
           </div>
         </fieldset>
 
-        <div className="sticky bottom-24 z-10 flex justify-end lg:bottom-6">
-          <Button type="submit" size="lg" disabled={!valid} className="shadow-[0_10px_30px_-10px_rgba(30,58,45,0.5)]">
-            Game over — reflect <Arrow />
+        <div className="rounded-2xl border border-line">
+          <button
+            type="button"
+            aria-expanded={more}
+            onClick={() => setMore((m) => !m)}
+            className="flex w-full items-center justify-between px-4 py-3 text-sm font-medium text-ink-2"
+          >
+            <span>
+              More details <span className="font-normal text-ink-3">· {SESSION_TYPES.find((t) => t.id === type)?.label}, {INTENSITIES.find((i) => i.id === intensity)?.label.toLowerCase()}</span>
+            </span>
+            <span className={cx('transition-transform', more && 'rotate-45')} aria-hidden>
+              +
+            </span>
+          </button>
+          {more && (
+            <div className="rise space-y-6 border-t border-line px-4 py-5">
+              <Chips label="Type" options={SESSION_TYPES} value={type} onChange={setType} />
+              <Chips label="Intensity" options={INTENSITIES.map((i) => ({ id: i.id, label: i.label }))} value={intensity} onChange={setIntensity} />
+            </div>
+          )}
+        </div>
+
+        <div className="flex justify-end">
+          <Button type="submit" size="lg" disabled={!valid} className="w-full sm:w-auto">
+            Next: how did it feel? <Arrow />
           </Button>
         </div>
       </form>

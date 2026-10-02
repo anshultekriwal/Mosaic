@@ -12,10 +12,10 @@ import Profile from './screens/Profile'
 
 const NAV: { id: Route; label: string; icon: ReactNode }[] = [
   { id: 'home', label: 'Home', icon: <IconHome /> },
-  { id: 'play', label: 'Play', icon: <IconPlay /> },
   { id: 'season', label: 'Season', icon: <IconSeason /> },
+  { id: 'play', label: 'Log', icon: <IconPlus /> },
   { id: 'insights', label: 'Insights', icon: <IconMap /> },
-  { id: 'profile', label: 'Profile', icon: <IconProfile /> },
+  { id: 'reset', label: 'Reset', icon: <IconReset /> },
 ]
 
 export default function App() {
@@ -54,19 +54,19 @@ export default function App() {
 
   if (immersive) return <main key={route + param}>{screen}</main>
 
-  const active = route === 'reset' ? 'home' : route
+  const active = route
   return (
-    <div className="min-h-dvh lg:grid lg:grid-cols-[248px_1fr]">
+    <div className="min-h-dvh lg:grid lg:grid-cols-[232px_1fr]">
       <a href="#main" onClick={(e) => (e.preventDefault(), document.getElementById('main')?.focus())} className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-paper focus:px-4 focus:py-2">
         Skip to content
       </a>
 
       {/* desktop sidebar */}
-      <aside className="sticky top-0 hidden h-dvh flex-col border-r border-line bg-paper/60 px-6 py-8 lg:flex">
-        <button onClick={() => go('home')} className="press text-left" aria-label="PLAY ON home">
+      <aside className="sticky top-0 hidden h-dvh flex-col border-r border-line bg-paper/60 px-5 py-8 lg:flex">
+        <button onClick={() => go('home')} className="press px-3 text-left" aria-label="PLAY ON home">
           <Wordmark />
         </button>
-        <nav className="mt-12 flex flex-col gap-1" aria-label="Primary">
+        <nav className="mt-10 flex flex-col gap-1" aria-label="Primary">
           {NAV.map((n) => (
             <a
               key={n.id}
@@ -74,42 +74,47 @@ export default function App() {
               onClick={navTo(n.id)}
               aria-current={active === n.id ? 'page' : undefined}
               className={cx(
-                'press flex items-center gap-3 rounded-full px-4 py-2.5 text-sm',
+                'press flex items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-medium',
                 active === n.id ? 'bg-forest text-paper' : 'text-ink-2 hover:bg-cream hover:text-ink',
               )}
             >
               {n.icon}
-              {n.label}
+              {n.id === 'play' ? 'Log a session' : n.label}
             </a>
           ))}
         </nav>
-        <div className="mt-auto space-y-4">
-          <a href="#/reset" onClick={navTo('reset')} className="press block rounded-2xl border border-line bg-lavender-soft/70 p-4 text-sm hover:border-lavender">
-            <span className="eyebrow block text-[10px]">Reset Room</span>
-            <span className="mt-1 block font-serif text-lg leading-snug">Need a minute?</span>
-          </a>
+        <div className="mt-auto space-y-3">
           {data.user.isDemo && <DemoNote />}
+          <a
+            href="#/profile"
+            onClick={navTo('profile')}
+            aria-current={active === 'profile' ? 'page' : undefined}
+            className={cx(
+              'press flex items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-medium',
+              active === 'profile' ? 'bg-forest text-paper' : 'text-ink-2 hover:bg-cream hover:text-ink',
+            )}
+          >
+            <Avatar name={data.user.name} />
+            {data.user.name}
+          </a>
         </div>
       </aside>
 
       <div className="min-w-0">
         {/* mobile top bar */}
-        <header className="sticky top-0 z-20 flex items-center justify-between border-b border-line/70 bg-cream/85 px-5 py-3 backdrop-blur lg:hidden">
+        <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-line/70 bg-cream/90 px-5 py-3 backdrop-blur lg:hidden">
           <button onClick={() => go('home')} className="press" aria-label="PLAY ON home">
             <Wordmark small />
           </button>
-          {data.user.isDemo ? (
-            <button onClick={() => go('profile')} aria-label="You're viewing sample data. Open profile to start fresh.">
-              <DemoBadge />
-            </button>
-          ) : (
-            <a href="#/reset" onClick={navTo('reset')} className="text-sm text-ink-2 underline decoration-line-2 underline-offset-4">
-              Reset Room
+          <div className="flex items-center gap-3">
+            {data.user.isDemo && <DemoBadge />}
+            <a href="#/profile" onClick={navTo('profile')} aria-label="Profile and settings" aria-current={active === 'profile' ? 'page' : undefined}>
+              <Avatar name={data.user.name} active={active === 'profile'} />
             </a>
-          )}
+          </div>
         </header>
 
-        <main id="main" tabIndex={-1} key={route} className="fade mx-auto w-full max-w-6xl px-5 pb-32 pt-6 sm:px-8 lg:px-14 lg:pb-20 lg:pt-12">
+        <main id="main" tabIndex={-1} key={route} className="fade mx-auto w-full max-w-4xl px-5 pb-32 pt-6 outline-none sm:px-8 lg:px-12 lg:pb-16 lg:pt-10">
           {screen}
         </main>
       </div>
@@ -119,28 +124,49 @@ export default function App() {
         aria-label="Primary"
         className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-paper/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
       >
-        <ul className="mx-auto flex max-w-lg justify-around">
-          {NAV.map((n) => (
-            <li key={n.id}>
-              <a
-                href={`#/${n.id}`}
-              onClick={navTo(n.id)}
-                aria-current={active === n.id ? 'page' : undefined}
-                className={cx(
-                  'press flex w-16 flex-col items-center gap-1 py-2.5 text-[11px]',
-                  active === n.id ? 'text-forest' : 'text-ink-3',
-                )}
-              >
-                <span className={cx('grid h-8 w-12 place-items-center rounded-full', active === n.id && 'bg-sage-soft')}>
-                  {n.icon}
-                </span>
-                {n.label}
-              </a>
-            </li>
-          ))}
+        <ul className="mx-auto flex max-w-lg items-end justify-around px-2">
+          {NAV.map((n) => {
+            const on = active === n.id
+            const primary = n.id === 'play'
+            return (
+              <li key={n.id} className="flex-1">
+                <a
+                  href={`#/${n.id}`}
+                  onClick={navTo(n.id)}
+                  aria-current={on ? 'page' : undefined}
+                  className={cx('press flex flex-col items-center gap-1 py-2 text-[11px] font-medium', on ? 'text-forest' : 'text-ink-3')}
+                >
+                  <span
+                    className={cx(
+                      'grid place-items-center rounded-full',
+                      primary ? 'h-11 w-11 -mt-4 bg-forest text-paper shadow-[0_8px_20px_-8px_rgba(30,58,45,0.6)]' : 'h-7 w-12',
+                      !primary && on && 'bg-sage-soft',
+                    )}
+                  >
+                    {n.icon}
+                  </span>
+                  {n.label}
+                </a>
+              </li>
+            )
+          })}
         </ul>
       </nav>
     </div>
+  )
+}
+
+function Avatar({ name, active }: { name: string; active?: boolean }) {
+  return (
+    <span
+      className={cx(
+        'grid h-8 w-8 shrink-0 place-items-center rounded-full text-sm font-semibold',
+        active ? 'bg-forest text-paper' : 'bg-sage-soft text-forest',
+      )}
+      aria-hidden
+    >
+      {name.trim().charAt(0).toUpperCase() || '·'}
+    </span>
   )
 }
 
@@ -148,7 +174,7 @@ function DemoNote() {
   return (
     <div className="rounded-2xl border border-dashed border-ember/50 p-4 text-xs leading-relaxed text-ink-2">
       <DemoBadge />
-      <p className="mt-2">You're exploring Alex's sample season. Nothing here is real.</p>
+      <p className="mt-2">You're exploring a sample season.</p>
       <button
         className="mt-2 font-medium text-forest underline underline-offset-4"
         onClick={() => {
@@ -169,7 +195,7 @@ export function Wordmark({ small, light }: { small?: boolean; light?: boolean })
         <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" strokeWidth="2" />
         <path d="M6 20c6-3.5 14-3.5 20 0" fill="none" stroke="var(--color-ember)" strokeWidth="2" strokeLinecap="round" />
       </svg>
-      <span className={cx('font-sans font-semibold tracking-[0.2em]', small ? 'text-[13px]' : 'text-sm')}>PLAY ON</span>
+      <span className={cx('font-bold tracking-[0.18em]', small ? 'text-[13px]' : 'text-sm')}>PLAY ON</span>
     </span>
   )
 }
@@ -185,15 +211,15 @@ function I({ d }: { d: string }) {
 function IconHome() {
   return <I d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-5h-6v5H5a1 1 0 0 1-1-1z" />
 }
-function IconPlay() {
-  return <I d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM3.5 9.5c5 2 12 2 17 0M3.5 14.5c5-2 12-2 17 0" />
-}
 function IconSeason() {
   return <I d="M2 19l5-7 4 4 4-6 7 9zM16 6.5a1.5 1.5 0 1 0 0-.01" />
 }
 function IconMap() {
   return <I d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
 }
-function IconProfile() {
-  return <I d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0" />
+function IconPlus() {
+  return <I d="M12 5v14M5 12h14" />
+}
+function IconReset() {
+  return <I d="M12 21c-4.5-2.5-8-6-8-10a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 11c0 4-3.5 7.5-8 10z" />
 }

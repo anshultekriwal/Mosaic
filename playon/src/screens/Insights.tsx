@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Arrow, Button, cx, DemoBadge, go, Rule, useCountUp } from '../components/ui'
+import { Arrow, Button, cx, go, PageHeader, Rule, useCountUp } from '../components/ui'
 import { sortedSessions, useData } from '../lib/store'
 import {
   computeInsights,
@@ -10,7 +10,7 @@ import {
   strongestPattern,
   type Insight,
 } from '../lib/insights'
-import { MOODS, moodLabel, socialColor, socialLabel, SOCIALS, intensityLabel } from '../lib/meta'
+import { moodLabel, socialColor, socialLabel, SOCIALS, intensityLabel } from '../lib/meta'
 import { shortDate } from '../lib/dates'
 import { ask, SUGGESTED, type Answer } from '../lib/ask'
 import type { ActivitySession, Social } from '../lib/types'
@@ -34,56 +34,36 @@ export default function Insights({ focus }: { focus?: string }) {
   }
 
   return (
-    <div className="space-y-16 lg:space-y-24">
-      <header>
-        <div className="flex flex-wrap items-center gap-3">
-          <p className="eyebrow">Your Game Map</p>
-          {data.user!.isDemo && <DemoBadge />}
-        </div>
-        <div className="mt-8 grid grid-cols-3 gap-4 border-y border-line py-8 sm:gap-10">
-          <Hero value={stats.count} label="sessions" decimals={0} />
-          <Hero value={stats.enjoyment} label="average enjoyment" decimals={1} suffix="/5" />
-          <Hero value={stats.energyChangePct} label="energy after playing" decimals={0} suffix="%" signed />
-        </div>
-        <p className="mt-3 text-xs text-ink-3">
-          Energy compares how you rated it before and after each session (1–5). All numbers come straight from your log.
-        </p>
-      </header>
+    <div className="space-y-10">
+      <PageHeader title="Insights" sub="What your logged sessions say about how playing affects you." />
+
+      <dl className="grid grid-cols-3 gap-3">
+        <Hero value={stats.count} label="Sessions" decimals={0} />
+        <Hero value={stats.enjoyment} label="Avg enjoyment" decimals={1} suffix="/5" />
+        <Hero value={stats.energyChangePct} label="Energy change" decimals={0} suffix="%" signed />
+      </dl>
 
       {strongest && (
-        <section aria-labelledby="h-strong" className="grid gap-8 lg:grid-cols-[1fr_2.2fr] lg:gap-16">
-          <h2 id="h-strong" className="eyebrow pt-3">
+        <section aria-labelledby="h-strong" className="rounded-3xl bg-forest p-6 text-paper sm:p-8">
+          <h2 id="h-strong" className="text-sm font-semibold text-sage">
             Your strongest pattern
           </h2>
-          <div>
-            <p className="rise font-serif text-[clamp(2rem,4.6vw,3.6rem)] font-light leading-[1.08]">{strongest}</p>
-            <button
-              onClick={() => showEvidence(insights[0].id)}
-              className="press group mt-6 inline-flex items-center gap-2 text-sm font-medium text-forest"
-            >
-              <span className="underline decoration-line-2 underline-offset-[6px] group-hover:decoration-forest">
-                See where this comes from
-              </span>
-              <Arrow className="rotate-90" />
-            </button>
-          </div>
+          <p className="rise mt-3 text-2xl font-bold leading-snug sm:text-3xl">{strongest}</p>
+          <button
+            onClick={() => showEvidence(insights[0].id)}
+            className="press mt-5 inline-flex items-center gap-2 text-sm font-medium text-paper/85 underline underline-offset-4 hover:text-paper"
+          >
+            Show me the sessions <Arrow className="rotate-90" />
+          </button>
         </section>
       )}
 
-      <section ref={mapRef} aria-labelledby="h-map" className="scroll-mt-20">
-        <MapChart sessions={sessions} insight={sel} onClear={() => setSelected(null)} />
-      </section>
-
       <section aria-labelledby="h-patterns">
-        <div className="flex items-end justify-between gap-4">
-          <h2 id="h-patterns" className="font-serif text-4xl font-light">
-            Patterns
-          </h2>
-          <p className="max-w-xs text-right text-xs text-ink-3">
-            Each one needs at least two sessions on both sides of the comparison. Tap one to light up its sessions on the map.
-          </p>
-        </div>
-        <Rule className="mt-5" />
+        <h2 id="h-patterns" className="text-xl font-bold">
+          Patterns
+        </h2>
+        <p className="mt-1 text-sm text-ink-3">Tap one to see where it comes from.</p>
+        <Rule className="mt-4" />
         {insights.length ? (
           <ul>
             {insights.map((ins) => (
@@ -91,16 +71,15 @@ export default function Insights({ focus }: { focus?: string }) {
             ))}
           </ul>
         ) : (
-          <p className="py-10 font-serif text-2xl font-light text-ink-2">
-            Nothing stands out yet — your sessions feel pretty even. That's a pattern too.
-          </p>
+          <p className="py-8 text-lg text-ink-2">Nothing stands out yet. Your sessions feel pretty even.</p>
         )}
       </section>
 
-      <div className="grid gap-16 lg:grid-cols-2">
-        <MoodSection sessions={sessions} />
-        <AskSection sessions={sessions} />
-      </div>
+      <section ref={mapRef} aria-labelledby="h-map" className="scroll-mt-20">
+        <MapChart sessions={sessions} insight={sel} onClear={() => setSelected(null)} />
+      </section>
+
+      <AskSection sessions={sessions} />
     </div>
   )
 }
@@ -109,12 +88,12 @@ function Hero({ value, label, decimals, suffix, signed }: { value: number; label
   const v = useCountUp(value)
   const shown = `${signed && value >= 0 ? '+' : signed ? '−' : ''}${Math.abs(v).toFixed(decimals)}`
   return (
-    <div>
-      <p className="font-serif text-[clamp(2.6rem,8vw,6rem)] font-light leading-none tabular" aria-label={`${signed && value >= 0 ? '+' : ''}${value.toFixed(decimals)}${suffix ?? ''} ${label}`}>
+    <div className="rounded-2xl border border-line bg-paper px-4 py-3">
+      <dt className="text-xs text-ink-3">{label}</dt>
+      <dd className="mt-1 text-2xl font-bold leading-none tabular" aria-label={`${signed && value >= 0 ? '+' : ''}${value.toFixed(decimals)}${suffix ?? ''}`}>
         {shown}
-        {suffix && <span className="text-[0.4em] text-ink-3">{suffix}</span>}
-      </p>
-      <p className="mt-3 text-xs uppercase tracking-[0.14em] text-ink-3 sm:text-sm sm:normal-case sm:tracking-normal">{label}</p>
+        {suffix && <span className="text-sm font-semibold text-ink-3">{suffix}</span>}
+      </dd>
     </div>
   )
 }
@@ -166,12 +145,10 @@ function MapChart({ sessions, insight, onClear }: { sessions: ActivitySession[];
     <div>
       <div className="flex flex-wrap items-end justify-between gap-6">
         <div>
-          <h2 id="h-map" className="font-serif text-4xl font-light">
-            The map
+          <h2 id="h-map" className="text-xl font-bold">
+            Every session
           </h2>
-          <p className="mt-2 max-w-md text-sm text-ink-2">
-            Every dot is a session you logged. Bigger dots were harder sessions.
-          </p>
+          <p className="mt-1 max-w-md text-sm text-ink-3">One dot per session. Bigger dots were harder.</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex rounded-full border border-line-2 p-1 text-sm" role="radiogroup" aria-label="Vertical axis">
@@ -234,7 +211,7 @@ function MapChart({ sessions, insight, onClear }: { sessions: ActivitySession[];
       {table ? (
         <SessionTable sessions={sessions.filter((s) => !hidden.includes(s.socialContext))} />
       ) : (
-        <div className="relative mt-4 overflow-hidden rounded-[2rem] bg-paper">
+        <div className="relative mt-4 overflow-hidden rounded-3xl border border-line bg-paper">
           <svg viewBox={`0 0 ${W} ${H}`} className="block w-full" role="img" aria-label={`Scatter of ${sessions.length} sessions: minutes played against ${yMode === 'enjoyment' ? 'enjoyment' : 'energy change'}. Use View as table for the data.`}>
             {/* court markings as the plot frame */}
             <rect x={P.l} y={P.t} width={W - P.l - P.r} height={H - P.t - P.b} fill="none" stroke="var(--color-line)" strokeWidth="1.5" />
@@ -259,10 +236,10 @@ function MapChart({ sessions, insight, onClear }: { sessions: ActivitySession[];
             <text x={P.l + 8} y={P.t + 16} fontSize="11" fill="var(--color-ink-3)" letterSpacing="1.5">
               {yMode === 'enjoyment' ? '↑ MORE ENJOYED' : '↑ MORE ENERGY AFTER'}
             </text>
-            <text x={(xs(0) + xs(60)) / 2} y={H - P.b - 10} fontSize="11" textAnchor="middle" fontStyle="italic" fontFamily="Fraunces, serif" fill="var(--color-ink-3)">
+            <text x={(xs(0) + xs(60)) / 2} y={H - P.b - 10} fontSize="11" textAnchor="middle" fontFamily="inherit" fill="var(--color-ink-3)">
               up to an hour
             </text>
-            <text x={(xs(90) + W - P.r) / 2} y={H - P.b - 10} fontSize="11" textAnchor="middle" fontStyle="italic" fontFamily="Fraunces, serif" fill="var(--color-ink-3)">
+            <text x={(xs(90) + W - P.r) / 2} y={H - P.b - 10} fontSize="11" textAnchor="middle" fontFamily="inherit" fill="var(--color-ink-3)">
               the long ones
             </text>
 
@@ -326,7 +303,7 @@ function DotCard({ s, pos, W, H }: { s: ActivitySession; pos: { x: number; y: nu
         <span className="h-2 w-2 rounded-full" style={{ background: socialColor(s.socialContext) }} aria-hidden />
         {socialLabel(s.socialContext)} · {shortDate(s.date)}
       </p>
-      <p className="mt-1 font-serif text-lg">
+      <p className="mt-1 text-lg font-semibold">
         {s.sport} · {s.duration}m
       </p>
       <dl className="mt-2 grid grid-cols-2 gap-1 text-xs text-ink-2">
@@ -341,7 +318,7 @@ function DotCard({ s, pos, W, H }: { s: ActivitySession; pos: { x: number; y: nu
         <dt>Intensity</dt>
         <dd className="text-right text-ink">{intensityLabel(s.intensity)}</dd>
       </dl>
-      {s.reflection && <p className="mt-2 border-t border-line pt-2 font-serif italic text-ink-2">“{s.reflection}”</p>}
+      {s.reflection && <p className="mt-2 border-t border-line pt-2 text-ink-2">“{s.reflection}”</p>}
     </div>
   )
 }
@@ -391,9 +368,9 @@ function PatternRow({ ins, active, onShow }: { ins: Insight; active: boolean; on
       <button
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className="press flex w-full items-start justify-between gap-6 py-7 text-left"
+        className="press flex w-full items-start justify-between gap-6 py-5 text-left"
       >
-        <span className="font-serif text-2xl font-light leading-snug sm:text-3xl">{ins.headline}</span>
+        <span className="text-lg font-semibold leading-snug">{ins.headline}</span>
         <span className={cx('mt-2 shrink-0 text-ink-3 transition-transform duration-300', open && 'rotate-45')} aria-hidden>
           <svg width="18" height="18" viewBox="0 0 18 18">
             <path d="M9 2v14M2 9h14" stroke="currentColor" strokeWidth="1.5" />
@@ -403,10 +380,10 @@ function PatternRow({ ins, active, onShow }: { ins: Insight; active: boolean; on
       {open && (
         <div className="rise grid gap-8 pb-8 lg:grid-cols-[1fr_1.4fr]">
           <div>
-            <p className="eyebrow text-[10px]">Where this comes from</p>
+            <p className="text-sm font-semibold">Where this comes from</p>
             <p className="mt-2 text-sm leading-relaxed text-ink-2">{ins.basis}</p>
             <Button variant="ghost" className="mt-4" onClick={onShow}>
-              Show these sessions on the map
+              Show on the chart
             </Button>
           </div>
           <div className="space-y-3" role="list" aria-label={`${ins.metric === 'lift' ? 'Average energy change' : 'Average enjoyment'} by group`}>
@@ -443,37 +420,6 @@ function PatternRow({ ins, active, onShow }: { ins: Insight; active: boolean; on
   )
 }
 
-/* ---------- how you leave the court ---------- */
-
-function MoodSection({ sessions }: { sessions: ActivitySession[] }) {
-  const counts = MOODS.map((m) => ({ ...m, n: sessions.filter((s) => s.moodAfter === m.id).length })).filter((m) => m.n)
-  const max = Math.max(...counts.map((c) => c.n))
-  return (
-    <section aria-labelledby="h-mood">
-      <h2 id="h-mood" className="font-serif text-4xl font-light">
-        How you leave the court
-      </h2>
-      <p className="mt-2 text-sm text-ink-2">The mood you reported after each session.</p>
-      <ul className="mt-8 space-y-4">
-        {counts.map((m) => (
-          <li key={m.id} className="grid grid-cols-[130px_1fr_32px] items-center gap-3 text-sm">
-            <span>
-              <span aria-hidden>{m.glyph}</span> {m.label}
-            </span>
-            <span className="h-3 rounded-[4px] bg-line/60">
-              <span
-                className={cx('block h-3 rounded-[4px]', m.id === 'frustrated' || m.id === 'drained' ? 'bg-lavender' : 'bg-forest-2')}
-                style={{ width: `${(m.n / max) * 100}%`, transition: 'width 1s var(--ease-out-soft)' }}
-              />
-            </span>
-            <span className="text-right tabular text-ink-2">{m.n}</span>
-          </li>
-        ))}
-      </ul>
-    </section>
-  )
-}
-
 /* ---------- Ask PLAY ON ---------- */
 
 function AskSection({ sessions }: { sessions: ActivitySession[] }) {
@@ -485,13 +431,11 @@ function AskSection({ sessions }: { sessions: ActivitySession[] }) {
     setQ('')
   }
   return (
-    <section aria-labelledby="h-ask" className="rounded-[2rem] bg-sky-soft/70 p-6 sm:p-8">
-      <h2 id="h-ask" className="font-serif text-4xl font-light">
+    <section aria-labelledby="h-ask" className="rounded-3xl bg-sky-soft/70 p-5 sm:p-6">
+      <h2 id="h-ask" className="text-xl font-bold">
         Ask PLAY ON
       </h2>
-      <p className="mt-2 text-sm text-ink-2">
-        Ask about your own play. Answers are worked out from your logged sessions only — no guessing, and never advice.
-      </p>
+      <p className="mt-1 text-sm text-ink-2">Answers come from your logged sessions only.</p>
       <form
         className="mt-6 flex gap-2"
         onSubmit={(e) => {
@@ -522,7 +466,7 @@ function AskSection({ sessions }: { sessions: ActivitySession[] }) {
       </div>
       {answer && (
         <div key={answer.q} className="rise mt-8 border-t border-line-2 pt-6" aria-live="polite">
-          <p className="font-serif text-lg italic text-ink-2">“{answer.q}”</p>
+          <p className="font-semibold text-ink-2">“{answer.q}”</p>
           <div className="mt-4 space-y-3 text-[15px] leading-relaxed">
             {answer.lines.map((l, i) => (
               <p key={i}>{l}</p>
@@ -542,45 +486,25 @@ function AskSection({ sessions }: { sessions: ActivitySession[] }) {
 function NotYet({ n }: { n: number }) {
   return (
     <div className="mx-auto max-w-3xl py-6">
-      <p className="eyebrow">Your Game Map</p>
-      <h1 className="mt-4 font-serif text-[clamp(2.6rem,6vw,4.5rem)] font-light leading-[1.02]">
+      <h1 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
         {n === 0 ? 'Your map starts with one session.' : `${MIN_SESSIONS - n} more session${MIN_SESSIONS - n === 1 ? '' : 's'} to go.`}
       </h1>
-      <p className="mt-5 max-w-xl text-lg text-ink-2">
-        Your Game Map shows how playing affects you — when you enjoy it most, what lifts your energy, who you like playing
-        with. We won't invent patterns, so it opens once you've logged {MIN_SESSIONS} sessions.
+      <p className="mt-3 max-w-xl text-ink-2">
+        Insights show when you enjoy playing most, what lifts your energy and who you like playing with. We won't invent
+        patterns, so they appear once you've logged {MIN_SESSIONS} sessions.
       </p>
-      <div className="mt-10 flex items-center gap-3" aria-label={`${n} of ${MIN_SESSIONS} sessions logged`}>
+      <div className="mt-8 flex items-center gap-2" aria-label={`${n} of ${MIN_SESSIONS} sessions logged`}>
         {Array.from({ length: MIN_SESSIONS }).map((_, i) => (
-          <span key={i} className={cx('grid h-12 w-12 place-items-center rounded-full border font-serif text-lg', i < n ? 'border-forest bg-forest text-paper' : 'border-dashed border-line-2 text-ink-3')}>
+          <span key={i} className={cx('grid h-11 w-11 place-items-center rounded-full border font-semibold', i < n ? 'border-forest bg-forest text-paper' : 'border-dashed border-line-2 text-ink-3')}>
             {i + 1}
           </span>
         ))}
       </div>
-      <div className="mt-12 flex flex-col gap-3 sm:flex-row">
+      <div className="mt-10 flex flex-col gap-3 sm:flex-row">
         <Button size="lg" onClick={() => go('play')}>
           Log a session <Arrow />
         </Button>
       </div>
-      <figure className="mt-16 rounded-[2rem] border border-dashed border-line-2 p-6 sm:p-8">
-        <figcaption className="eyebrow">What it will look like — illustration, not your data</figcaption>
-        <svg viewBox="0 0 600 200" className="mt-6 w-full opacity-60" aria-hidden>
-          <rect x="1" y="1" width="598" height="198" fill="none" stroke="var(--color-line-2)" />
-          <line x1="300" x2="300" y1="0" y2="200" stroke="var(--color-line)" />
-          {[
-            [80, 50, 'friends'],
-            [140, 40, 'friends'],
-            [200, 70, 'club'],
-            [260, 60, 'friends'],
-            [360, 110, 'club'],
-            [470, 150, 'tournament'],
-            [520, 130, 'tournament'],
-            [180, 100, 'solo'],
-          ].map(([x, y, c], i) => (
-            <circle key={i} cx={x as number} cy={y as number} r={9} fill={socialColor(c as Social)} stroke="var(--color-paper)" strokeWidth="2" />
-          ))}
-        </svg>
-      </figure>
     </div>
   )
 }

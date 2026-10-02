@@ -81,6 +81,11 @@ export const actions = {
   addCheckIn(c: CheckIn) {
     commit({ ...state, checkins: [...state.checkins, c] })
   },
+  /** Drop today's check-ins so the mood can be picked again. */
+  undoCheckInToday() {
+    const today = new Date().toDateString()
+    commit({ ...state, checkins: state.checkins.filter((c) => new Date(c.date).toDateString() !== today) })
+  },
   addMoment(m: Moment) {
     commit({ ...state, moments: [...state.moments, m] })
   },

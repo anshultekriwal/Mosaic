@@ -29,20 +29,22 @@ Neither app has a public deployment yet. **This is the main open task.**
 
 **Stack:** TypeScript, React 19, Vite 8, Tailwind 4, and hand-built SVG charts with no chart library. Data lives in `localStorage` under the key `playon:v1`. Routing is hash-based with an in-memory fallback, so the app also works inside sandboxed frames such as Artifacts.
 
-**Screens** (`playon/src/screens/`):
+**Navigation (after the declutter pass, 2 Oct):** five tabs: Home, Season, **Log** (raised centre button), Insights and Reset. Profile is the avatar in the top bar (mobile) or the name at the bottom of the sidebar (desktop). Reset is now a top-level tab rather than a hidden link.
+
+**Screens** (`playon/src/screens/`). Several were simplified in the declutter pass; the notes in brackets describe the current state:
 - `Welcome`: hero page with **Start your season** and **Explore a demo**.
-- `Onboarding`: name, sports, experience, how often you play now, goals, weekly intention (1–5). Then "Your Autumn Season starts now".
-- `Home`: mood check-in (mood, energy, stress, note), sessions this week against the intention, last session, "Something we've noticed", and a Reset suggestion. Shows "Welcome back" after 7+ days away.
-- `Play`: 30-second session log (sport, length, type, played with, intensity, energy before, date).
-- `PostGame`: full screen "GAME OVER. How did it feel?". Asks energy, mood, stars and what stood out, plus an optional note. Ends with a session summary and one line based on the data.
+- `Onboarding`: name, sports, weekly intention (1–5), then "Your Autumn Season starts now". [Experience level, frequency and goals questions removed; defaults are stored.]
+- `Home`: one-tap mood check-in that suggests a reset, one "Just played?" button, a This week card, one insight and the last session. [Energy/stress/note in the check-in and the Reset teaser were removed.]
+- `Play`: sport, length, who with and when, with type and intensity tucked under "More details".
+- `PostGame`: one dark screen, "Game over. How did it feel?": mood, stars, energy before/after (1–5) and an optional note, then a summary with one line drawn from the data. [Was a 5-step wizard with an auto-advancing intro; "what stood out" was removed and is saved as `[]`.]
 - `Season`: 12-week landscape SVG. Sessions are trees (height = enjoyment), milestones are flags, empty weeks are "rest" meadows, future weeks are hatched. A week-by-week timeline sits below.
-- `Insights` (Game Map):
+- `Insights` (renamed from Game Map; ordered strongest pattern → patterns → chart → Ask; mood distribution removed):
   - hero numbers and the strongest pattern;
   - a scatter of minutes against enjoyment or energy change, coloured by who you played with, with legend filters and a table view;
   - pattern rows with comparison bars, plus "Show these sessions on the map" to highlight them;
   - a mood distribution;
   - **Ask PLAY ON**: deterministic keyword-routed answers from the log (`lib/ask.ts`), with no AI model.
-- `Reset`: four exercises:
+- `Reset`: a grid of four exercise cards with the one suited to your last mood marked "Suggested":
   - Reset after a tough game: 50 s of 4/6 breathing, then one question;
   - Clear your head: 90 s box breathing;
   - Capture the moment: save a note;
@@ -54,7 +56,7 @@ Neither app has a public deployment yet. **This is the main open task.**
 - `demo.ts`: demo user "Alex" with 15 hand-written sessions (pickleball and table tennis) and dates relative to today. Flagged with `isDemo` and shown with "Sample data" badges.
 - `season.ts`, `store.ts` (store built on useSyncExternalStore), `dates.ts`, `meta.ts` (labels and a categorical palette checked with a colour validator).
 
-**Design:** deep forest `#1e3a2d`, cream `#f5f0e6`, paper `#fbf8f1`, ember accent `#d9622b`, plus sage, lavender and sky. Fonts are Fraunces (serif display) and Inter. Animations are subtle and respect `prefers-reduced-motion`. Mobile has bottom navigation; desktop has a sidebar.
+**Design:** deep forest `#1e3a2d`, cream `#f5f0e6`, paper `#fbf8f1`, ember accent `#d9622b`, plus sage, lavender and sky. The font is the same rounded system face as Steady (`ui-rounded`, SF Pro Rounded), with Nunito from Google Fonts as the fallback where that face isn't available. Headings are bold sans; there are no serif or italic styles. Animations are subtle and respect `prefers-reduced-motion`. Mobile has bottom navigation; desktop has a sidebar.
 
 **Run / deploy:**
 ```sh

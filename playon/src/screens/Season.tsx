@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Button, cx, DemoBadge, go, Stars } from '../components/ui'
+import { Button, cx, PageHeader, Stars } from '../components/ui'
 import { actions, useData } from '../lib/store'
 import { seasonSummary, MILESTONES, milestoneLabel, type WeekSlot } from '../lib/season'
-import { fmt1 } from '../lib/insights'
 import { moodLabel, socialLabel } from '../lib/meta'
 import { shortDate } from '../lib/dates'
 import type { ActivitySession } from '../lib/types'
@@ -15,44 +14,27 @@ export default function Season() {
   const ended = new Date(season.endDate).getTime() < Date.now()
 
   return (
-    <div className="space-y-14">
-      <header>
-        <div className="flex flex-wrap items-center gap-3">
-          <p className="eyebrow">Your {season.name}</p>
-          {data.user!.isDemo && <DemoBadge />}
-        </div>
-        <h1 className="mt-4 font-serif text-[clamp(2.8rem,7vw,5.5rem)] font-light leading-[0.95]">
-          {ended ? 'Season complete.' : `Week ${summary.weekNumber}`}
-          <span className="italic text-ink-3"> {ended ? '' : 'of 12'}</span>
-        </h1>
-        <p className="mt-4 max-w-xl text-ink-2">
-          No streaks to break. Every session plants something; every quiet week is part of the landscape too.
-        </p>
-      </header>
+    <div className="space-y-8">
+      <PageHeader
+        title={ended ? 'Season complete' : `Week ${summary.weekNumber} of 12`}
+        sub={`Your ${season.name}. No streaks to break: every session plants a tree, and quiet weeks are part of the landscape too.`}
+      />
 
-      <dl className="grid grid-cols-2 gap-x-6 gap-y-8 border-y border-line py-8 sm:grid-cols-3 lg:grid-cols-6">
-        <Fact label="Intention" value={`${season.weeklyGoal}×`} sub="per week" />
-        <Fact label="This week" value={`${summary.thisWeek} / ${season.weeklyGoal}`} sub="sessions" />
-        <Fact label="Season" value={`${summary.sessions.length}`} sub="sessions" />
-        <Fact label="Time on court" value={`${Math.round(summary.minutes / 60)}`} sub="hours" />
-        <Fact label="Favourite" value={summary.favorite ?? '—'} serifSmall />
-        <Fact
-          label="Avg enjoyment"
-          value={summary.sessions.length ? fmt1(summary.enjoyment) : '—'}
-          sub={summary.sessions.length ? '/ 5' : ''}
-        />
+      <dl className="grid grid-cols-3 gap-3">
+        <Fact label="This week" value={`${summary.thisWeek}/${season.weeklyGoal}`} />
+        <Fact label="Sessions" value={`${summary.sessions.length}`} />
+        <Fact label="Hours played" value={`${Math.round(summary.minutes / 60)}`} />
       </dl>
 
       <Landscape weeks={weeks} />
 
-      <section aria-labelledby="h-weeks" className="grid gap-10 lg:grid-cols-[1fr_2fr]">
+      <section aria-labelledby="h-weeks" className="space-y-4">
         <div>
-          <h2 id="h-weeks" className="font-serif text-3xl font-light">
-            The season so far
+          <h2 id="h-weeks" className="text-xl font-bold">
+            Week by week
           </h2>
-          <p className="mt-3 text-sm text-ink-2">
-            You've played in {summary.playedWeeks} of {Math.min(summary.weekNumber, 12)} weeks, and met your intention in{' '}
-            {summary.metIntentionWeeks}. Both numbers are just context — not a score.
+          <p className="mt-1 text-sm text-ink-2">
+            Played in {summary.playedWeeks} of {Math.min(summary.weekNumber, 12)} weeks. Context, not a score.
           </p>
           {ended && (
             <Button className="mt-6" onClick={() => actions.startNewSeason()}>
@@ -66,14 +48,11 @@ export default function Season() {
   )
 }
 
-function Fact({ label, value, sub, serifSmall }: { label: string; value: string; sub?: string; serifSmall?: boolean }) {
+function Fact({ label, value }: { label: string; value: string }) {
   return (
-    <div>
-      <dt className="eyebrow text-[10px]">{label}</dt>
-      <dd className={cx('mt-2 font-serif font-light leading-none tabular', serifSmall ? 'text-2xl' : 'text-4xl')}>
-        {value}
-        {sub && <span className="ml-1 font-sans text-xs text-ink-3">{sub}</span>}
-      </dd>
+    <div className="rounded-2xl border border-line bg-paper px-4 py-3">
+      <dt className="text-xs text-ink-3">{label}</dt>
+      <dd className="mt-1 text-2xl font-bold leading-none tabular">{value}</dd>
     </div>
   )
 }
@@ -143,7 +122,7 @@ function Landscape({ weeks }: { weeks: WeekSlot[] }) {
         Season landscape
       </h2>
       <div ref={scroller} className="no-scrollbar overflow-x-auto px-5 sm:px-0">
-        <div className="relative min-w-[880px] overflow-hidden rounded-[2rem] bg-paper">
+        <div className="relative min-w-[880px] overflow-hidden rounded-3xl border border-line bg-paper">
           <svg viewBox={`0 0 ${W} ${H}`} className="block w-full" role="img" aria-label={`Season landscape with ${count} sessions across ${lastPast + 1} weeks`}>
             <defs>
               <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
@@ -207,14 +186,14 @@ function Landscape({ weeks }: { weeks: WeekSlot[] }) {
                 <g key={`m${t.n}`} className="fade" style={{ animationDelay: `${t.n * 70 + 400}ms` }}>
                   <line x1={t.x + 14} x2={t.x + 14} y1={t.y} y2={t.y - 92} stroke="var(--color-ink)" strokeWidth="1" />
                   <path d={`M${t.x + 14},${t.y - 92} l18,6 l-18,6z`} fill="var(--color-ember)" />
-                  <text x={t.x + 12} y={t.y - 98} fontSize="11" fill="var(--color-ink-2)" fontStyle="italic" fontFamily="Fraunces, serif">
+                  <text x={t.x + 12} y={t.y - 98} fontSize="11" fill="var(--color-ink-2)" fontFamily="inherit">
                     {milestoneLabel(t.n)}
                   </text>
                 </g>
               ))}
 
             {count === 0 && (
-              <text x={W / 2} y={150} textAnchor="middle" fontFamily="Fraunces, serif" fontSize="26" fontStyle="italic" fill="var(--color-ink-3)">
+              <text x={W / 2} y={150} textAnchor="middle" fontFamily="inherit" fontSize="26" fill="var(--color-ink-3)">
                 Your first session plants the first tree.
               </text>
             )}
@@ -243,7 +222,7 @@ function Landscape({ weeks }: { weeks: WeekSlot[] }) {
           </svg>
           Rest week
         </span>
-        <span>Tap or tab through trees for details</span>
+        <span>Tap a tree for details</span>
       </div>
     </section>
   )
@@ -301,7 +280,7 @@ function Meadow({ x, y }: { x: number; y: number }) {
       {[-26, -14, -4, 8, 20, 30].map((dx, i) => (
         <path key={i} d={`M${x + dx},${y + 2} q${i % 2 ? 2 : -2},-6 ${i % 2 ? 1 : -1},-${10 + (i % 3) * 3}`} stroke="var(--color-sage)" strokeWidth="1.2" fill="none" />
       ))}
-      <text x={x} y={y + 22} textAnchor="middle" fontSize="10.5" fontStyle="italic" fontFamily="Fraunces, serif" fill="var(--color-ink-3)">
+      <text x={x} y={y + 22} textAnchor="middle" fontSize="10.5" fontFamily="inherit" fill="var(--color-ink-3)">
         rest
       </text>
     </g>
@@ -320,7 +299,7 @@ function TreeCard({ f }: { f: { s: ActivitySession; x: number; y: number; n: num
       <p className="text-xs text-ink-3">
         Session {f.n} · {shortDate(s.date)}
       </p>
-      <p className="mt-1 font-serif text-xl">{s.sport}</p>
+      <p className="mt-1 text-lg font-semibold">{s.sport}</p>
       <p className="text-ink-2">
         {s.duration} min · {socialLabel(s.socialContext)}
       </p>
@@ -328,7 +307,7 @@ function TreeCard({ f }: { f: { s: ActivitySession; x: number; y: number; n: num
         <Stars value={s.enjoyment} size={14} />
         <span className="text-xs text-ink-2">{moodLabel(s.moodAfter)}</span>
       </div>
-      {s.reflection && <p className="mt-2 border-t border-line pt-2 font-serif italic text-ink-2">“{s.reflection}”</p>}
+      {s.reflection && <p className="mt-2 border-t border-line pt-2 text-ink-2">“{s.reflection}”</p>}
     </div>
   )
 }
@@ -346,9 +325,9 @@ function Timeline({ weeks, goal }: { weeks: WeekSlot[]; goal: number }) {
         const startCount = cumulative
         const ms = MILESTONES.filter((m) => m > startCount && m <= endCount)
         return (
-          <li key={w.index} className="grid grid-cols-[72px_1fr] gap-4 border-b border-line py-5 sm:grid-cols-[110px_1fr_auto]">
+          <li key={w.index} className="grid grid-cols-[84px_1fr] gap-4 border-b border-line py-4 sm:grid-cols-[110px_1fr_auto]">
             <div>
-              <p className="font-serif text-xl">{w.isCurrent ? 'This week' : `Week ${w.index + 1}`}</p>
+              <p className="font-semibold">{w.isCurrent ? 'This week' : `Week ${w.index + 1}`}</p>
               <p className="text-xs text-ink-3">{w.start.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}</p>
             </div>
             <div className="min-w-0">
@@ -362,7 +341,7 @@ function Timeline({ weeks, goal }: { weeks: WeekSlot[]; goal: number }) {
                   ))}
                 </ul>
               ) : (
-                <p className="font-serif text-sm italic text-ink-3">
+                <p className="text-sm text-ink-3">
                   {w.isCurrent ? 'Nothing yet — plenty of week left.' : 'A rest week. Recovery is part of the season.'}
                 </p>
               )}
@@ -386,11 +365,6 @@ function Timeline({ weeks, goal }: { weeks: WeekSlot[]; goal: number }) {
           </li>
         )
       })}
-      <li className="pt-5">
-        <button className="text-sm text-forest underline underline-offset-4" onClick={() => go('play')}>
-          Log a session
-        </button>
-      </li>
     </ol>
   )
 }

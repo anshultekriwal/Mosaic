@@ -197,9 +197,9 @@ export function StarInput({ value, onChange }: { value: number; onChange: (n: nu
             aria-checked={value === i}
             aria-label={`${i} — ${words[i - 1]}`}
             onClick={() => onChange(i)}
-            className="press grid h-14 w-14 place-items-center rounded-full hover:bg-ember-soft sm:h-16 sm:w-16"
+            className="press grid h-12 w-12 place-items-center rounded-full hover:bg-ember-soft"
           >
-            <svg width="40" height="40" viewBox="0 0 24 24" aria-hidden className={cx('transition-transform duration-300', value >= i && 'scale-110')}>
+            <svg width="34" height="34" viewBox="0 0 24 24" aria-hidden className={cx('transition-transform duration-300', value >= i && 'scale-110')}>
               <path
                 d="M12 2.8l2.7 5.9 6.4.7-4.8 4.3 1.4 6.3L12 16.8 6.3 20l1.4-6.3L2.9 9.4l6.4-.7z"
                 fill={value >= i ? 'var(--color-ember)' : 'transparent'}
@@ -211,7 +211,7 @@ export function StarInput({ value, onChange }: { value: number; onChange: (n: nu
           </button>
         ))}
       </div>
-      <p className="mt-3 h-6 font-serif text-lg italic text-ink-2" aria-live="polite">
+      <p className="mt-2 h-6 font-medium text-ink-2" aria-live="polite">
         {value ? words[value - 1] : ''}
       </p>
     </div>
@@ -243,7 +243,7 @@ export function Scale({
         <label className={hideLabel ? 'sr-only' : 'eyebrow'} htmlFor={`sc-${label}`}>
           {label}
         </label>
-        {words && <span className="font-serif text-lg italic text-ink-2">{words[value - 1]}</span>}
+        {words && <span className="text-sm font-medium text-ink-2">{words[value - 1]}</span>}
       </div>
       <input
         id={`sc-${label}`}
@@ -278,6 +278,23 @@ export function DemoBadge({ className }: { className?: string }) {
       Sample data
     </span>
   )
+}
+
+export function PageHeader({ title, sub, aside }: { title: ReactNode; sub?: ReactNode; aside?: ReactNode }) {
+  return (
+    <header className="flex flex-wrap items-end justify-between gap-4">
+      <div className="min-w-0">
+        <h1 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl">{title}</h1>
+        {sub && <p className="mt-2 max-w-xl text-ink-2">{sub}</p>}
+      </div>
+      {aside}
+    </header>
+  )
+}
+
+/** A quiet bordered surface for grouping one idea. */
+export function Card({ children, className, tone }: { children: ReactNode; className?: string; tone?: string }) {
+  return <section className={cx('rounded-3xl border border-line p-5 sm:p-6', tone ?? 'bg-paper', className)}>{children}</section>
 }
 
 export function Rule({ className }: { className?: string }) {

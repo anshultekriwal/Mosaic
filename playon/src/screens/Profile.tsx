@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Button, Chips, cx, DemoBadge, go, Rule, Stars } from '../components/ui'
+import { Button, Chips, cx, go, PageHeader, Rule, Stars } from '../components/ui'
 import { actions, sortedSessions, useData } from '../lib/store'
-import { GOALS, LEVELS, moodLabel, socialLabel } from '../lib/meta'
+import { moodLabel, socialLabel } from '../lib/meta'
 import { shortDate } from '../lib/dates'
 
 export default function Profile() {
@@ -23,21 +23,15 @@ export default function Profile() {
   }
 
   return (
-    <div className="space-y-16">
-      <header>
-        <div className="flex flex-wrap items-center gap-3">
-          <p className="eyebrow">Profile</p>
-          {user.isDemo && <DemoBadge />}
-        </div>
-        <h1 className="mt-4 font-serif text-[clamp(2.6rem,6vw,4.5rem)] font-light leading-[1.02]">{user.name}</h1>
-        <p className="mt-2 text-ink-2">
-          {user.sports.join(' · ')} · since {new Date(user.createdAt).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}
-        </p>
-      </header>
+    <div className="space-y-7">
+      <PageHeader
+        title={user.name}
+        sub={`${user.sports.join(' · ')} · since ${new Date(user.createdAt).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}`}
+      />
 
       {user.isDemo && (
-        <section className="rounded-[2rem] border border-dashed border-ember/50 bg-ember-soft/40 p-6 sm:p-8">
-          <p className="font-serif text-2xl">You're exploring a sample season.</p>
+        <section className="rounded-3xl border border-dashed border-ember/50 bg-ember-soft/40 p-5 sm:p-6">
+          <p className="text-lg font-semibold">You're exploring a sample season.</p>
           <p className="mt-2 max-w-xl text-sm text-ink-2">
             Alex and their sessions are made up so you can see how PLAY ON works. Start your own season to clear the sample
             and begin with a blank slate.
@@ -54,11 +48,11 @@ export default function Profile() {
         </section>
       )}
 
-      <section aria-labelledby="h-prefs" className="grid gap-10 lg:grid-cols-[1fr_2fr]">
-        <h2 id="h-prefs" className="font-serif text-3xl font-light">
+      <section aria-labelledby="h-prefs" className="grid gap-6 lg:grid-cols-[1fr_2fr]">
+        <h2 id="h-prefs" className="text-xl font-bold">
           Preferences
         </h2>
-        <div className="space-y-10">
+        <div className="space-y-7">
           <div className="max-w-sm">
             <label htmlFor="pname" className="eyebrow">
               Name
@@ -68,7 +62,7 @@ export default function Profile() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               onBlur={() => name.trim() && actions.updateUser({ name: name.trim() })}
-              className="mt-2 h-12 w-full border-0 border-b border-line-2 bg-transparent font-serif text-2xl outline-none focus:border-forest"
+              className="mt-2 h-11 w-full rounded-xl border border-line-2 bg-paper/60 px-4 outline-none focus:border-forest"
             />
           </div>
           <Chips
@@ -83,45 +77,28 @@ export default function Profile() {
             value={String(user.weeklyGoal)}
             onChange={(n) => actions.updateUser({ weeklyGoal: Number(n) })}
           />
-          <Chips
-            label="Experience"
-            options={LEVELS.map((l) => ({ id: l.id, label: l.label }))}
-            value={user.experienceLevel}
-            onChange={(l) => actions.updateUser({ experienceLevel: l })}
-          />
-          <Chips
-            label="What you want from PLAY ON"
-            multi
-            options={GOALS}
-            value={user.wellnessGoal}
-            onChange={(g) =>
-              actions.updateUser({
-                wellnessGoal: user.wellnessGoal.includes(g) ? user.wellnessGoal.filter((x) => x !== g) : [...user.wellnessGoal, g],
-              })
-            }
-          />
         </div>
       </section>
 
       <Rule />
 
-      <section aria-labelledby="h-history" className="grid gap-10 lg:grid-cols-[1fr_2fr]">
+      <section aria-labelledby="h-history" className="grid gap-6 lg:grid-cols-[1fr_2fr]">
         <div>
-          <h2 id="h-history" className="font-serif text-3xl font-light">
+          <h2 id="h-history" className="text-xl font-bold">
             Activity history
           </h2>
           <p className="mt-2 text-sm text-ink-2">{sessions.length} sessions logged.</p>
         </div>
         <div>
           {sessions.length === 0 ? (
-            <p className="font-serif text-xl italic text-ink-3">Nothing yet. Your first session will show up here.</p>
+            <p className="text-ink-3">Nothing yet. Your first session will show up here.</p>
           ) : (
             <ul className="border-t border-line">
-              {(showAll ? sessions : sessions.slice(0, 8)).map((s) => (
+              {(showAll ? sessions : sessions.slice(0, 5)).map((s) => (
                 <li key={s.id} className="flex flex-wrap items-center justify-between gap-3 border-b border-line py-4">
                   <div className="min-w-0">
-                    <p className="font-serif text-xl">
-                      {s.sport} <span className="font-sans text-sm text-ink-3">· {s.duration} min · {socialLabel(s.socialContext)}</span>
+                    <p className="font-semibold">
+                      {s.sport} <span className="text-sm font-normal text-ink-3">· {s.duration} min · {socialLabel(s.socialContext)}</span>
                     </p>
                     <p className="text-xs text-ink-3">
                       {shortDate(s.date)} · felt {moodLabel(s.moodAfter).toLowerCase()}
@@ -158,7 +135,7 @@ export default function Profile() {
               ))}
             </ul>
           )}
-          {sessions.length > 8 && (
+          {sessions.length > 5 && (
             <Button variant="quiet" className="mt-4" onClick={() => setShowAll((x) => !x)}>
               {showAll ? 'Show fewer' : `Show all ${sessions.length}`}
             </Button>
@@ -168,9 +145,9 @@ export default function Profile() {
 
       <Rule />
 
-      <section aria-labelledby="h-data" className="grid gap-10 lg:grid-cols-[1fr_2fr]">
+      <section aria-labelledby="h-data" className="grid gap-6 lg:grid-cols-[1fr_2fr]">
         <div>
-          <h2 id="h-data" className="font-serif text-3xl font-light">
+          <h2 id="h-data" className="text-xl font-bold">
             Your data
           </h2>
           <p className="mt-2 text-sm text-ink-2">Everything lives in this browser. Nothing is sent anywhere.</p>

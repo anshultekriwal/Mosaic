@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Arrow, Button, cx, go, useReducedMotion } from '../components/ui'
+import { Arrow, Button, cx, go, PageHeader, useReducedMotion } from '../components/ui'
 import { actions, sortedSessions, uid, useData } from '../lib/store'
 import { moodLabel } from '../lib/meta'
 import { shortDate } from '../lib/dates'
@@ -82,63 +82,41 @@ function RoomIndex() {
   const rec = suggestionFor(mood)
 
   return (
-    <div className="space-y-14">
-      <header className="max-w-3xl">
-        <p className="eyebrow">Reset Room</p>
-        <h1 className="mt-4 font-serif text-[clamp(2.6rem,6vw,4.5rem)] font-light leading-[1.02]">
-          A minute for yourself.
-          <span className="block italic text-ink-2">That's all this takes.</span>
-        </h1>
-        <p className="mt-5 max-w-xl text-ink-2">
-          Small things to do after a game, or any time. Not therapy, not training — just a short pause.
-        </p>
-      </header>
+    <div className="space-y-8">
+      <PageHeader title="Reset" sub="A minute for yourself, after a game or any time." />
 
-      <section aria-labelledby="h-rec" className={cx('rounded-[2rem] p-7 sm:p-10', rec.tone)}>
-        <p id="h-rec" className="eyebrow">
-          {mood ? `You last said you felt ${moodLabel(mood).toLowerCase()}` : 'A good place to start'}
-        </p>
-        <p className="mt-4 font-serif text-4xl font-light sm:text-5xl">{rec.title}</p>
-        <p className="mt-3 text-ink-2">
-          {rec.length} · {rec.blurb}
-        </p>
-        <Button size="lg" className="mt-8" onClick={() => go('reset', rec.id)}>
-          Begin <Arrow />
-        </Button>
-      </section>
-
-      <section aria-labelledby="h-all">
-        <h2 id="h-all" className="eyebrow">
-          Everything in the room
-        </h2>
-        <ul className="mt-4 border-t border-line">
-          {EXERCISES.map((e) => (
-            <li key={e.id} className="border-b border-line">
-              <button onClick={() => go('reset', e.id)} className="press group grid w-full gap-1 py-6 text-left sm:grid-cols-[220px_1fr_auto] sm:items-center sm:gap-6">
-                <span className="text-sm text-ink-3">{e.when}</span>
-                <span>
-                  <span className="block font-serif text-2xl sm:text-3xl">{e.title}</span>
-                  <span className="text-sm text-ink-2">{e.blurb}</span>
-                </span>
-                <span className="flex items-center gap-3 text-sm text-ink-2">
-                  {e.length}
-                  <Arrow className="transition-transform group-hover:translate-x-1" />
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <ul className="grid gap-3 sm:grid-cols-2">
+        {[rec, ...EXERCISES.filter((e) => e.id !== rec.id)].map((e) => (
+          <li key={e.id}>
+            <button
+              onClick={() => go('reset', e.id)}
+              className={cx('press group flex h-full w-full flex-col rounded-3xl border p-5 text-left hover:border-forest', e.tone, e.id === rec.id ? 'border-forest' : 'border-transparent')}
+            >
+              <span className="flex w-full items-center justify-between gap-2 text-sm text-ink-3">
+                {e.when}
+                {e.id === rec.id && <span className="rounded-full bg-forest px-2.5 py-0.5 text-xs font-medium text-paper">Suggested</span>}
+              </span>
+              <span className="mt-3 text-xl font-bold">{e.title}</span>
+              <span className="mt-1 text-sm text-ink-2">{e.blurb}</span>
+              <span className="mt-4 flex items-center gap-2 text-sm font-medium text-forest">
+                {e.length}
+                <Arrow className="transition-transform group-hover:translate-x-1" />
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+      {mood && <p className="-mt-4 text-sm text-ink-3">Suggested because you last said you felt {moodLabel(mood).toLowerCase()}.</p>}
 
       {data.moments.length > 0 && (
         <section aria-labelledby="h-moments">
-          <h2 id="h-moments" className="eyebrow">
-            Moments you've captured
+          <h2 id="h-moments" className="font-semibold">
+            Moments you've saved
           </h2>
-          <ul className="mt-6 grid gap-6 sm:grid-cols-2">
-            {[...data.moments].reverse().map((m) => (
-              <li key={m.id} className="border-l-2 border-ember pl-4">
-                <p className="font-serif text-xl italic">“{m.text}”</p>
+          <ul className="mt-4 grid gap-4 sm:grid-cols-2">
+            {[...data.moments].reverse().slice(0, 6).map((m) => (
+              <li key={m.id} className="border-l-2 border-ember pl-3">
+                <p>“{m.text}”</p>
                 <p className="mt-1 text-xs text-ink-3">{shortDate(m.date)}</p>
               </li>
             ))}
@@ -163,7 +141,7 @@ function ExerciseScreen({ ex }: { ex: Exercise }) {
     <div className={cx('relative flex min-h-dvh flex-col', dark ? 'bg-forest text-paper' : 'bg-cream text-ink')}>
       <header className="mx-auto flex w-full max-w-3xl items-center justify-between px-6 pt-6">
         <button onClick={() => go('reset')} className={cx('press text-sm', dark ? 'text-paper/70 hover:text-paper' : 'text-ink-2 hover:text-ink')}>
-          ← Reset Room
+          ← Reset
         </button>
         <span className={cx('text-sm', dark ? 'text-paper/60' : 'text-ink-3')}>{ex.length}</span>
       </header>
@@ -194,7 +172,7 @@ function Finished({ ex, dark }: { ex: Exercise; dark: boolean }) {
   return (
     <div className="rise flex flex-1 flex-col justify-center">
       <p className={cx('eyebrow', dark && 'text-sage')}>{ex.title}</p>
-      <p className="mt-5 font-serif text-5xl font-light leading-tight sm:text-6xl">{lines[ex.id]}</p>
+      <p className="mt-5 text-4xl font-bold leading-tight">{lines[ex.id]}</p>
       <div className="mt-12 flex flex-col gap-3 sm:flex-row">
         <Button variant={dark ? 'light' : 'primary'} size="lg" onClick={() => go('home')}>
           Back home
@@ -205,7 +183,7 @@ function Finished({ ex, dark }: { ex: Exercise; dark: boolean }) {
           className={dark ? 'border border-paper/30 bg-transparent hover:bg-paper/5' : ''}
           onClick={() => go('reset')}
         >
-          Reset Room
+          More resets
         </Button>
       </div>
     </div>
@@ -261,7 +239,7 @@ function Breather({ phases, total, onDone, intro }: { phases: Phase[]; total: nu
     <div className="flex flex-1 flex-col items-center justify-center text-center">
       {!running ? (
         <div className="rise">
-          <p className="mx-auto max-w-md font-serif text-3xl font-light leading-snug">{intro}</p>
+          <p className="mx-auto max-w-md text-3xl font-bold leading-snug">{intro}</p>
           <Button variant="light" size="lg" className="mt-10" onClick={() => setRunning(true)}>
             Start breathing
           </Button>
@@ -279,7 +257,7 @@ function Breather({ phases, total, onDone, intro }: { phases: Phase[]; total: nu
               style={reduced ? { opacity: 0.2 + scale * 0.6 } : { transform: `scale(${0.5 + scale * 0.5})` }}
             />
           </div>
-          <p className="mt-10 font-serif text-4xl font-light italic" aria-live="polite">
+          <p className="mt-10 text-4xl font-bold" aria-live="polite">
             {label}
           </p>
           <p className="mt-3 text-sm text-paper/60 tabular">{remaining}s</p>
@@ -333,7 +311,7 @@ function ToughGame({ onDone }: { onDone: () => void }) {
       }}
     >
       <p className="eyebrow text-sage">One question</p>
-      <label htmlFor="tg" className="mt-4 block font-serif text-4xl font-light leading-tight sm:text-5xl">
+      <label htmlFor="tg" className="mt-4 block text-3xl font-bold leading-tight sm:text-4xl">
         What would you say to a friend who just played that game?
       </label>
       <textarea
@@ -343,7 +321,7 @@ function ToughGame({ onDone }: { onDone: () => void }) {
         rows={3}
         maxLength={240}
         placeholder="Optional"
-        className="mt-10 w-full resize-none border-0 border-b border-paper/25 bg-transparent pb-3 font-serif text-2xl font-light italic outline-none placeholder:text-paper/35 focus:border-sage"
+        className="mt-10 w-full resize-none border-0 border-b border-paper/25 bg-transparent pb-3 text-2xl font-bold outline-none placeholder:text-paper/35 focus:border-sage"
       />
       <div className="mt-auto flex justify-end gap-4 pt-10">
         <Button type="submit" variant="light" size="lg">
@@ -369,7 +347,7 @@ function Capture({ onDone }: { onDone: () => void }) {
       }}
     >
       <p className="eyebrow">Capture the moment</p>
-      <label htmlFor="cap" className="mt-4 block font-serif text-4xl font-light leading-tight sm:text-6xl">
+      <label htmlFor="cap" className="mt-4 block text-3xl font-bold leading-tight sm:text-4xl">
         Write one thing that made today enjoyable.
       </label>
       <textarea
@@ -380,7 +358,7 @@ function Capture({ onDone }: { onDone: () => void }) {
         rows={3}
         maxLength={240}
         placeholder="The rally that wouldn't end…"
-        className="mt-10 w-full resize-none border-0 border-b border-line-2 bg-transparent pb-3 font-serif text-2xl font-light italic outline-none placeholder:text-ink-3/50 focus:border-forest sm:text-3xl"
+        className="mt-10 w-full resize-none border-0 border-b border-line-2 bg-transparent pb-3 text-2xl font-bold outline-none placeholder:text-ink-3/50 focus:border-forest sm:text-3xl"
       />
       <div className="mt-auto flex justify-end pt-10">
         <Button type="submit" size="lg" disabled={!text.trim()}>
@@ -409,7 +387,7 @@ function Recovery({ onDone }: { onDone: () => void }) {
     return (
       <div className="rise flex flex-1 flex-col justify-center">
         <p className="eyebrow">Recovery mode</p>
-        <h1 className="mt-4 font-serif text-5xl font-light leading-tight sm:text-6xl">Five easy stretches.</h1>
+        <h1 className="mt-4 text-4xl font-bold leading-tight">Five easy stretches.</h1>
         <p className="mt-4 max-w-md text-ink-2">
           Thirty seconds each. Ease in, never push into pain — if anything hurts, stop.
         </p>
@@ -444,7 +422,7 @@ function Stretch({ i, onNext }: { i: number; onNext: () => void }) {
       <p className="eyebrow">
         Stretch {i + 1} of {STRETCHES.length}
       </p>
-      <h1 className="mt-4 font-serif text-5xl font-light sm:text-7xl">{name}</h1>
+      <h1 className="mt-4 text-4xl font-bold">{name}</h1>
       <p className="mt-4 max-w-md text-lg text-ink-2">{how}</p>
       <div className="mt-12 h-1 w-full max-w-md rounded-full bg-line" aria-hidden>
         <div className="h-1 rounded-full bg-forest" style={{ width: `${(elapsed / 30) * 100}%` }} />
