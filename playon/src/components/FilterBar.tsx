@@ -53,7 +53,7 @@ export default function FilterBar({ filters, onChange, compute }: Props) {
         >
           <FunnelIcon />
           Filters
-          {n > 0 && <span className="grid h-5 min-w-5 place-items-center rounded-full bg-forest px-1.5 text-[11px] text-paper tabular">{n}</span>}
+          {n > 0 && <span className="grid h-5 min-w-5 place-items-center rounded-full bg-forest px-1.5 text-sm text-paper tabular">{n}</span>}
         </button>
         <span className="truncate text-sm text-ink-2">{PERIODS.find((p) => p.id === filters.period)!.label}</span>
       </div>
@@ -77,7 +77,7 @@ export default function FilterBar({ filters, onChange, compute }: Props) {
 function PeriodControl({ value, onChange }: { value: Period; onChange: (p: Period) => void }) {
   return (
     <fieldset className="shrink-0">
-      <legend className="eyebrow mb-2 text-[10px]">Period</legend>
+      <legend className="eyebrow mb-2 text-sm">Period</legend>
       <div className="flex rounded-full border border-line-2 bg-paper/60 p-1 text-sm" role="radiogroup" aria-label="Period">
         {PERIODS.map((p) => (
           <button
@@ -100,7 +100,7 @@ function FacetGroup({ facet, onToggle, className, wrap }: { facet: Facet; onTogg
   const id = useId()
   return (
     <div className={className} role="group" aria-labelledby={id}>
-      <p id={id} className="eyebrow mb-2 text-[10px]">
+      <p id={id} className="eyebrow mb-2 text-sm">
         {facet.label}
       </p>
       <div className={cx('flex gap-1.5', wrap && 'flex-wrap')}>
@@ -189,7 +189,7 @@ function Sheet({
         className="sheet-up absolute inset-x-0 bottom-0 flex max-h-[88vh] flex-col supports-[height:100dvh]:max-h-[88dvh] rounded-t-[1.75rem] bg-paper shadow-[0_-20px_50px_-20px_rgba(30,58,45,0.4)]"
       >
         <div className="flex shrink-0 items-center justify-between border-b border-line px-5 py-4">
-          <h2 id={titleId} className="font-serif text-2xl">
+          <h2 id={titleId} className="text-2xl">
             Filters
           </h2>
           <button onClick={onClose} className="press rounded-full px-3 py-1.5 text-sm text-ink-2 underline underline-offset-4">

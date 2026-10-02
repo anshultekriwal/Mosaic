@@ -1,13 +1,13 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Arrow, Button, cx, DemoBadge, go, LinkArrow, Rule, Scale, Stars } from '../components/ui'
 import { actions, sortedSessions, uid, useData } from '../lib/store'
 import { daysBetween, greeting, relativeDay } from '../lib/dates'
-import { ENERGY_WORDS, MOODS, moodLabel, socialLabel, sessionTypeLabel } from '../lib/meta'
+import { ENERGY_WORDS, MOODS, moodLabel, resultLabel, socialLabel, sessionTypeLabel } from '../lib/meta'
 import { computeInsights, daysSinceLastSession, earlyWarning, MIN_SESSIONS, orderInsights } from '../lib/insights'
 import { seasonSummary } from '../lib/season'
 import { suggestionFor } from './Reset'
 import { LiveGameCard } from '../components/LiveGame'
-import type { BodyAfter, Mood } from '../lib/types'
+import type { ActivitySession, BodyAfter, Mood } from '../lib/types'
 
 export default function Home() {
   const data = useData()
@@ -28,7 +28,7 @@ export default function Home() {
 
       {since != null && since >= 7 && (
         <section className="rise rounded-3xl bg-lavender-soft px-6 py-7 sm:px-10" aria-label="Welcome back">
-          <p className="font-serif text-3xl font-light">Welcome back.</p>
+          <p className="text-3xl">Welcome back.</p>
           <p className="mt-2 max-w-lg text-ink-2">
             Sometimes the best part of the long game is coming back. Your season is still here. Pick up wherever feels
             right.
@@ -49,9 +49,9 @@ export default function Home() {
               </span>
             )}
           </div>
-          <h1 className="mt-4 font-serif text-[clamp(2.6rem,6vw,4.5rem)] font-light leading-[1.02]">
+          <h1 className="mt-4 text-5xl leading-[1.02]">
             {greeting()}, {user.name}.
-            <span className="block italic text-ink-2">How are you feeling today?</span>
+            <span className="block text-ink-2">How are you feeling today?</span>
           </h1>
         </div>
         <CheckInPanel existing={todayCheckIn?.mood} existingEnergy={todayCheckIn?.energy} />
@@ -68,7 +68,7 @@ export default function Home() {
         <div className="relative flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="eyebrow text-sage">About to play, or just played?</p>
-            <p className="mt-3 font-serif text-3xl font-light sm:text-4xl">Remember how it felt.</p>
+            <p className="mt-3 text-3xl sm:text-4xl">Remember how it felt.</p>
             <p className="mt-2 max-w-md text-sm text-paper/70">
               Start a game now and we'll ask how you feel going in, then how it went when you finish. Or log one you've already
               played. About thirty seconds, mostly taps.
@@ -94,13 +94,13 @@ export default function Home() {
                 <span className="h-1.5 w-1.5 rounded-full bg-ember" aria-hidden />
                 Worth noticing
               </h2>
-              <p className="mt-4 font-serif text-3xl font-light leading-snug sm:text-4xl">{warning.title}</p>
+              <p className="mt-4 text-3xl leading-snug sm:text-4xl">{warning.title}</p>
               <p className="mt-3 text-sm text-ink-2">{warning.insight.basis}</p>
               {warning.bounce && <p className="mt-2 text-sm font-medium text-forest">{warning.bounce}</p>}
             </div>
             <div className="rounded-2xl bg-paper/80 p-5">
-              <p className="eyebrow text-[10px]">One thing to try</p>
-              <p className="mt-2 font-serif text-xl leading-snug">{warning.suggestion}</p>
+              <p className="eyebrow text-sm">One thing to try</p>
+              <p className="mt-2 text-xl leading-snug">{warning.suggestion}</p>
               <LinkArrow className="mt-4" onClick={() => go('insights', warning.insight.id, 'period=all')}>
                 See the games behind this
               </LinkArrow>
@@ -108,6 +108,8 @@ export default function Home() {
           </div>
         </section>
       )}
+
+      <LastGame last={last} />
 
       <div className="grid gap-14 lg:grid-cols-2 lg:gap-x-16 lg:gap-y-16">
         {/* season */}
@@ -123,7 +125,7 @@ export default function Home() {
             </div>
             <Rule className="mt-3" />
             <div className="mt-6 flex items-end gap-6">
-              <p className="font-serif text-7xl font-light leading-none tabular">
+              <p className="text-7xl leading-none tabular">
                 {summary.thisWeek}
                 <span className="text-3xl text-ink-3"> / {summary.season.weeklyGoal}</span>
               </p>
@@ -147,43 +149,6 @@ export default function Home() {
           </section>
         )}
 
-        {/* last session */}
-        <section aria-labelledby="h-last">
-          <h2 id="h-last" className="eyebrow">
-            Last time you played
-          </h2>
-          <Rule className="mt-3" />
-          {last ? (
-            <div className="mt-6">
-              <p className="font-serif text-4xl font-light">{last.sport}</p>
-              <p className="mt-2 text-ink-2">
-                {last.duration} min · {sessionTypeLabel(last.sessionType)} · {socialLabel(last.socialContext)} ·{' '}
-                {relativeDay(last.date)}
-              </p>
-              <div className="mt-5 flex flex-wrap items-center gap-x-8 gap-y-3 text-sm">
-                <span className="flex items-center gap-2">
-                  <span className="text-ink-3">Enjoyment</span>
-                  <Stars value={last.enjoyment} />
-                </span>
-                <span>
-                  <span className="text-ink-3">Left feeling </span>
-                  {moodLabel(last.moodAfter).toLowerCase()}
-                </span>
-              </div>
-              {last.reflection && (
-                <blockquote className="mt-5 border-l-2 border-ember pl-4 font-serif text-lg italic text-ink-2">
-                  “{last.reflection}”
-                </blockquote>
-              )}
-            </div>
-          ) : (
-            <div className="mt-6">
-              <p className="font-serif text-3xl font-light text-ink-2">Nothing logged yet.</p>
-              <p className="mt-2 text-sm text-ink-2">Log your first game and PLAY ON starts remembering how it felt.</p>
-            </div>
-          )}
-        </section>
-
         {/* noticed */}
         <section aria-labelledby="h-noticed" className="lg:col-span-1">
           <h2 id="h-noticed" className="eyebrow">
@@ -192,7 +157,7 @@ export default function Home() {
           <Rule className="mt-3" />
           {noticed ? (
             <>
-              <p className="mt-6 font-serif text-3xl font-light leading-snug">{noticed.headline}</p>
+              <p className="mt-6 text-3xl leading-snug">{noticed.headline}</p>
               <p className="mt-3 text-sm text-ink-2">{noticed.basis}</p>
               <LinkArrow className="mt-5" onClick={() => go('insights', noticed.id, 'period=all')}>
                 Explore your patterns
@@ -202,7 +167,7 @@ export default function Home() {
             <>
               {sessions.length < MIN_SESSIONS ? (
                 <>
-                  <p className="mt-6 font-serif text-3xl font-light leading-snug">
+                  <p className="mt-6 text-3xl leading-snug">
                     {sessions.length} of {MIN_SESSIONS} games logged.
                   </p>
                   <p className="mt-3 text-sm text-ink-2">
@@ -211,7 +176,7 @@ export default function Home() {
                 </>
               ) : (
                 <>
-                  <p className="mt-6 font-serif text-3xl font-light leading-snug text-ink-2">Nothing stands out yet. Your games look pretty even.</p>
+                  <p className="mt-6 text-3xl leading-snug text-ink-2">Nothing stands out yet. Your games look pretty even.</p>
                   <p className="mt-3 text-sm text-ink-2">We only point out patterns that are really in your log.</p>
                 </>
               )}
@@ -233,11 +198,79 @@ export default function Home() {
   )
 }
 
+/** The most recent game, given room: centred, with its key numbers as tiles. */
+function LastGame({ last }: { last?: ActivitySession }) {
+  if (!last)
+    return (
+      <section aria-labelledby="h-last" className="rounded-[2rem] border border-line bg-paper px-6 py-10 text-center sm:px-10">
+        <h2 id="h-last" className="eyebrow">
+          Last time you played
+        </h2>
+        <p className="mt-4 text-3xl text-ink-2">Nothing logged yet.</p>
+        <p className="mx-auto mt-2 max-w-md text-sm text-ink-2">Log your first game and PLAY ON starts remembering how it felt.</p>
+      </section>
+    )
+  const lift = last.energyAfter - last.energyBefore
+  const tiles: { label: string; value: ReactNode }[] = [
+    { label: 'Played', value: <span className="tabular">{last.duration} min</span> },
+    {
+      label: 'Enjoyment',
+      value: (
+        <span className="inline-flex flex-col items-center gap-1">
+          <Stars value={last.enjoyment} size={18} />
+          <span className="tabular">{last.enjoyment}/5</span>
+        </span>
+      ),
+    },
+    {
+      label: 'Energy',
+      value: (
+        <span className="tabular">
+          {last.energyBefore} → {last.energyAfter}
+          <span className="text-ink-3"> ({lift > 0 ? '+' : lift < 0 ? '−' : '±'}{Math.abs(lift)})</span>
+        </span>
+      ),
+    },
+    { label: 'Left feeling', value: <span>{moodLabel(last.moodAfter)}</span> },
+  ]
+  return (
+    <section aria-labelledby="h-last" className="rounded-[2rem] border border-line bg-paper px-5 py-10 text-center sm:px-10 lg:py-12">
+      <h2 id="h-last" className="eyebrow">
+        Last time you played · {relativeDay(last.date)}
+      </h2>
+      <p className="mt-4 text-4xl">{last.sport}</p>
+      <p className="mt-2 text-ink-2">
+        {sessionTypeLabel(last.sessionType)} · {socialLabel(last.socialContext)}
+        {last.result && <> · {resultLabel(last.result)}</>}
+      </p>
+      <dl className="mx-auto mt-8 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
+        {tiles.map((t) => (
+          <div key={t.label} className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-cream/70 px-3 py-5">
+            <dt className="text-xs text-ink-3">{t.label}</dt>
+            <dd className="text-xl">{t.value}</dd>
+          </div>
+        ))}
+      </dl>
+      {last.reflection && (
+        <blockquote className="mx-auto mt-8 max-w-xl text-lg text-ink-2">
+          <span className="text-ember" aria-hidden>
+            “
+          </span>
+          {last.reflection}
+          <span className="text-ember" aria-hidden>
+            ”
+          </span>
+        </blockquote>
+      )}
+    </section>
+  )
+}
+
 function ResetTeaser({ mood, body }: { mood?: Mood; body?: BodyAfter }) {
   const s = suggestionFor(mood, body)
   return (
     <div className="mt-6">
-      <p className="font-serif text-3xl font-light">{s.title}</p>
+      <p className="text-3xl">{s.title}</p>
       <p className="mt-2 text-sm text-ink-2">
         {s.length} · {s.blurb}
       </p>
@@ -293,7 +326,7 @@ function CheckInPanel({ existing, existingEnergy }: { existing?: Mood; existingE
     return (
       <div className="rise rounded-3xl border border-line bg-paper p-6" aria-live="polite">
         <p className="eyebrow">Today's check-in</p>
-        <p className="mt-3 font-serif text-2xl">
+        <p className="mt-3 text-2xl">
           {MOODS.find((m) => m.id === existing)?.glyph} {moodLabel(existing)}
           {existingEnergy && <span className="text-ink-3"> · energy {ENERGY_WORDS[existingEnergy - 1].toLowerCase()}</span>}
         </p>

@@ -1,5 +1,5 @@
 import { Wordmark } from '../App'
-import { Arrow, Button, go } from '../components/ui'
+import { Arrow, BackButton, Button, go } from '../components/ui'
 import { actions, getData } from '../lib/store'
 import { buildDemo } from '../lib/demo'
 
@@ -19,22 +19,18 @@ export default function Welcome() {
         <div className="relative mx-auto flex min-h-[92dvh] max-w-6xl flex-col px-6 pb-14 pt-8 sm:px-10 lg:min-h-[86dvh]">
           <header className="flex items-center justify-between">
             <Wordmark light />
-            {existing && (
-              <button onClick={() => go('home')} className="text-sm text-paper/80 underline underline-offset-4 hover:text-paper">
-                Back to my season
-              </button>
-            )}
+            {existing && <BackButton light label="Back to my season" onClick={() => go('home')} />}
           </header>
 
           <div className="mt-auto max-w-3xl pt-24">
             <p className="eyebrow rise text-sage" style={{ animationDelay: '80ms' }}>
               For people who play for the love of it
             </p>
-            <h1 className="mt-6 font-serif text-[clamp(3.2rem,9vw,7.5rem)] font-light leading-[0.92]">
+            <h1 className="mt-6 text-5xl leading-[0.92]">
               <span className="rise block" style={{ animationDelay: '160ms' }}>
                 Keep playing.
               </span>
-              <span className="rise block italic text-sage" style={{ animationDelay: '320ms' }}>
+              <span className="rise block text-sage" style={{ animationDelay: '320ms' }}>
                 Just play differently.
               </span>
             </h1>
@@ -67,7 +63,7 @@ export default function Welcome() {
         <div className="grid gap-12 lg:grid-cols-[1fr_1.3fr] lg:gap-20">
           <div>
             <p className="eyebrow">Why PLAY ON?</p>
-            <h2 className="mt-4 font-serif text-4xl font-light leading-tight sm:text-5xl">
+            <h2 className="mt-4 text-4xl leading-tight sm:text-5xl">
               Your post-game chat, <em>remembered</em>.
             </h2>
           </div>
@@ -77,7 +73,7 @@ export default function Welcome() {
               the conversation is gone. PLAY ON keeps those thirty seconds, game after game.
             </p>
             <p>
-              Over a season they show you <span className="font-serif italic text-ink">what keeps the game fun</span>, and
+              Over a season they show you <span className="text-ink">what keeps the game fun</span>, and
               the slow drift that makes people quit, while there's still time to play differently.
             </p>
           </div>
@@ -90,8 +86,8 @@ export default function Welcome() {
             ['03', 'Notice the drift', 'Your Game Map shows what makes your games fun, and gently flags when they start to feel less so.'],
           ].map(([n, t, d]) => (
             <li key={n} className="bg-paper p-8">
-              <span className="font-serif text-sm italic text-ember">{n}</span>
-              <h3 className="mt-6 font-serif text-2xl">{t}</h3>
+              <span className="text-sm text-ember">{n}</span>
+              <h3 className="mt-6 text-2xl">{t}</h3>
               <p className="mt-3 text-sm leading-relaxed text-ink-2">{d}</p>
             </li>
           ))}

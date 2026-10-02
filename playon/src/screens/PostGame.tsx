@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Arrow, Button, cx, go, StarInput, useReducedMotion } from '../components/ui'
+import { Arrow, back, BackButton, Button, cx, go, StarInput, useReducedMotion } from '../components/ui'
+import { Wordmark } from '../App'
 import { actions, getData, sortedSessions, uid } from '../lib/store'
 import { BODIES, bodyLabel, ENERGY_WORDS, moodLabel, MOODS, RESULTS, resultLabel, STANDOUTS, socialLabel } from '../lib/meta'
 import { avg, computeInsights, MIN_SESSIONS } from '../lib/insights'
@@ -66,24 +67,22 @@ export default function PostGame({ draft }: { draft: Draft }) {
     <div className="relative flex min-h-dvh flex-col overflow-hidden bg-forest text-paper">
       <Rings step={i} />
 
-      {step !== 'intro' && step !== 'done' && (
-        <header className="relative z-10 mx-auto flex w-full max-w-3xl items-center justify-between px-6 pt-6">
-          <button
-            onClick={() => (i <= 1 ? go('play') : setI(i - 1))}
-            className="press text-sm text-paper/70 hover:text-paper"
-          >
-            ← Back
-          </button>
-          <div className="flex gap-1.5" aria-label={`Question ${qIndex + 1} of ${qCount}`}>
+      <header className="relative z-10 mx-auto w-full max-w-3xl px-4 pt-4 sm:px-6">
+        <div className="flex items-center justify-between gap-3">
+          <BackButton light onClick={() => (step === 'done' ? go('home') : i <= 1 ? back() : setI(i - 1))} />
+          <Wordmark small light />
+          <span className="min-w-0 flex-1 truncate text-right text-sm text-paper/60">
+            {draft.sport} · {draft.duration}m
+          </span>
+        </div>
+        {step !== 'intro' && step !== 'done' && (
+          <div className="mt-4 flex justify-center gap-1.5" role="img" aria-label={`Question ${qIndex + 1} of ${qCount}`}>
             {Array.from({ length: qCount }).map((_, k) => (
               <span key={k} className={cx('h-1 w-6 rounded-full transition-colors duration-500', k <= qIndex ? 'bg-sage' : 'bg-paper/15')} />
             ))}
           </div>
-          <span className="text-sm text-paper/60">
-            {draft.sport} · {draft.duration}m
-          </span>
-        </header>
-      )}
+        )}
+      </header>
 
       <div className="relative z-10 mx-auto flex w-full max-w-3xl flex-1 flex-col px-6 pb-10">
         {step === 'intro' && (
@@ -91,7 +90,7 @@ export default function PostGame({ draft }: { draft: Draft }) {
             <p className="eyebrow fade text-sage">
               {draft.sport} · {draft.duration} minutes
             </p>
-            <h1 className="mt-6 font-serif text-[clamp(4rem,16vw,11rem)] font-light leading-[0.85] tracking-tight" aria-label="Game over.">
+            <h1 className="mt-6 text-5xl leading-[0.85] tracking-tight" aria-label="Game over.">
               {'GAME'.split('').map((c, k) => (
                 <span key={k} className="letter" style={{ animationDelay: `${150 + k * 70}ms` }}>
                   {c}
@@ -99,12 +98,12 @@ export default function PostGame({ draft }: { draft: Draft }) {
               ))}
               <br />
               {'OVER.'.split('').map((c, k) => (
-                <span key={k} className="letter italic text-sage" style={{ animationDelay: `${480 + k * 70}ms` }}>
+                <span key={k} className="letter text-sage" style={{ animationDelay: `${480 + k * 70}ms` }}>
                   {c}
                 </span>
               ))}
             </h1>
-            <p className="rise mt-8 font-serif text-3xl font-light italic text-paper/85" style={{ animationDelay: '1100ms' }}>
+            <p className="rise mt-8 text-3xl text-paper/85" style={{ animationDelay: '1100ms' }}>
               How did it feel?
             </p>
           </button>
@@ -124,7 +123,7 @@ export default function PostGame({ draft }: { draft: Draft }) {
                 <>
                   <Label n="Energy" />
                   <H>How much energy do you have now?</H>
-                  <p className="mt-10 font-serif text-4xl font-light italic text-sage" aria-live="polite">
+                  <p className="mt-10 text-4xl text-sage" aria-live="polite">
                     {ENERGY_WORDS[energyAfter - 1]}
                   </p>
                   <div className="mt-6 max-w-xl">
@@ -168,7 +167,7 @@ export default function PostGame({ draft }: { draft: Draft }) {
                         aria-checked={mood === m.id}
                         onClick={() => setMood(m.id)}
                         className={cx(
-                          'press flex items-center gap-3 rounded-2xl border px-4 py-4 text-left text-[15px] transition-all duration-300',
+                          'press flex items-center gap-3 rounded-2xl border px-4 py-4 text-left text-sm transition-all duration-300',
                           mood === m.id
                             ? 'scale-[1.04] border-sage bg-paper text-forest'
                             : 'border-paper/20 hover:border-paper/50 hover:bg-paper/5',
@@ -210,7 +209,7 @@ export default function PostGame({ draft }: { draft: Draft }) {
                           aria-checked={on}
                           onClick={() => setStandouts((xs) => (on ? xs.filter((x) => x !== s) : [...xs, s]))}
                           className={cx(
-                            'press rounded-full border px-5 py-3 text-[15px]',
+                            'press rounded-full border px-5 py-3 text-sm',
                             on ? 'border-sage bg-paper text-forest' : 'border-paper/20 hover:border-paper/50',
                           )}
                         >
@@ -236,7 +235,7 @@ export default function PostGame({ draft }: { draft: Draft }) {
                     maxLength={280}
                     rows={3}
                     placeholder="A shot, a moment, a feeling… (optional)"
-                    className="mt-10 w-full max-w-2xl resize-none border-0 border-b border-paper/25 bg-transparent pb-3 font-serif text-2xl font-light italic text-paper outline-none placeholder:text-paper/35 focus:border-sage sm:text-3xl"
+                    className="mt-10 w-full max-w-2xl resize-none border-0 border-b border-paper/25 bg-transparent pb-3 text-2xl text-paper outline-none placeholder:text-paper/35 focus:border-sage sm:text-3xl"
                   />
                   <p className="mt-2 text-right text-xs text-paper/40 sm:max-w-2xl">{reflection.length}/280</p>
                 </>
@@ -287,7 +286,7 @@ function TapRow<T extends string>({
             aria-pressed={value === o.id}
             onClick={() => onChange(value === o.id ? undefined : o.id)}
             className={cx(
-              'press min-w-20 rounded-full border px-5 py-2.5 text-[15px]',
+              'press min-w-20 rounded-full border px-5 py-2.5 text-sm',
               value === o.id ? 'border-sage bg-paper text-forest' : 'border-paper/20 hover:border-paper/50',
             )}
           >
@@ -303,7 +302,7 @@ function Label({ n }: { n: string }) {
   return <p className="eyebrow text-sage">{n}</p>
 }
 function H({ children }: { children: string }) {
-  return <h1 className="mt-4 font-serif text-4xl font-light leading-[1.05] sm:text-6xl">{children}</h1>
+  return <h1 className="mt-4 text-4xl leading-[1.05] sm:text-6xl">{children}</h1>
 }
 
 function Complete({ s }: { s: ActivitySession }) {
@@ -321,7 +320,7 @@ function Complete({ s }: { s: ActivitySession }) {
         <Stat big={`${s.enjoyment}`} unit="/5" label="Enjoyment" />
       </div>
       <Compare s={s} />
-      <p className="rise mt-10 max-w-2xl font-serif text-3xl font-light leading-snug sm:text-4xl" style={{ animationDelay: '300ms' }}>
+      <p className="rise mt-10 max-w-2xl text-3xl leading-snug sm:text-4xl" style={{ animationDelay: '300ms' }}>
         {note.headline}
       </p>
       {note.sub && (
@@ -371,7 +370,7 @@ function Compare({ s }: { s: ActivitySession }) {
   const extras = [s.result && resultLabel(s.result), s.bodyAfter && `body ${bodyLabel(s.bodyAfter).toLowerCase()}`].filter(Boolean)
   return (
     <div className="rise mt-8 max-w-2xl" style={{ animationDelay: '200ms' }}>
-      <dl className="space-y-2 text-[15px]">
+      <dl className="space-y-2 text-sm">
         {rows.map(([k, v]) => (
           <div key={k} className="grid grid-cols-[120px_1fr] gap-3">
             <dt className="text-paper/55">{k}</dt>
@@ -393,11 +392,11 @@ function Compare({ s }: { s: ActivitySession }) {
 function Stat({ big, unit, label, serif }: { big: string; unit?: string; label: string; serif?: boolean }) {
   return (
     <div>
-      <p className={cx('font-serif font-light leading-none', serif ? 'truncate text-2xl sm:text-4xl' : 'text-5xl sm:text-6xl')}>
+      <p className={cx(' leading-none', serif ? 'truncate text-2xl sm:text-4xl' : 'text-5xl sm:text-6xl')}>
         {big}
         {unit && <span className="text-xl text-paper/60">{unit}</span>}
       </p>
-      <p className="mt-2 text-xs uppercase tracking-[0.14em] text-paper/60">{label}</p>
+      <p className="mt-2 text-xs text-paper/60">{label}</p>
     </div>
   )
 }

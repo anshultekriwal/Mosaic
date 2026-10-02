@@ -144,7 +144,7 @@ export default function TimeDial({ value, onChange, label = 'Time you started' }
         </svg>
 
         <div>
-          <p className="font-serif text-4xl font-light tabular" aria-hidden>
+          <p className="text-4xl tabular" aria-hidden>
             {fmtTime(value)}
           </p>
           <p className="mt-1 text-sm text-ink-2">{timeLabel(band)}. Drag the dial or tap a time of day.</p>

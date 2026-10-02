@@ -63,9 +63,9 @@ function FinishGame() {
   return (
     <div className="mx-auto max-w-3xl">
       <p className="eyebrow">Finish your game</p>
-      <h1 className="mt-3 font-serif text-5xl font-light leading-tight sm:text-6xl">
+      <h1 className="mt-3 text-5xl leading-tight sm:text-6xl">
         {game.sport}
-        <span className="block italic text-ink-2">{stale ? 'How long did you actually play?' : 'Game over.'}</span>
+        <span className="block text-ink-2">{stale ? 'How long did you actually play?' : 'Game over.'}</span>
       </h1>
       {stale ? (
         <p className="mt-4 max-w-lg text-ink-2">
@@ -74,7 +74,7 @@ function FinishGame() {
         </p>
       ) : (
         <div className="mt-8 flex items-end gap-4 border-y border-line py-6">
-          <p className="font-serif text-6xl font-light leading-none tabular sm:text-7xl">{fmtElapsed(startedMs)}</p>
+          <p className="text-6xl leading-none tabular sm:text-7xl">{fmtElapsed(startedMs)}</p>
           <p className="pb-1 text-sm text-ink-2">
             Clock stopped. Saved as
             <br />
@@ -117,7 +117,7 @@ function DurationPicker({ value, onChange }: { value: number; onChange: (m: numb
             aria-pressed={value === d}
             onClick={() => onChange(d)}
             className={cx(
-              'press h-12 min-w-16 rounded-full border px-4 text-[15px] tabular',
+              'press h-12 min-w-16 rounded-full border px-4 text-sm tabular',
               value === d ? 'border-forest bg-forest text-paper' : 'border-line-2 bg-paper/60 hover:border-ink-3',
             )}
           >
@@ -250,7 +250,7 @@ function LogForm({ startLive }: { startLive: boolean }) {
         ))}
       </div>
       <p className="eyebrow mt-8">{mode === 'before' ? 'Start a game' : 'Log a game'}</p>
-      <h1 className="mt-3 font-serif text-5xl font-light leading-tight sm:text-6xl">
+      <h1 className="mt-3 text-5xl leading-tight sm:text-6xl">
         {mode === 'before' ? 'What are you about to play?' : 'What did you play?'}
       </h1>
       {mode === 'before' && (

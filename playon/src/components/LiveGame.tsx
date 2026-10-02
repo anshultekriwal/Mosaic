@@ -49,11 +49,11 @@ export function LiveGameCard({ game }: { game: ActiveGame }) {
             <LiveDot />
             {stale ? 'Still playing?' : 'Playing now'}
           </h2>
-          <p className="mt-4 font-serif text-4xl font-light sm:text-5xl">{game.sport}</p>
+          <p className="mt-4 text-4xl sm:text-5xl">{game.sport}</p>
           <p className="mt-2 text-sm text-paper/70">
             {sessionTypeLabel(game.sessionType)}, {socialPhrase(game.socialContext)} · started {started}
           </p>
-          <p className="mt-6 font-serif text-6xl font-light tabular sm:text-7xl" aria-hidden>
+          <p className="mt-6 text-6xl tabular sm:text-7xl" aria-hidden>
             {fmtElapsed(ms)}
           </p>
           <p className="sr-only" aria-live="off">

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Wordmark } from '../App'
-import { Arrow, Button, Chips, cx, go } from '../components/ui'
+import { Arrow, BackButton, Button, Chips, cx, go } from '../components/ui'
 import { FREQUENCIES, GOALS, LEVELS, PLAYER_TYPES, SPORTS } from '../lib/meta'
 import { actions, uid } from '../lib/store'
 import { seasonNameFor } from '../lib/dates'
@@ -61,9 +61,7 @@ export default function Onboarding() {
   return (
     <div className="flex min-h-dvh flex-col bg-cream">
       <header className="mx-auto flex w-full max-w-3xl items-center justify-between px-6 pt-6">
-        <button onClick={() => (i === 0 ? go('welcome') : setI(i - 1))} className="press text-sm text-ink-2 hover:text-ink">
-          ← {i === 0 ? 'Back' : 'Previous'}
-        </button>
+        <BackButton onClick={() => (i === 0 ? go('welcome') : setI(i - 1))} label={i === 0 ? 'Back' : 'Previous'} />
         <Wordmark small />
         <span className="w-14 text-right text-xs text-ink-3 tabular">
           {Math.min(i + 1, STEPS.length - 1)} / {STEPS.length - 1}
@@ -94,7 +92,7 @@ export default function Onboarding() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your first name"
-                className="mt-10 w-full border-0 border-b border-line-2 bg-transparent pb-3 font-serif text-4xl font-light outline-none placeholder:text-ink-3/50 focus:border-forest sm:text-5xl"
+                className="mt-10 w-full border-0 border-b border-line-2 bg-transparent pb-3 text-4xl outline-none placeholder:text-ink-3/50 focus:border-forest sm:text-5xl"
               />
             </>
           )}
@@ -137,7 +135,7 @@ export default function Onboarding() {
                       aria-checked={idx >= 0}
                       onClick={() => toggleSport(s)}
                       className={cx(
-                        'press rounded-full border px-5 py-3 text-[15px]',
+                        'press rounded-full border px-5 py-3 text-sm',
                         idx >= 0 ? 'border-forest bg-forest text-paper' : 'border-line-2 bg-paper/60 hover:border-ink-3',
                       )}
                     >
@@ -249,7 +247,7 @@ export default function Onboarding() {
                       aria-label={`${n} per week`}
                       onClick={() => setWeekly(n)}
                       className={cx(
-                        'press grid h-16 w-14 place-items-center rounded-2xl border font-serif text-2xl sm:h-20 sm:w-16 sm:text-3xl',
+                        'press grid h-16 w-14 place-items-center rounded-2xl border text-2xl sm:h-20 sm:w-16 sm:text-3xl',
                         weekly === n ? 'border-forest bg-forest text-paper' : 'border-line-2 bg-paper/60 hover:border-ink-3',
                       )}
                     >
@@ -268,26 +266,26 @@ export default function Onboarding() {
           {step === 'ready' && (
             <div className="pt-6">
               <p className="eyebrow">You're all set</p>
-              <h1 className="mt-5 font-serif text-[clamp(2.8rem,8vw,5.5rem)] font-light leading-[0.95]">
+              <h1 className="mt-5 text-5xl leading-[0.95]">
                 Your {season} Season
-                <span className="block italic text-forest-2">starts now.</span>
+                <span className="block text-forest-2">starts now.</span>
               </h1>
               <dl className="mt-12 grid max-w-xl grid-cols-2 gap-y-6 border-t border-line pt-6 text-sm">
                 <div>
                   <dt className="text-ink-3">Playing</dt>
-                  <dd className="mt-1 font-serif text-xl">{sports.join(' · ')}</dd>
+                  <dd className="mt-1 text-xl">{sports.join(' · ')}</dd>
                 </div>
                 <div>
                   <dt className="text-ink-3">Intention</dt>
-                  <dd className="mt-1 font-serif text-xl">{weekly}× a week</dd>
+                  <dd className="mt-1 text-xl">{weekly}× a week</dd>
                 </div>
                 <div>
                   <dt className="text-ink-3">Season length</dt>
-                  <dd className="mt-1 font-serif text-xl">12 weeks</dd>
+                  <dd className="mt-1 text-xl">12 weeks</dd>
                 </div>
                 <div>
                   <dt className="text-ink-3">Focus</dt>
-                  <dd className="mt-1 font-serif text-xl">{GOALS.find((g) => g.id === goals[0])?.label}</dd>
+                  <dd className="mt-1 text-xl">{GOALS.find((g) => g.id === goals[0])?.label}</dd>
                 </div>
               </dl>
               <p className="mt-10 max-w-md text-ink-2">
@@ -312,7 +310,7 @@ function Q({ eyebrow, title, sub }: { eyebrow: string; title: string; sub?: stri
   return (
     <>
       <p className="eyebrow">{eyebrow}</p>
-      <h1 className="mt-4 font-serif text-4xl font-light leading-[1.05] sm:text-6xl">{title}</h1>
+      <h1 className="mt-4 text-4xl leading-[1.05] sm:text-6xl">{title}</h1>
       {sub && <p className="mt-4 max-w-lg text-ink-2">{sub}</p>}
     </>
   )

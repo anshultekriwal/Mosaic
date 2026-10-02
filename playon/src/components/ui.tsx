@@ -56,7 +56,12 @@ export function useRoute() {
   return loc
 }
 
+// In-app history, so Back works even where the browser history can't be used.
+const backStack: Loc[] = []
+
 export const go = (route: Route, param?: string, query = '') => {
+  backStack.push(current)
+  if (backStack.length > 50) backStack.shift()
   current = { route, param, query }
   try {
     history.pushState(null, '', hashFor(current))
@@ -89,6 +94,31 @@ export const setQuery = (query: string) => {
   emit(false)
 }
 
+/** Where Back goes when there's no earlier screen in this visit. */
+function parentOf(l: Loc): Loc {
+  if (l.route === 'play' && l.param === 'reflect') return { route: 'play', query: '' }
+  if (l.route === 'reset' && l.param) return { route: 'reset', query: '' }
+  if (l.route === 'insights' && (l.param || l.query)) return { route: 'insights', query: '' }
+  if (l.route === 'home' || l.route === 'onboarding') return { route: 'welcome', query: '' }
+  if (l.route === 'welcome') return { route: 'home', query: '' }
+  return { route: 'home', query: '' }
+}
+
+/** Go to the previous screen in this visit, or to the screen's parent. */
+export const back = () => {
+  let prev = backStack.pop()
+  // Skip entries that are the same screen (e.g. filter changes) or a finished reflection.
+  while (prev && ((prev.route === current.route && prev.param === current.param) || (prev.route === 'play' && prev.param === 'reflect')))
+    prev = backStack.pop()
+  current = prev ?? parentOf(current)
+  try {
+    history.replaceState(null, '', hashFor(current))
+  } catch {
+    /* URL updates blocked */
+  }
+  emit()
+}
+
 /** onClick for <a href="#/x"> links so they route in-app. */
 export const navTo = (route: Route) => (e: { preventDefault: () => void }) => {
   e.preventDefault()
@@ -105,7 +135,7 @@ export function Button({ variant = 'primary', size = 'md', className, ...p }: Bt
       {...p}
       className={cx(
         'press inline-flex items-center justify-center gap-2 rounded-full font-medium disabled:cursor-not-allowed disabled:opacity-40',
-        size === 'lg' ? 'h-14 px-8 text-[15px]' : 'h-11 px-5 text-sm',
+        size === 'lg' ? 'h-14 px-8 text-sm' : 'h-11 px-5 text-sm',
         variant === 'primary' && 'bg-forest text-paper hover:bg-forest-2',
         variant === 'light' && 'bg-paper text-forest hover:bg-white',
         variant === 'ghost' && 'border border-line-2 bg-transparent text-ink hover:border-forest hover:bg-paper',
@@ -113,6 +143,39 @@ export function Button({ variant = 'primary', size = 'md', className, ...p }: Bt
         className,
       )}
     />
+  )
+}
+
+/** The Back control used at the top of every screen. */
+export function BackButton({
+  light,
+  className,
+  label = 'Back',
+  onClick,
+  'aria-label': ariaLabel,
+}: {
+  light?: boolean
+  className?: string
+  label?: string
+  onClick?: () => void
+  'aria-label'?: string
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick ?? back}
+      aria-label={ariaLabel ?? (label ? undefined : 'Back')}
+      className={cx(
+        'press inline-flex h-10 items-center gap-1.5 rounded-full pl-2 pr-3 text-sm font-medium',
+        light ? 'text-paper/80 hover:bg-paper/10 hover:text-paper' : 'text-ink-2 hover:bg-paper hover:text-ink',
+        className,
+      )}
+    >
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+        <path d="M13 8H3M7 4L3 8l4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+      {label}
+    </button>
   )
 }
 
@@ -163,7 +226,7 @@ export function Chips<T extends string>({
               onClick={() => onChange(o.id)}
               className={cx(
                 'press rounded-full border text-left',
-                size === 'lg' ? 'px-5 py-3 text-[15px]' : 'px-4 py-2 text-sm',
+                size === 'lg' ? 'px-5 py-3 text-sm' : 'px-4 py-2 text-sm',
                 on
                   ? 'border-forest bg-forest text-paper'
                   : 'border-line-2 bg-paper/60 text-ink hover:border-ink-3 hover:bg-paper',
@@ -239,7 +302,7 @@ export function StarInput({ value, onChange }: { value: number; onChange: (n: nu
           </button>
         ))}
       </div>
-      <p className="mt-3 h-6 font-serif text-lg italic text-ink-2" aria-live="polite">
+      <p className="mt-3 h-6 text-lg text-ink-2" aria-live="polite">
         {value ? words[value - 1] : ''}
       </p>
     </div>
@@ -271,7 +334,7 @@ export function Scale({
         <label className={hideLabel ? 'sr-only' : 'eyebrow'} htmlFor={`sc-${label}`}>
           {label}
         </label>
-        {words && <span className="font-serif text-lg italic text-ink-2">{words[value - 1]}</span>}
+        {words && <span className="text-lg text-ink-2">{words[value - 1]}</span>}
       </div>
       <input
         id={`sc-${label}`}
@@ -298,7 +361,7 @@ export function DemoBadge({ className }: { className?: string }) {
   return (
     <span
       className={cx(
-        'inline-flex items-center gap-1.5 rounded-full border border-dashed border-ember/60 bg-ember-soft/60 px-2.5 py-1 text-[11px] font-medium tracking-wide text-[#8a3a12]',
+        'inline-flex items-center gap-1.5 rounded-full border border-dashed border-ember/60 bg-ember-soft/60 px-2.5 py-1 text-sm font-medium tracking-wide text-[#8a3a12]',
         className,
       )}
     >

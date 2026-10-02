@@ -1,6 +1,6 @@
 import { useEffect, type ReactNode } from 'react'
 import { useData, actions } from './lib/store'
-import { Button, currentRoute, cx, DemoBadge, go, navTo, replace, useRoute, type Route } from './components/ui'
+import { BackButton, Button, currentRoute, cx, DemoBadge, go, navTo, replace, useRoute, type Route } from './components/ui'
 import { buildDemo } from './lib/demo'
 import { LivePill } from './components/LiveGame'
 import Welcome from './screens/Welcome'
@@ -102,8 +102,8 @@ export default function App() {
         </nav>
         <div className="mt-auto space-y-4 pt-6">
           <a href="#/reset" onClick={navTo('reset')} className="press block rounded-2xl border border-line bg-lavender-soft/70 p-4 text-sm hover:border-lavender">
-            <span className="eyebrow block text-[10px]">Reset Room</span>
-            <span className="mt-1 block font-serif text-lg leading-snug">Need a minute?</span>
+            <span className="eyebrow block text-sm">Reset Room</span>
+            <span className="mt-1 block text-lg leading-snug">Need a minute?</span>
           </a>
           {data.user.isDemo && <DemoNote />}
         </div>
@@ -111,10 +111,13 @@ export default function App() {
 
       <div className="min-w-0">
         {/* mobile top bar */}
-        <header className="sticky top-0 z-20 flex items-center justify-between border-b border-line/70 bg-cream/85 px-5 py-3 backdrop-blur lg:hidden">
-          <button onClick={() => go('home')} className="press" aria-label="PLAY ON home">
-            <Wordmark small />
-          </button>
+        <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-line/70 bg-cream/85 px-3 py-2.5 backdrop-blur lg:hidden">
+          <div className="flex min-w-0 items-center gap-1">
+            <BackButton label="" className="h-10 w-10 justify-center !px-0" aria-label="Back" />
+            <button onClick={() => go('home')} className="press" aria-label="PLAY ON home">
+              <Wordmark small />
+            </button>
+          </div>
           {livePill ? (
             <LivePill game={data.active!} />
           ) : data.user.isDemo ? (
@@ -128,7 +131,10 @@ export default function App() {
           )}
         </header>
 
-        <main id="main" tabIndex={-1} key={route} className="fade mx-auto w-full max-w-6xl px-5 pb-32 pt-6 sm:px-8 lg:px-14 lg:pb-20 lg:pt-12">
+        <main id="main" tabIndex={-1} key={route} className="fade mx-auto w-full max-w-6xl px-5 pb-32 pt-6 sm:px-8 lg:px-14 lg:pb-20 lg:pt-8">
+          <div className="-ml-2 mb-6 hidden lg:block">
+            <BackButton />
+          </div>
           {screen}
         </main>
       </div>
@@ -146,7 +152,7 @@ export default function App() {
               onClick={navTo(n.id)}
                 aria-current={active === n.id ? 'page' : undefined}
                 className={cx(
-                  'press flex w-16 flex-col items-center gap-1 py-2.5 text-[11px]',
+                  'press flex w-16 flex-col items-center gap-1 py-2.5 text-sm',
                   active === n.id ? 'text-forest' : 'text-ink-3',
                 )}
               >
@@ -168,7 +174,7 @@ function DemoConfirm() {
     <main className="grid min-h-dvh place-items-center bg-cream px-6">
       <div className="max-w-md">
         <Wordmark />
-        <h1 className="mt-10 font-serif text-4xl font-light leading-tight">Open the sample season?</h1>
+        <h1 className="mt-10 text-4xl leading-tight">Open the sample season?</h1>
         <p className="mt-4 text-ink-2">
           This link loads Alex's sample season. It would replace the season saved on this device, so we wanted to check
           first.
@@ -213,12 +219,12 @@ function DemoNote() {
 
 export function Wordmark({ small, light }: { small?: boolean; light?: boolean }) {
   return (
-    <span className={cx('inline-flex items-center gap-2', light ? 'text-paper' : 'text-forest')}>
+    <span className={cx('inline-flex shrink-0 items-center gap-2 whitespace-nowrap', light ? 'text-paper' : 'text-forest')}>
       <svg width={small ? 22 : 26} height={small ? 22 : 26} viewBox="0 0 32 32" aria-hidden>
         <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" strokeWidth="2" />
         <path d="M6 20c6-3.5 14-3.5 20 0" fill="none" stroke="var(--color-ember)" strokeWidth="2" strokeLinecap="round" />
       </svg>
-      <span className={cx('font-sans font-semibold tracking-[0.2em]', small ? 'text-[13px]' : 'text-sm')}>PLAY ON</span>
+      <span className={cx('font-sans font-semibold tracking-[0.2em]', small ? 'text-sm' : 'text-sm')}>PLAY ON</span>
     </span>
   )
 }

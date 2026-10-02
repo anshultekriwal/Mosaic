@@ -29,7 +29,7 @@ export default function Profile() {
           <p className="eyebrow">Profile</p>
           {user.isDemo && <DemoBadge />}
         </div>
-        <h1 className="mt-4 font-serif text-[clamp(2.6rem,6vw,4.5rem)] font-light leading-[1.02]">{user.name}</h1>
+        <h1 className="mt-4 text-5xl leading-[1.02]">{user.name}</h1>
         <p className="mt-2 text-ink-2">
           {user.sports.join(' · ')} · since {new Date(user.createdAt).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}
         </p>
@@ -37,7 +37,7 @@ export default function Profile() {
 
       {user.isDemo && (
         <section className="rounded-[2rem] border border-dashed border-ember/50 bg-ember-soft/40 p-6 sm:p-8">
-          <p className="font-serif text-2xl">You're exploring a sample season.</p>
+          <p className="text-2xl">You're exploring a sample season.</p>
           <p className="mt-2 max-w-xl text-sm text-ink-2">
             Alex and their sessions are made up so you can see how PLAY ON works. Start your own season to clear the sample
             and begin with a blank slate.
@@ -55,7 +55,7 @@ export default function Profile() {
       )}
 
       <section aria-labelledby="h-prefs" className="grid gap-10 lg:grid-cols-[1fr_2fr]">
-        <h2 id="h-prefs" className="font-serif text-3xl font-light">
+        <h2 id="h-prefs" className="text-3xl">
           Preferences
         </h2>
         <div className="space-y-10">
@@ -68,7 +68,7 @@ export default function Profile() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               onBlur={() => name.trim() && actions.updateUser({ name: name.trim() })}
-              className="mt-2 h-12 w-full border-0 border-b border-line-2 bg-transparent font-serif text-2xl outline-none focus:border-forest"
+              className="mt-2 h-12 w-full border-0 border-b border-line-2 bg-transparent text-2xl outline-none focus:border-forest"
             />
           </div>
           <Chips
@@ -113,20 +113,20 @@ export default function Profile() {
 
       <section aria-labelledby="h-history" className="grid gap-10 lg:grid-cols-[1fr_2fr]">
         <div>
-          <h2 id="h-history" className="font-serif text-3xl font-light">
+          <h2 id="h-history" className="text-3xl">
             Activity history
           </h2>
           <p className="mt-2 text-sm text-ink-2">{sessions.length} sessions logged.</p>
         </div>
         <div>
           {sessions.length === 0 ? (
-            <p className="font-serif text-xl italic text-ink-3">Nothing yet. Your first session will show up here.</p>
+            <p className="text-xl text-ink-3">Nothing yet. Your first session will show up here.</p>
           ) : (
             <ul className="border-t border-line">
               {(showAll ? sessions : sessions.slice(0, 8)).map((s) => (
                 <li key={s.id} className="flex flex-wrap items-center justify-between gap-3 border-b border-line py-4">
                   <div className="min-w-0">
-                    <p className="font-serif text-xl">
+                    <p className="text-xl">
                       {s.sport} <span className="font-sans text-sm text-ink-3">· {s.duration} min · {socialLabel(s.socialContext)}</span>
                     </p>
                     <p className="text-xs text-ink-3">
@@ -176,7 +176,7 @@ export default function Profile() {
 
       <section aria-labelledby="h-data" className="grid gap-10 lg:grid-cols-[1fr_2fr]">
         <div>
-          <h2 id="h-data" className="font-serif text-3xl font-light">
+          <h2 id="h-data" className="text-3xl">
             Your data
           </h2>
           <p className="mt-2 text-sm text-ink-2">Everything lives in this browser. Nothing is sent anywhere.</p>

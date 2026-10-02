@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Arrow, Button, cx, go, useReducedMotion } from '../components/ui'
+import { Arrow, BackButton, Button, cx, go, useReducedMotion } from '../components/ui'
+import { Wordmark } from '../App'
 import { actions, sortedSessions, uid, useData } from '../lib/store'
 import { moodLabel } from '../lib/meta'
 import { shortDate } from '../lib/dates'
@@ -84,9 +85,9 @@ function RoomIndex() {
     <div className="space-y-14">
       <header className="max-w-3xl">
         <p className="eyebrow">Reset Room</p>
-        <h1 className="mt-4 font-serif text-[clamp(2.6rem,6vw,4.5rem)] font-light leading-[1.02]">
+        <h1 className="mt-4 text-5xl leading-[1.02]">
           A minute for yourself.
-          <span className="block italic text-ink-2">That's all this takes.</span>
+          <span className="block text-ink-2">That's all this takes.</span>
         </h1>
         <p className="mt-5 max-w-xl text-ink-2">
           A few short things to do after a game, or any time. Not therapy, not training. Just a short pause.
@@ -97,7 +98,7 @@ function RoomIndex() {
         <p id="h-rec" className="eyebrow">
           {mood ? `You last said you felt ${moodLabel(mood).toLowerCase()}` : 'A good place to start'}
         </p>
-        <p className="mt-4 font-serif text-4xl font-light sm:text-5xl">{rec.title}</p>
+        <p className="mt-4 text-4xl sm:text-5xl">{rec.title}</p>
         <p className="mt-3 text-ink-2">
           {rec.length} · {rec.blurb}
         </p>
@@ -116,7 +117,7 @@ function RoomIndex() {
               <button onClick={() => go('reset', e.id)} className="press group grid w-full gap-1 py-6 text-left sm:grid-cols-[220px_1fr_auto] sm:items-center sm:gap-6">
                 <span className="text-sm text-ink-3">{e.when}</span>
                 <span>
-                  <span className="block font-serif text-2xl sm:text-3xl">{e.title}</span>
+                  <span className="block text-2xl sm:text-3xl">{e.title}</span>
                   <span className="text-sm text-ink-2">{e.blurb}</span>
                 </span>
                 <span className="flex items-center gap-3 text-sm text-ink-2">
@@ -140,7 +141,7 @@ function RoomIndex() {
           {STRETCHES.map(([n, how, url], k) => (
             <li key={n} className="flex items-center justify-between gap-4 border-b border-line py-4">
               <span className="min-w-0">
-                <span className="block font-serif text-xl">
+                <span className="block text-xl">
                   <span className="mr-2 font-sans text-sm tabular text-ink-3">0{k + 1}</span>
                   {n}
                 </span>
@@ -160,7 +161,7 @@ function RoomIndex() {
           <ul className="mt-6 grid gap-6 sm:grid-cols-2">
             {[...data.moments].reverse().map((m) => (
               <li key={m.id} className="border-l-2 border-ember pl-4">
-                <p className="font-serif text-xl italic">“{m.text}”</p>
+                <p className="text-xl">“{m.text}”</p>
                 <p className="mt-1 text-xs text-ink-3">{shortDate(m.date)}</p>
               </li>
             ))}
@@ -183,10 +184,9 @@ function ExerciseScreen({ ex }: { ex: Exercise }) {
   const dark = ex.id === 'clear-head' || ex.id === 'tough-game'
   return (
     <div className={cx('relative flex min-h-dvh flex-col', dark ? 'bg-forest text-paper' : 'bg-cream text-ink')}>
-      <header className="mx-auto flex w-full max-w-3xl items-center justify-between px-6 pt-6">
-        <button onClick={() => go('reset')} className={cx('press text-sm', dark ? 'text-paper/70 hover:text-paper' : 'text-ink-2 hover:text-ink')}>
-          ← Reset Room
-        </button>
+      <header className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 pt-4 sm:px-6">
+        <BackButton light={dark} onClick={() => go('reset')} />
+        <Wordmark small light={dark} />
         <span className={cx('text-sm', dark ? 'text-paper/60' : 'text-ink-3')}>{ex.length}</span>
       </header>
       <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-6 pb-12 pt-10">
@@ -216,7 +216,7 @@ function Finished({ ex, dark }: { ex: Exercise; dark: boolean }) {
   return (
     <div className="rise flex flex-1 flex-col justify-center">
       <p className={cx('eyebrow', dark && 'text-sage')}>{ex.title}</p>
-      <p className="mt-5 font-serif text-5xl font-light leading-tight sm:text-6xl">{lines[ex.id]}</p>
+      <p className="mt-5 text-5xl leading-tight sm:text-6xl">{lines[ex.id]}</p>
       <div className="mt-12 flex flex-col gap-3 sm:flex-row">
         <Button variant={dark ? 'light' : 'primary'} size="lg" onClick={() => go('home')}>
           Back home
@@ -283,7 +283,7 @@ function Breather({ phases, total, onDone, intro }: { phases: Phase[]; total: nu
     <div className="flex flex-1 flex-col items-center justify-center text-center">
       {!running ? (
         <div className="rise">
-          <p className="mx-auto max-w-md font-serif text-3xl font-light leading-snug">{intro}</p>
+          <p className="mx-auto max-w-md text-3xl leading-snug">{intro}</p>
           <Button variant="light" size="lg" className="mt-10" onClick={() => setRunning(true)}>
             Start breathing
           </Button>
@@ -301,7 +301,7 @@ function Breather({ phases, total, onDone, intro }: { phases: Phase[]; total: nu
               style={reduced ? { opacity: 0.2 + scale * 0.6 } : { transform: `scale(${0.5 + scale * 0.5})` }}
             />
           </div>
-          <p className="mt-10 font-serif text-4xl font-light italic" aria-live="polite">
+          <p className="mt-10 text-4xl" aria-live="polite">
             {label}
           </p>
           <p className="mt-3 text-sm text-paper/60 tabular">{remaining}s</p>
@@ -355,7 +355,7 @@ function ToughGame({ onDone }: { onDone: () => void }) {
       }}
     >
       <p className="eyebrow text-sage">One question</p>
-      <label htmlFor="tg" className="mt-4 block font-serif text-4xl font-light leading-tight sm:text-5xl">
+      <label htmlFor="tg" className="mt-4 block text-4xl leading-tight sm:text-5xl">
         What would you say to a friend who just played that game?
       </label>
       <textarea
@@ -365,7 +365,7 @@ function ToughGame({ onDone }: { onDone: () => void }) {
         rows={3}
         maxLength={240}
         placeholder="Optional"
-        className="mt-10 w-full resize-none border-0 border-b border-paper/25 bg-transparent pb-3 font-serif text-2xl font-light italic outline-none placeholder:text-paper/35 focus:border-sage"
+        className="mt-10 w-full resize-none border-0 border-b border-paper/25 bg-transparent pb-3 text-2xl outline-none placeholder:text-paper/35 focus:border-sage"
       />
       <div className="mt-auto flex justify-end gap-4 pt-10">
         <Button type="submit" variant="light" size="lg">
@@ -391,7 +391,7 @@ function Capture({ onDone }: { onDone: () => void }) {
       }}
     >
       <p className="eyebrow">Capture the moment</p>
-      <label htmlFor="cap" className="mt-4 block font-serif text-4xl font-light leading-tight sm:text-6xl">
+      <label htmlFor="cap" className="mt-4 block text-4xl leading-tight sm:text-6xl">
         Write one thing that made today enjoyable.
       </label>
       <textarea
@@ -402,7 +402,7 @@ function Capture({ onDone }: { onDone: () => void }) {
         rows={3}
         maxLength={240}
         placeholder="The rally that wouldn't end…"
-        className="mt-10 w-full resize-none border-0 border-b border-line-2 bg-transparent pb-3 font-serif text-2xl font-light italic outline-none placeholder:text-ink-3/50 focus:border-forest sm:text-3xl"
+        className="mt-10 w-full resize-none border-0 border-b border-line-2 bg-transparent pb-3 text-2xl outline-none placeholder:text-ink-3/50 focus:border-forest sm:text-3xl"
       />
       <div className="mt-auto flex justify-end pt-10">
         <Button type="submit" size="lg" disabled={!text.trim()}>
@@ -455,7 +455,7 @@ function Recovery({ onDone }: { onDone: () => void }) {
     return (
       <div className="rise flex flex-1 flex-col justify-center">
         <p className="eyebrow">Recovery mode</p>
-        <h1 className="mt-4 font-serif text-5xl font-light leading-tight sm:text-6xl">Five easy stretches.</h1>
+        <h1 className="mt-4 text-5xl leading-tight sm:text-6xl">Five easy stretches.</h1>
         <p className="mt-4 max-w-md text-ink-2">
           Thirty seconds each. Ease in, never push into pain. If anything hurts, stop.
         </p>
@@ -495,7 +495,7 @@ function Stretch({ i, onNext }: { i: number; onNext: () => void }) {
         Stretch {i + 1} of {STRETCHES.length}
       </p>
       <div className="mt-4 flex items-center gap-4">
-        <h1 className="font-serif text-5xl font-light sm:text-7xl">{name}</h1>
+        <h1 className="text-5xl sm:text-7xl">{name}</h1>
         <TutorialLink name={name} url={url} size="lg" />
       </div>
       <p className="mt-4 max-w-md text-lg text-ink-2">{how}</p>

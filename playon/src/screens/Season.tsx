@@ -21,9 +21,9 @@ export default function Season() {
           <p className="eyebrow">Your {season.name}</p>
           {data.user!.isDemo && <DemoBadge />}
         </div>
-        <h1 className="mt-4 font-serif text-[clamp(2.8rem,7vw,5.5rem)] font-light leading-[0.95]">
+        <h1 className="mt-4 text-5xl leading-[0.95]">
           {ended ? 'Season complete.' : `Week ${summary.weekNumber}`}
-          <span className="italic text-ink-3"> {ended ? '' : 'of 12'}</span>
+          <span className="text-ink-3"> {ended ? '' : 'of 12'}</span>
         </h1>
         <p className="mt-4 max-w-xl text-ink-2">
           No streaks to break. Every session plants something; every quiet week is part of the landscape too.
@@ -47,7 +47,7 @@ export default function Season() {
 
       <section aria-labelledby="h-weeks" className="grid gap-10 lg:grid-cols-[1fr_2fr]">
         <div>
-          <h2 id="h-weeks" className="font-serif text-3xl font-light">
+          <h2 id="h-weeks" className="text-3xl">
             The season so far
           </h2>
           <p className="mt-3 text-sm text-ink-2">
@@ -69,8 +69,8 @@ export default function Season() {
 function Fact({ label, value, sub, serifSmall }: { label: string; value: string; sub?: string; serifSmall?: boolean }) {
   return (
     <div>
-      <dt className="eyebrow text-[10px]">{label}</dt>
-      <dd className={cx('mt-2 font-serif font-light leading-none tabular', serifSmall ? 'text-2xl' : 'text-4xl')}>
+      <dt className="eyebrow text-sm">{label}</dt>
+      <dd className={cx('mt-2 leading-none tabular', serifSmall ? 'text-2xl' : 'text-4xl')}>
         {value}
         {sub && <span className="ml-1 font-sans text-xs text-ink-3">{sub}</span>}
       </dd>
@@ -207,14 +207,14 @@ function Landscape({ weeks }: { weeks: WeekSlot[] }) {
                 <g key={`m${t.n}`} className="fade" style={{ animationDelay: `${t.n * 70 + 400}ms` }}>
                   <line x1={t.x + 14} x2={t.x + 14} y1={t.y} y2={t.y - 92} stroke="var(--color-ink)" strokeWidth="1" />
                   <path d={`M${t.x + 14},${t.y - 92} l18,6 l-18,6z`} fill="var(--color-ember)" />
-                  <text x={t.x + 12} y={t.y - 98} fontSize="11" fill="var(--color-ink-2)" fontStyle="italic" fontFamily="Fraunces, serif">
+                  <text x={t.x + 12} y={t.y - 98} fontSize="11" fill="var(--color-ink-2)">
                     {milestoneLabel(t.n)}
                   </text>
                 </g>
               ))}
 
             {count === 0 && (
-              <text x={W / 2} y={150} textAnchor="middle" fontFamily="Fraunces, serif" fontSize="26" fontStyle="italic" fill="var(--color-ink-3)">
+              <text x={W / 2} y={150} textAnchor="middle" fontSize="26" fill="var(--color-ink-3)">
                 Your first session plants the first tree.
               </text>
             )}
@@ -301,7 +301,7 @@ function Meadow({ x, y }: { x: number; y: number }) {
       {[-26, -14, -4, 8, 20, 30].map((dx, i) => (
         <path key={i} d={`M${x + dx},${y + 2} q${i % 2 ? 2 : -2},-6 ${i % 2 ? 1 : -1},-${10 + (i % 3) * 3}`} stroke="var(--color-sage)" strokeWidth="1.2" fill="none" />
       ))}
-      <text x={x} y={y + 22} textAnchor="middle" fontSize="10.5" fontStyle="italic" fontFamily="Fraunces, serif" fill="var(--color-ink-3)">
+      <text x={x} y={y + 22} textAnchor="middle" fontSize="10.5" fill="var(--color-ink-3)">
         rest
       </text>
     </g>
@@ -320,7 +320,7 @@ function TreeCard({ f }: { f: { s: ActivitySession; x: number; y: number; n: num
       <p className="text-xs text-ink-3">
         Session {f.n} · {shortDate(s.date)}
       </p>
-      <p className="mt-1 font-serif text-xl">{s.sport}</p>
+      <p className="mt-1 text-xl">{s.sport}</p>
       <p className="text-ink-2">
         {s.duration} min · {socialLabel(s.socialContext)}
       </p>
@@ -328,7 +328,7 @@ function TreeCard({ f }: { f: { s: ActivitySession; x: number; y: number; n: num
         <Stars value={s.enjoyment} size={14} />
         <span className="text-xs text-ink-2">{moodLabel(s.moodAfter)}</span>
       </div>
-      {s.reflection && <p className="mt-2 border-t border-line pt-2 font-serif italic text-ink-2">“{s.reflection}”</p>}
+      {s.reflection && <p className="mt-2 border-t border-line pt-2 text-ink-2">“{s.reflection}”</p>}
     </div>
   )
 }
@@ -348,7 +348,7 @@ function Timeline({ weeks, goal }: { weeks: WeekSlot[]; goal: number }) {
         return (
           <li key={w.index} className="grid grid-cols-[72px_1fr] gap-4 border-b border-line py-5 sm:grid-cols-[110px_1fr_auto]">
             <div>
-              <p className="font-serif text-xl">{w.isCurrent ? 'This week' : `Week ${w.index + 1}`}</p>
+              <p className="text-xl">{w.isCurrent ? 'This week' : `Week ${w.index + 1}`}</p>
               <p className="text-xs text-ink-3">{w.start.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}</p>
             </div>
             <div className="min-w-0">
@@ -362,7 +362,7 @@ function Timeline({ weeks, goal }: { weeks: WeekSlot[]; goal: number }) {
                   ))}
                 </ul>
               ) : (
-                <p className="font-serif text-sm italic text-ink-3">
+                <p className="text-sm text-ink-3">
                   {w.isCurrent ? 'Nothing yet. Plenty of week left.' : 'A rest week. Recovery is part of the season.'}
                 </p>
               )}

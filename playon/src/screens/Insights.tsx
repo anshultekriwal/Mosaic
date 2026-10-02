@@ -144,7 +144,7 @@ export default function Insights({ focus, query = '' }: { focus?: string; query?
 
       {sessions.length === 0 ? (
         <section className="rounded-[2rem] border border-dashed border-line-2 px-6 py-12 text-center sm:px-10">
-          <p className="font-serif text-3xl font-light">No games match these filters.</p>
+          <p className="text-3xl">No games match these filters.</p>
           <p className="mt-2 text-ink-2">Try fewer filters, or a longer period.</p>
           <Button variant="ghost" className="mt-6" onClick={clear}>
             Clear filters
@@ -163,7 +163,7 @@ export default function Insights({ focus, query = '' }: { focus?: string; query?
                   {filtered ? 'Strongest pattern in this view' : 'Your strongest pattern'}
                 </h2>
                 <div>
-                  <p key={strongest} className="rise font-serif text-[clamp(2rem,4.6vw,3.6rem)] font-light leading-[1.08]">
+                  <p key={strongest} className="rise text-5xl leading-[1.08]">
                     {strongest}
                   </p>
                   <button
@@ -187,7 +187,7 @@ export default function Insights({ focus, query = '' }: { focus?: string; query?
           {sessions.length >= MIN_SESSIONS && (
             <section aria-labelledby="h-patterns">
               <div className="flex flex-wrap items-end justify-between gap-4">
-                <h2 id="h-patterns" className="font-serif text-4xl font-light">
+                <h2 id="h-patterns" className="text-4xl">
                   Patterns
                 </h2>
                 <p className="max-w-xs text-xs text-ink-3 sm:text-right">
@@ -203,7 +203,7 @@ export default function Insights({ focus, query = '' }: { focus?: string; query?
                   ))}
                 </ul>
               ) : (
-                <p className="py-10 font-serif text-2xl font-light text-ink-2">
+                <p className="py-10 text-2xl text-ink-2">
                   {filtered
                     ? 'Nothing stands out in this slice. These games feel pretty even.'
                     : "Nothing stands out yet. Your games feel pretty even, and that's a pattern too."}
@@ -225,7 +225,7 @@ export default function Insights({ focus, query = '' }: { focus?: string; query?
 function TooFew({ n, onClear }: { n: number; onClear: () => void }) {
   return (
     <section className="rounded-[2rem] bg-paper px-6 py-10 sm:px-10" aria-live="polite">
-      <p className="font-serif text-3xl font-light">
+      <p className="text-3xl">
         Only {n} game{n === 1 ? '' : 's'} match{n === 1 ? 'es' : ''}. Patterns need at least {MIN_SESSIONS}.
       </p>
       <p className="mt-2 max-w-lg text-ink-2">We only show patterns that hold up. You can still see these games on the map below.</p>
@@ -255,7 +255,7 @@ function CommonCard({ kind, traits, count, baseCount }: { kind: 'best' | 'toughe
         <p className={cx('eyebrow', best ? 'text-sage' : '')}>
           {count} {best ? 'games you loved' : 'games that felt not great'}, out of {baseCount}
         </p>
-        <h2 id="h-common" className="mt-4 max-w-3xl font-serif text-[clamp(2rem,4.6vw,3.4rem)] font-light leading-[1.05]">
+        <h2 id="h-common" className="mt-4 max-w-3xl text-5xl leading-[1.05]">
           {title}
         </h2>
 
@@ -278,8 +278,8 @@ function CommonCard({ kind, traits, count, baseCount }: { kind: 'best' | 'toughe
                   className={cx('rise border-t pt-5', best ? 'border-paper/20' : 'border-ink/15')}
                   style={{ animationDelay: `${120 + i * 120}ms` }}
                 >
-                  <p className={cx('font-serif text-sm italic', best ? 'text-sage' : 'text-ember')}>0{i + 1}</p>
-                  <p className="mt-2 font-serif text-3xl font-light leading-tight">{t.label}</p>
+                  <p className={cx('text-sm', best ? 'text-sage' : 'text-ember')}>0{i + 1}</p>
+                  <p className="mt-2 text-3xl leading-tight">{t.label}</p>
                   <div className="mt-5 space-y-2 text-xs" aria-hidden>
                     <ShareBar label={best ? 'Best games' : 'Toughest'} value={share} strong dark={best} />
                     <ShareBar label="All games" value={baseShare} dark={best} />
@@ -300,7 +300,7 @@ function CommonCard({ kind, traits, count, baseCount }: { kind: 'best' | 'toughe
 
 function ShareBar({ label, value, strong, dark }: { label: string; value: number; strong?: boolean; dark?: boolean }) {
   return (
-    <div className="grid grid-cols-[76px_1fr_36px] items-center gap-2">
+    <div className="grid grid-cols-[88px_1fr_52px] items-center gap-2">
       <span className={dark ? 'text-paper/70' : 'text-ink-2'}>{label}</span>
       <span className={cx('h-2 rounded-full', dark ? 'bg-paper/10' : 'bg-ink/10')}>
         <span
@@ -318,11 +318,11 @@ function Hero({ value, label, decimals, suffix, signed }: { value: number; label
   const shown = `${signed && value >= 0 ? '+' : signed ? '−' : ''}${Math.abs(v).toFixed(decimals)}`
   return (
     <div>
-      <p className="font-serif text-[clamp(2.6rem,8vw,6rem)] font-light leading-none tabular" aria-label={`${signed && value >= 0 ? '+' : ''}${value.toFixed(decimals)}${suffix ?? ''} ${label}`}>
+      <p className="text-5xl leading-none tabular" aria-label={`${signed && value >= 0 ? '+' : ''}${value.toFixed(decimals)}${suffix ?? ''} ${label}`}>
         {shown}
-        {suffix && <span className="text-[0.4em] text-ink-3">{suffix}</span>}
+        {suffix && <span className="text-sm text-ink-3">{suffix}</span>}
       </p>
-      <p className="mt-3 text-xs uppercase tracking-[0.14em] text-ink-3 sm:text-sm sm:normal-case sm:tracking-normal">{label}</p>
+      <p className="mt-3 text-xs text-ink-3">{label}</p>
     </div>
   )
 }
@@ -373,7 +373,7 @@ function MapChart({ sessions, insight, onClear }: { sessions: ActivitySession[];
     <div>
       <div className="flex flex-wrap items-end justify-between gap-6">
         <div>
-          <h2 id="h-map" className="font-serif text-4xl font-light">
+          <h2 id="h-map" className="text-4xl">
             The map
           </h2>
           <p className="mt-2 max-w-md text-sm text-ink-2">
@@ -455,10 +455,10 @@ function MapChart({ sessions, insight, onClear }: { sessions: ActivitySession[];
             <text x={P.l + 8} y={P.t + 16} fontSize="11" fill="var(--color-ink-3)" letterSpacing="1.5">
               {yMode === 'enjoyment' ? '↑ MORE ENJOYED' : '↑ MORE ENERGY AFTER'}
             </text>
-            <text x={(xs(0) + xs(60)) / 2} y={H - P.b - 10} fontSize="11" textAnchor="middle" fontStyle="italic" fontFamily="Fraunces, serif" fill="var(--color-ink-3)">
+            <text x={(xs(0) + xs(60)) / 2} y={H - P.b - 10} fontSize="11" textAnchor="middle" fill="var(--color-ink-3)">
               up to an hour
             </text>
-            <text x={(xs(90) + W - P.r) / 2} y={H - P.b - 10} fontSize="11" textAnchor="middle" fontStyle="italic" fontFamily="Fraunces, serif" fill="var(--color-ink-3)">
+            <text x={(xs(90) + W - P.r) / 2} y={H - P.b - 10} fontSize="11" textAnchor="middle" fill="var(--color-ink-3)">
               the long ones
             </text>
 
@@ -520,7 +520,7 @@ function DotCard({ s, pos, W, H }: { s: ActivitySession; pos: { x: number; y: nu
         <span className="h-2 w-2 rounded-full" style={{ background: socialColor(s.socialContext) }} aria-hidden />
         {socialLabel(s.socialContext)} · {shortDate(s.date)}
       </p>
-      <p className="mt-1 font-serif text-lg">
+      <p className="mt-1 text-lg">
         {s.sport} · {s.duration}m
       </p>
       <dl className="mt-2 grid grid-cols-2 gap-1 text-xs text-ink-2">
@@ -535,7 +535,7 @@ function DotCard({ s, pos, W, H }: { s: ActivitySession; pos: { x: number; y: nu
         <dt>Intensity</dt>
         <dd className="text-right text-ink">{intensityLabel(s.intensity)}</dd>
       </dl>
-      {s.reflection && <p className="mt-2 border-t border-line pt-2 font-serif italic text-ink-2">“{s.reflection}”</p>}
+      {s.reflection && <p className="mt-2 border-t border-line pt-2 text-ink-2">“{s.reflection}”</p>}
     </div>
   )
 }
@@ -595,7 +595,7 @@ function PatternRow({ ins, active, onShow }: { ins: Insight; active: boolean; on
         aria-expanded={open}
         className="press flex w-full items-start justify-between gap-6 py-7 text-left"
       >
-        <span className="font-serif text-2xl font-light leading-snug sm:text-3xl">{ins.headline}</span>
+        <span className="text-2xl leading-snug sm:text-3xl">{ins.headline}</span>
         <span className={cx('mt-2 shrink-0 text-ink-3 transition-transform duration-300', open && 'rotate-45')} aria-hidden>
           <svg width="18" height="18" viewBox="0 0 18 18">
             <path d="M9 2v14M2 9h14" stroke="currentColor" strokeWidth="1.5" />
@@ -605,7 +605,7 @@ function PatternRow({ ins, active, onShow }: { ins: Insight; active: boolean; on
       {open && (
         <div className="rise grid gap-8 pb-8 lg:grid-cols-[1fr_1.4fr]">
           <div>
-            <p className="eyebrow text-[10px]">Where this comes from</p>
+            <p className="eyebrow text-sm">Where this comes from</p>
             <p className="mt-2 text-sm leading-relaxed text-ink-2">{ins.basis}</p>
             <Button variant="ghost" className="mt-4" onClick={onShow}>
               Show these sessions on the map
@@ -650,7 +650,7 @@ function MoodSection({ sessions }: { sessions: ActivitySession[] }) {
   const max = Math.max(...counts.map((c) => c.n))
   return (
     <section aria-labelledby="h-mood">
-      <h2 id="h-mood" className="font-serif text-4xl font-light">
+      <h2 id="h-mood" className="text-4xl">
         How you leave the court
       </h2>
       <p className="mt-2 text-sm text-ink-2">The mood you reported after each session.</p>
@@ -686,7 +686,7 @@ function AskSection({ sessions, all, filtered }: { sessions: ActivitySession[]; 
   }
   return (
     <section aria-labelledby="h-ask" className="rounded-[2rem] bg-sky-soft/70 p-6 sm:p-8">
-      <h2 id="h-ask" className="font-serif text-4xl font-light">
+      <h2 id="h-ask" className="text-4xl">
         Ask PLAY ON
       </h2>
       <p className="mt-2 text-sm text-ink-2">
@@ -723,8 +723,8 @@ function AskSection({ sessions, all, filtered }: { sessions: ActivitySession[]; 
       </div>
       {answer && (
         <div key={answer.q} className="rise mt-8 border-t border-line-2 pt-6" aria-live="polite">
-          <p className="font-serif text-lg italic text-ink-2">“{answer.q}”</p>
-          <div className="mt-4 space-y-3 text-[15px] leading-relaxed">
+          <p className="text-lg text-ink-2">“{answer.q}”</p>
+          <div className="mt-4 space-y-3 text-sm leading-relaxed">
             {answer.lines.map((l, i) => (
               <p key={i}>{l}</p>
             ))}
@@ -744,9 +744,9 @@ function NotYet({ n }: { n: number }) {
   return (
     <div className="mx-auto max-w-3xl py-6">
       <p className="eyebrow">Your Game Map</p>
-      <h1 className="mt-4 font-serif text-[clamp(2.6rem,6vw,4.5rem)] font-light leading-[1.02]">
+      <h1 className="mt-4 text-5xl leading-[1.02]">
         {n} of {MIN_SESSIONS} games logged.
-        <span className="block italic text-ink-2">Your first patterns unlock at {MIN_SESSIONS}.</span>
+        <span className="block text-ink-2">Your first patterns unlock at {MIN_SESSIONS}.</span>
       </h1>
       <p className="mt-5 max-w-xl text-lg text-ink-2">
         Your Game Map shows how playing affects you: when you enjoy it most, what lifts your energy, and the slow drift
@@ -754,7 +754,7 @@ function NotYet({ n }: { n: number }) {
       </p>
       <div className="mt-10 flex items-center gap-3" role="img" aria-label={`${n} of ${MIN_SESSIONS} games logged`}>
         {Array.from({ length: MIN_SESSIONS }).map((_, i) => (
-          <span key={i} className={cx('grid h-12 w-12 place-items-center rounded-full border font-serif text-lg', i < n ? 'border-forest bg-forest text-paper' : 'border-dashed border-line-2 text-ink-3')}>
+          <span key={i} className={cx('grid h-12 w-12 place-items-center rounded-full border text-lg', i < n ? 'border-forest bg-forest text-paper' : 'border-dashed border-line-2 text-ink-3')}>
             {i + 1}
           </span>
         ))}
