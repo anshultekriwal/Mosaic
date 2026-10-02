@@ -30,25 +30,38 @@ export function clearEpisodes() {
   write([])
 }
 
-// One trusted contact the user can call or text from a session.
-const CONTACT_KEY = 'steady.contact.v1'
+// "My circle": up to three people, in the order Steady should reach them.
+const CIRCLE_KEY = 'steady.circle.v1'
+const LEGACY_CONTACT_KEY = 'steady.contact.v1' // single contact, before the circle
+
+export const MAX_CONTACTS = 3
 
 export const DEFAULT_MESSAGE =
   'I’m having a hard time right now. Can you call me or come and be with me?'
 
-export function loadContact() {
+export function loadCircle() {
   try {
-    const c = JSON.parse(localStorage.getItem(CONTACT_KEY) || 'null')
-    return c && c.phone ? c : null
+    const c = JSON.parse(localStorage.getItem(CIRCLE_KEY) || 'null')
+    if (c && Array.isArray(c.contacts)) {
+      return {
+        contacts: c.contacts.filter((x) => x && x.phone).slice(0, MAX_CONTACTS),
+        message: c.message || DEFAULT_MESSAGE,
+      }
+    }
+    const old = JSON.parse(localStorage.getItem(LEGACY_CONTACT_KEY) || 'null')
+    if (old && old.phone) {
+      return { contacts: [{ name: old.name || '', phone: old.phone }], message: old.message || DEFAULT_MESSAGE }
+    }
   } catch {
-    return null
+    /* fall through */
   }
+  return { contacts: [], message: DEFAULT_MESSAGE }
 }
 
-export function saveContact(contact) {
+export function saveCircle(circle) {
   try {
-    if (contact) localStorage.setItem(CONTACT_KEY, JSON.stringify(contact))
-    else localStorage.removeItem(CONTACT_KEY)
+    localStorage.setItem(CIRCLE_KEY, JSON.stringify(circle))
+    localStorage.removeItem(LEGACY_CONTACT_KEY)
   } catch {
     /* storage blocked */
   }

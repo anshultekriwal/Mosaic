@@ -4,14 +4,16 @@
 @custom-variant short (@media (max-height: 700px));
 
 @theme {
-  --color-night: #081423;
-  --color-deep: #0d1f33;
-  --color-tide: #13304a;
-  --color-mist: #dbe7ee;
-  --color-haze: #8fa6b8;
-  --color-calm: #6cc4bb;
-  --color-calm-deep: #2f7f7a;
-  --color-ember: #e7a07a;
+  /* Dark, soft blue-grey ground; warm neutral text; muted sage for actions. */
+  --color-night: #1a2026;
+  --color-deep: #232b32;
+  --color-tide: #2f3b45;
+  --color-mist: #efe9df;
+  --color-haze: #b3aca1;
+  --color-calm: #a3bfa0;
+  --color-calm-deep: #6e8c72;
+  --color-sky: #9db7cc;
+  --color-ember: #d8b994;
   --font-sans: ui-rounded, 'SF Pro Rounded', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 

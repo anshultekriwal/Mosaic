@@ -8,6 +8,9 @@ import Pacer from './screens/Pacer.jsx'
 import CheckIn from './screens/CheckIn.jsx'
 import Grounding from './screens/Grounding.jsx'
 import Support from './screens/Support.jsx'
+import ReachOut from './screens/ReachOut.jsx'
+import { callPerson } from './lib/reach.js'
+import { loadCircle } from './lib/storage.js'
 import Pulse from './screens/Pulse.jsx'
 import Summary from './screens/Summary.jsx'
 
@@ -18,12 +21,15 @@ import Summary from './screens/Summary.jsx'
  * live:     measure → reflect → pacer → check-in
  *             better → pulse → remeasure → summary
  *             same/worse → grounding → pacer → check-in …
- *             every 2nd check-in without "better" → support
+ *             every 2nd check-in without "better" → reach the circle
+ *               (or the helpline screen when the circle is empty)
  * practice: pacer → check-in → (better → done | else grounding → pacer …)
  */
 export default function Session({ practice = false, onExit }) {
   const [step, setStep] = useState(practice ? 'pacer' : 'measure')
   const [round, setRound] = useState(0)
+  const [reachKey, setReachKey] = useState(0)
+  const circle = useRef(loadCircle()).current
   const notBetter = useRef(0)
   const data = useRef({ id: crypto.randomUUID?.() ?? String(Date.now()), start: Date.now() })
 
@@ -65,8 +71,18 @@ export default function Session({ practice = false, onExit }) {
   function onAnswer(answer) {
     if (answer === 'better') return go(practice ? 'practiceDone' : 'pulse')
     notBetter.current += 1
-    if (!practice && notBetter.current % 2 === 0) return go('support')
+    if (!practice && notBetter.current % 2 === 0) {
+      if (circle.contacts.length) return reach()
+      return go('support')
+    }
     go('grounding')
+  }
+
+  // Runs inside a tap, so the browser lets us open the dialer right away.
+  function reach() {
+    callPerson(circle.contacts[0])
+    setReachKey((k) => k + 1)
+    go('reach')
   }
 
   function continueAfterSupport() {
@@ -101,6 +117,17 @@ export default function Session({ practice = false, onExit }) {
     case 'support':
       content = <Support onContinue={continueAfterSupport} onBetter={() => go('pulse')} />
       break
+    case 'reach':
+      content = (
+        <ReachOut
+          key={reachKey}
+          contacts={circle.contacts}
+          message={circle.message}
+          onContinue={continueAfterSupport}
+          onBetter={() => go(practice ? 'practiceDone' : 'pulse')}
+        />
+      )
+      break
     case 'pulse':
       content = <Pulse onDone={onPulse} />
       break
@@ -123,9 +150,10 @@ export default function Session({ practice = false, onExit }) {
   }
 
   const leave = step === 'summary' || step === 'practiceDone' ? null : onExit
+  const canReach = circle.contacts.length > 0 && !['reach', 'summary', 'practiceDone'].includes(step)
 
   return (
-    <SessionScreen onLeave={leave} showContact={step !== 'support'} stepKey={step === 'pacer' ? `pacer-${round}` : step}>
+    <SessionScreen onLeave={leave} onReach={canReach ? reach : undefined} stepKey={step === 'pacer' ? `pacer-${round}` : step === 'reach' ? `reach-${reachKey}` : step}>
       {content}
     </SessionScreen>
   )

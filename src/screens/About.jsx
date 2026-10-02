@@ -14,8 +14,12 @@ const SECTIONS = [
     'Naming 5 things you see, 4 you can touch, 3 you hear, 2 you smell and 1 you taste brings your attention back to the room around you.',
   ],
   [
+    'My circle',
+    'Add up to three people. If you still feel the same or worse after two rounds, Steady opens your dialer for the first person. If they don’t answer, it opens a text to them and moves to the next. A web page can’t place calls or send texts on its own, so you tap call and send.',
+  ],
+  [
     'Your data',
-    'Everything stays in this browser on this device, including your trusted contact. There is no account and nothing is sent anywhere. Calls and texts go through your phone’s own apps. Clearing your browser data removes it all.',
+    'Everything stays in this browser on this device, including the people in your circle. There is no account and nothing is sent anywhere. Calls and texts go through your phone’s own apps. Clearing your browser data removes it all.',
   ],
 ]
 

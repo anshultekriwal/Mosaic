@@ -72,10 +72,10 @@ export default function Pacer({ startBpm, holdCycles = 3, onDone }) {
   return (
     <div className="flex h-full w-full flex-col items-center justify-center gap-8">
       <div className="relative aspect-square w-[min(80vw,48vh)]">
-        <div className="absolute inset-0 rounded-full border border-calm/20" />
-        <div className="absolute inset-[-6%] rounded-full bg-calm/10 blur-2xl" style={circleStyle} />
+        <div className="absolute inset-0 rounded-full border border-sky/25" />
+        <div className="absolute inset-[-6%] rounded-full bg-sky/15 blur-2xl" style={circleStyle} />
         <div
-          className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_40%,var(--color-calm)_0%,var(--color-calm-deep)_75%)]"
+          className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_40%,var(--color-calm)_0%,var(--color-sky)_100%)]"
           style={circleStyle}
         />
       </div>

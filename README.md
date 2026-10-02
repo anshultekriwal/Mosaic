@@ -27,7 +27,8 @@ relative paths, so it works from a sub-folder too.
 4. **Pacer**: starts at the measured rate and eases to 4 s in / 6 s out over ~2 min,
    with vibration cues where supported.
 5. **Check-in**: Better → pulse. Same/Worse → 5-4-3-2-1 grounding → pacer again.
-   Every second "not better" shows "Call someone you trust", Tele-MANAS 14416 and 112.
+   Every second "not better" starts reaching your circle (or shows Tele-MANAS 14416
+   when the circle is empty).
 6. **Pulse** (skippable): tap with your heartbeat for 15 s.
 7. **Summary**: re-measure, before/after, optional trigger tag. Saved automatically.
 
@@ -37,11 +38,19 @@ only, nothing saved).
 
 Every session screen carries "Severe chest pain or feel faint? Call 112".
 
-**Settings** holds one trusted contact (name, number, and a ready-written text
-message). Once set, "Call" and "Text" links for them sit beside the 112 link on
-every session screen, and become the first options on the "Call someone you
-trust" screen. Calls and texts open the phone's own dialer and messages app via
-`tel:` and `sms:` links; Steady sends nothing itself.
+**My circle** holds up to three people in the order to reach them, plus one
+ready-written message. When a session gets hard (every second check-in without
+"Better"), or when "Reach <name> now" at the bottom of a session screen is
+tapped, Steady opens the dialer for person 1. Coming back to the app, it asks
+whether they answered. "No answer" opens the message to that person and lines up
+the next one; after everyone, it offers the Tele-MANAS helpline. With an empty
+circle the original "Call someone you trust" screen with 14416 is shown instead.
+
+A web page can only hand numbers to the phone via `tel:` and `sms:` links. It
+cannot place a call or send a text by itself, open both from one tap, or tell
+whether a call was answered, so each step is one tap and the person still presses
+call and send. Fully automatic calling and texting would need a native app or a
+server-side calling/SMS service.
 
 ## Notes
 

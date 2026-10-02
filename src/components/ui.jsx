@@ -1,50 +1,33 @@
-import { loadContact } from '../lib/storage.js'
+import { frameSafe, smsUrl, telUrl } from '../lib/reach.js'
+import { loadCircle } from '../lib/storage.js'
 
 // Shared layout and controls.
 
-// When Steady runs inside a frame (an embed or preview), a tel: link would
-// navigate the frame itself and many hosts block that, leaving an error page
-// where the app was. Open it in a new browsing context there instead, so the
-// app stays on screen and the phone can still hand off to the dialer.
-const framed = (() => {
-  try {
-    return window.self !== window.top
-  } catch {
-    return true
-  }
-})()
-
-const frameSafe = framed ? { target: '_blank', rel: 'noopener' } : {}
-
 export function CallLink({ number, ...rest }) {
-  return <a href={`tel:${number}`} {...frameSafe} {...rest} />
+  return <a href={telUrl(number)} {...frameSafe} {...rest} />
 }
 
-// `sms:NUMBER?&body=` is the form both iOS Messages and Android accept.
 export function TextLink({ number, body, ...rest }) {
-  const query = body ? `?&body=${encodeURIComponent(body)}` : ''
-  return <a href={`sms:${number}${query}`} {...frameSafe} {...rest} />
+  return <a href={smsUrl(number, body)} {...frameSafe} {...rest} />
 }
 
-export const contactName = (c) => c?.name?.trim() || 'my contact'
+export const contactName = (c) => c?.name?.trim() || 'your contact'
 
 const footLink =
   'flex min-h-11 items-center justify-center px-3 text-center text-sm text-haze underline decoration-haze/40 underline-offset-4'
 
-/** Bottom of every session screen: trusted contact (if set) and 112. */
-export function EmergencyLink({ showContact = true }) {
-  const contact = showContact ? loadContact() : null
+/**
+ * Bottom of every session screen. With people in the circle, one link starts
+ * reaching them (`onReach`, which dials the first person); 112 is always there.
+ */
+export function EmergencyLink({ onReach }) {
+  const first = onReach ? loadCircle().contacts[0] : null
   return (
     <div className="flex flex-col items-center">
-      {contact && (
-        <div className="flex flex-wrap justify-center">
-          <CallLink number={contact.phone} className={footLink}>
-            Call {contactName(contact)}
-          </CallLink>
-          <TextLink number={contact.phone} body={contact.message} className={footLink}>
-            Text {contactName(contact)}
-          </TextLink>
-        </div>
+      {first && (
+        <button type="button" onClick={onReach} className={footLink}>
+          Reach {contactName(first)} now
+        </button>
       )}
       <CallLink number="112" className={footLink}>
         Severe chest pain or feel faint? Call 112
@@ -55,10 +38,10 @@ export function EmergencyLink({ showContact = true }) {
 
 /**
  * Full-height session screen: never scrolls. `onLeave` shows a quiet exit
- * link top-left; `emergency` pins the 112 link (and the trusted contact,
- * unless `showContact` is false) to the bottom.
+ * link top-left; `emergency` pins the 112 link (and, with `onReach`, a link
+ * to reach the circle) to the bottom.
  */
-export function SessionScreen({ children, onLeave, emergency = true, showContact = true, stepKey }) {
+export function SessionScreen({ children, onLeave, emergency = true, onReach, stepKey }) {
   return (
     <div className="flex h-dvh flex-col overflow-hidden pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
       <div className="flex h-12 shrink-0 items-center px-3">
@@ -75,7 +58,7 @@ export function SessionScreen({ children, onLeave, emergency = true, showContact
       <main key={stepKey} className="settle flex min-h-0 flex-1 flex-col items-center justify-center px-6">
         {children}
       </main>
-      {emergency && <EmergencyLink showContact={showContact} />}
+      {emergency && <EmergencyLink onReach={onReach} />}
     </div>
   )
 }
