@@ -383,9 +383,15 @@ function SessionTable({ sessions }: { sessions: ActivitySession[] }) {
 
 /* ---------- pattern rows with their evidence ---------- */
 
+const metricName = (ins: Insight) =>
+  ins.metric === 'lift'
+    ? 'Average change in energy, before to after (points on a 1 to 5 scale)'
+    : ins.metric === 'share'
+      ? `Share of games that ${ins.shareOf ?? 'match'}`
+      : 'Average enjoyment out of 5'
+
 function PatternRow({ ins, active, onShow }: { ins: Insight; active: boolean; onShow: () => void }) {
   const [open, setOpen] = useState(active)
-  const metricMax = ins.metric === 'lift' ? 4 : 5
   return (
     <li className={cx('border-b border-line transition-colors', active && 'bg-paper/70')}>
       <button
@@ -409,12 +415,12 @@ function PatternRow({ ins, active, onShow }: { ins: Insight; active: boolean; on
               Show these sessions on the map
             </Button>
           </div>
-          <div className="space-y-3" role="list" aria-label={`${ins.metric === 'lift' ? 'Average energy change' : 'Average enjoyment'} by group`}>
+          <div className="space-y-3" role="list" aria-label={metricName(ins) + ' by group'}>
             {ins.groups.map((g) => {
-              const v = ins.metric === 'lift' ? g.lift : g.enjoyment
-              const pct = ins.metric === 'lift' ? (Math.abs(v) / metricMax) * 50 : (v / metricMax) * 100
+              const v = ins.metric === 'lift' ? g.lift : ins.metric === 'share' ? (g.share ?? 0) : g.enjoyment
+              const pct = ins.metric === 'lift' ? (Math.abs(v) / 4) * 50 : ins.metric === 'share' ? v * 100 : (v / 5) * 100
               return (
-                <div key={g.key} role="listitem" className="grid grid-cols-[110px_1fr_64px] items-center gap-3 text-sm">
+                <div key={g.key} role="listitem" className="grid grid-cols-[110px_1fr_72px] items-center gap-3 text-sm">
                   <span className={cx(g.highlight ? 'font-medium text-ink' : 'text-ink-2')}>{g.label}</span>
                   <span className="relative h-3">
                     {ins.metric === 'lift' && <span className="absolute left-1/2 top-[-4px] h-5 w-px bg-line-2" aria-hidden />}
@@ -427,15 +433,13 @@ function PatternRow({ ins, active, onShow }: { ins: Insight; active: boolean; on
                     />
                   </span>
                   <span className="text-right tabular text-ink">
-                    {ins.metric === 'lift' ? `${v >= 0 ? '+' : '−'}${fmt1(Math.abs(v))}` : fmt1(v)}
+                    {ins.metric === 'lift' ? `${v >= 0 ? '+' : '−'}${fmt1(Math.abs(v))}` : ins.metric === 'share' ? `${Math.round(v * 100)}%` : fmt1(v)}
                     <span className="ml-1 text-xs text-ink-3">n={g.sessions.length}</span>
                   </span>
                 </div>
               )
             })}
-            <p className="pt-1 text-xs text-ink-3">
-              {ins.metric === 'lift' ? 'Average change in energy, before → after (points on a 1–5 scale).' : 'Average enjoyment out of 5.'} n = number of sessions.
-            </p>
+            <p className="pt-1 text-xs text-ink-3">{metricName(ins)}. n = number of games.</p>
           </div>
         </div>
       )}
