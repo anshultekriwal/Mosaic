@@ -1,6 +1,6 @@
 import type { ActivitySession, AppData, PlayerType, Social } from './types'
 import { daysBetween, isWeekend } from './dates'
-import { POSITIVE_MOODS, RESULTS, BODIES, SESSION_TYPES, INTENSITIES, socialLabel, SOCIALS, sessionTypeLabel } from './meta'
+import { POSITIVE_MOODS, RESULTS, BODIES, SESSION_TYPES, INTENSITIES, socialLabel, SOCIALS } from './meta'
 import { sortedSessions } from './store'
 import {
   buildContext,
@@ -592,7 +592,7 @@ export function commonTraits(
     ...SESSION_TYPES.map((t) => ({
       dim: 'type' as const,
       key: t.id,
-      label: sessionTypeLabel(t.id),
+      label: { match: 'Matches', casual: 'Casual hits', practice: 'Practice', lesson: 'Lessons' }[t.id],
       phrase: { match: 'matches', casual: 'casual hits', practice: 'practice sessions', lesson: 'lessons' }[t.id],
       test: (s: ActivitySession) => s.sessionType === t.id,
     })),
