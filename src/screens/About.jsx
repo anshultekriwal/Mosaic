@@ -1,4 +1,4 @@
-import { Page } from '../components/ui.jsx'
+import { CallLink, Page } from '../components/ui.jsx'
 
 const SECTIONS = [
   [
@@ -33,8 +33,8 @@ export default function About({ onBack }) {
           This is not a diagnosis or a treatment. If episodes are frequent, speak to a doctor.
         </p>
         <p className="text-base text-haze">
-          In an emergency call <a className="underline" href="tel:112">112</a>. For mental health
-          support in India, Tele-MANAS is free on <a className="underline" href="tel:14416">14416</a>.
+          In an emergency call <CallLink className="underline" number="112">112</CallLink>. For mental health
+          support in India, Tele-MANAS is free on <CallLink className="underline" number="14416">14416</CallLink>.
         </p>
       </div>
     </Page>

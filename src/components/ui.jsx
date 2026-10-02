@@ -1,13 +1,31 @@
 // Shared layout and controls.
 
+// When Steady runs inside a frame (an embed or preview), a tel: link would
+// navigate the frame itself and many hosts block that, leaving an error page
+// where the app was. Open it in a new browsing context there instead, so the
+// app stays on screen and the phone can still hand off to the dialer.
+const framed = (() => {
+  try {
+    return window.self !== window.top
+  } catch {
+    return true
+  }
+})()
+
+export function CallLink({ number, ...rest }) {
+  return (
+    <a href={`tel:${number}`} {...(framed ? { target: '_blank', rel: 'noopener' } : {})} {...rest} />
+  )
+}
+
 export function EmergencyLink() {
   return (
-    <a
-      href="tel:112"
+    <CallLink
+      number="112"
       className="flex min-h-11 items-center justify-center px-4 text-center text-sm text-haze underline decoration-haze/40 underline-offset-4"
     >
       Severe chest pain or feel faint? Call 112
-    </a>
+    </CallLink>
   )
 }
 
