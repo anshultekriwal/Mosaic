@@ -8,26 +8,63 @@ export function cx(...xs: (string | false | null | undefined)[]) {
 
 export type Route = 'welcome' | 'onboarding' | 'home' | 'play' | 'season' | 'insights' | 'reset' | 'profile'
 
-const parse = (): { route: Route; param?: string } => {
-  const [r, param] = window.location.hash.replace(/^#\/?/, '').split('/')
+type Loc = { route: Route; param?: string }
+
+const parseHash = (): Loc => {
+  let h = ''
+  try {
+    h = window.location.hash
+  } catch {
+    /* sandboxed frame */
+  }
+  const [r, param] = h.replace(/^#\/?/, '').split('/')
   return { route: (r || 'home') as Route, param }
 }
 
+// The in-memory location is the source of truth; the URL hash is synced when the
+// host allows it, so routing also works inside sandboxed frames.
+let current: Loc = parseHash()
+const routeListeners = new Set<(l: Loc) => void>()
+const emit = () => {
+  routeListeners.forEach((l) => l(current))
+  window.scrollTo({ top: 0 })
+}
+
+export const currentRoute = () => current.route
+
 export function useRoute() {
-  const [loc, setLoc] = useState(parse)
+  const [loc, setLoc] = useState(current)
   useEffect(() => {
-    const on = () => {
-      setLoc(parse())
-      window.scrollTo({ top: 0 })
+    routeListeners.add(setLoc)
+    const onHash = () => {
+      const next = parseHash()
+      if (next.route === current.route && next.param === current.param) return
+      current = next
+      emit()
     }
-    window.addEventListener('hashchange', on)
-    return () => window.removeEventListener('hashchange', on)
+    window.addEventListener('hashchange', onHash)
+    return () => {
+      routeListeners.delete(setLoc)
+      window.removeEventListener('hashchange', onHash)
+    }
   }, [])
   return loc
 }
 
 export const go = (route: Route, param?: string) => {
-  window.location.hash = `/${route}${param ? `/${param}` : ''}`
+  current = { route, param }
+  try {
+    history.pushState(null, '', `#/${route}${param ? `/${param}` : ''}`)
+  } catch {
+    /* URL updates blocked; in-memory routing still works */
+  }
+  emit()
+}
+
+/** onClick for <a href="#/x"> links so they route in-app. */
+export const navTo = (route: Route) => (e: { preventDefault: () => void }) => {
+  e.preventDefault()
+  go(route)
 }
 
 /* ---------- buttons ---------- */

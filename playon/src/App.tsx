@@ -1,6 +1,6 @@
 import { useEffect, type ReactNode } from 'react'
 import { useData, actions } from './lib/store'
-import { cx, DemoBadge, go, useRoute, type Route } from './components/ui'
+import { currentRoute, cx, DemoBadge, go, navTo, useRoute, type Route } from './components/ui'
 import Welcome from './screens/Welcome'
 import Onboarding from './screens/Onboarding'
 import Home from './screens/Home'
@@ -24,8 +24,8 @@ export default function App() {
 
   const needsUser = !data.user && route !== 'welcome' && route !== 'onboarding'
   useEffect(() => {
-    // Read the live hash: a reset may already have navigated to onboarding.
-    if (needsUser && !/^#\/(welcome|onboarding)/.test(window.location.hash)) go('welcome')
+    // Read the live route: a reset may already have navigated to onboarding.
+    if (needsUser && currentRoute() !== 'welcome' && currentRoute() !== 'onboarding') go('welcome')
   }, [needsUser])
 
   if (!data.user || route === 'welcome' || route === 'onboarding') {
@@ -57,7 +57,7 @@ export default function App() {
   const active = route === 'reset' ? 'home' : route
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[248px_1fr]">
-      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-paper focus:px-4 focus:py-2">
+      <a href="#main" onClick={(e) => (e.preventDefault(), document.getElementById('main')?.focus())} className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-paper focus:px-4 focus:py-2">
         Skip to content
       </a>
 
@@ -71,6 +71,7 @@ export default function App() {
             <a
               key={n.id}
               href={`#/${n.id}`}
+              onClick={navTo(n.id)}
               aria-current={active === n.id ? 'page' : undefined}
               className={cx(
                 'press flex items-center gap-3 rounded-full px-4 py-2.5 text-sm',
@@ -83,7 +84,7 @@ export default function App() {
           ))}
         </nav>
         <div className="mt-auto space-y-4">
-          <a href="#/reset" className="press block rounded-2xl border border-line bg-lavender-soft/70 p-4 text-sm hover:border-lavender">
+          <a href="#/reset" onClick={navTo('reset')} className="press block rounded-2xl border border-line bg-lavender-soft/70 p-4 text-sm hover:border-lavender">
             <span className="eyebrow block text-[10px]">Reset Room</span>
             <span className="mt-1 block font-serif text-lg leading-snug">Need a minute?</span>
           </a>
@@ -102,13 +103,13 @@ export default function App() {
               <DemoBadge />
             </button>
           ) : (
-            <a href="#/reset" className="text-sm text-ink-2 underline decoration-line-2 underline-offset-4">
+            <a href="#/reset" onClick={navTo('reset')} className="text-sm text-ink-2 underline decoration-line-2 underline-offset-4">
               Reset Room
             </a>
           )}
         </header>
 
-        <main id="main" key={route} className="fade mx-auto w-full max-w-6xl px-5 pb-32 pt-6 sm:px-8 lg:px-14 lg:pb-20 lg:pt-12">
+        <main id="main" tabIndex={-1} key={route} className="fade mx-auto w-full max-w-6xl px-5 pb-32 pt-6 sm:px-8 lg:px-14 lg:pb-20 lg:pt-12">
           {screen}
         </main>
       </div>
@@ -123,6 +124,7 @@ export default function App() {
             <li key={n.id}>
               <a
                 href={`#/${n.id}`}
+              onClick={navTo(n.id)}
                 aria-current={active === n.id ? 'page' : undefined}
                 className={cx(
                   'press flex w-16 flex-col items-center gap-1 py-2.5 text-[11px]',
