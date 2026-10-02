@@ -1,4 +1,24 @@
-import type { Intensity, Level, Mood, SessionType, Social, WellnessGoal } from './types'
+import type { BodyAfter, Intensity, Level, Mood, PlayerType, Result, SessionType, Social, WellnessGoal } from './types'
+
+export const RESULTS: { id: Result; label: string }[] = [
+  { id: 'won', label: 'Won' },
+  { id: 'lost', label: 'Lost' },
+  { id: 'no_score', label: 'No score' },
+]
+export const resultLabel = (r: Result) => RESULTS.find((x) => x.id === r)?.label ?? r
+
+export const BODIES: { id: BodyAfter; label: string }[] = [
+  { id: 'fresh', label: 'Fresh' },
+  { id: 'tired', label: 'Tired' },
+  { id: 'sore', label: 'Sore' },
+]
+export const bodyLabel = (b: BodyAfter) => BODIES.find((x) => x.id === b)?.label ?? b
+
+export const PLAYER_TYPES: { id: PlayerType; label: string; hint: string }[] = [
+  { id: 'comeback', label: 'Getting back into sport', hint: 'Easing back in after time away' },
+  { id: 'high_volume', label: 'Playing a lot lately', hint: 'Most weeks have several games' },
+  { id: 'casual', label: 'Just love playing', hint: 'Here for the fun of it' },
+]
 
 export const MOODS: { id: Mood; label: string; glyph: string }[] = [
   { id: 'happy', label: 'Happy', glyph: '🙂' },

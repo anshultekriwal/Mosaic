@@ -3,6 +3,9 @@ export type Social = 'solo' | 'friends' | 'club' | 'tournament' | 'family' | 'ot
 export type Intensity = 'easy' | 'moderate' | 'hard'
 export type SessionType = 'match' | 'practice' | 'casual' | 'lesson'
 export type Level = 'new' | 'casual' | 'regular' | 'competitive'
+export type Result = 'won' | 'lost' | 'no_score'
+export type BodyAfter = 'fresh' | 'tired' | 'sore'
+export type PlayerType = 'comeback' | 'high_volume' | 'casual'
 export type WellnessGoal =
   | 'energized'
   | 'consistent'
@@ -20,6 +23,8 @@ export interface User {
   currentFrequency: string
   weeklyGoal: number
   wellnessGoal: WellnessGoal[]
+  /** Optional: "What brings you here?" Orders which insights surface first. */
+  playerType?: PlayerType
   createdAt: string
   isDemo: boolean
 }
@@ -39,6 +44,10 @@ export interface ActivitySession {
   moodAfter: Mood
   standouts: string[]
   reflection: string
+  /** Optional, only asked for matches. */
+  result?: Result
+  /** Optional: how the body felt afterwards. */
+  bodyAfter?: BodyAfter
 }
 
 export interface CheckIn {
