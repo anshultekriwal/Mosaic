@@ -69,6 +69,8 @@ export default function App() {
   if (immersive) return <main key={route + param}>{screen}</main>
 
   const active = route === 'reset' ? 'home' : route
+  // The Finish screen shows the stopped clock, so the ticking pill would contradict it.
+  const livePill = !!data.active && !(route === 'play' && param === 'finish')
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[248px_1fr]">
       <a href="#main" onClick={(e) => (e.preventDefault(), document.getElementById('main')?.focus())} className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-paper focus:px-4 focus:py-2">
@@ -80,7 +82,7 @@ export default function App() {
         <button onClick={() => go('home')} className="press text-left" aria-label="PLAY ON home">
           <Wordmark />
         </button>
-        {data.active && <LivePill game={data.active} className="mt-6 self-start" />}
+        {livePill && <LivePill game={data.active!} className="mt-6 self-start" />}
         <nav className="mt-8 flex shrink-0 flex-col gap-1" aria-label="Primary">
           {NAV.map((n) => (
             <a
@@ -113,8 +115,8 @@ export default function App() {
           <button onClick={() => go('home')} className="press" aria-label="PLAY ON home">
             <Wordmark small />
           </button>
-          {data.active ? (
-            <LivePill game={data.active} />
+          {livePill ? (
+            <LivePill game={data.active!} />
           ) : data.user.isDemo ? (
             <button onClick={() => go('profile')} aria-label="You're viewing sample data. Open profile to start fresh.">
               <DemoBadge />

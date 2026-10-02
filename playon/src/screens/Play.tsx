@@ -6,7 +6,7 @@ import { ENERGY_WORDS, INTENSITIES, PRE_FEELINGS, SESSION_TYPES, SOCIALS } from 
 import type { ActivitySession, Intensity, SessionType, Social } from '../lib/types'
 import PostGame from './PostGame'
 import TimeDial from '../components/TimeDial'
-import { LiveGameCard, STALE_MS } from '../components/LiveGame'
+import { fmtElapsed, LiveGameCard, STALE_MS } from '../components/LiveGame'
 
 export type Draft = Pick<
   ActivitySession,
@@ -38,10 +38,9 @@ function FinishGame() {
   const [startedMs] = useState(() => (game ? Date.now() - new Date(game.startedAt).getTime() : 0))
   const stale = startedMs > STALE_MS
   const last = sortedSessions(data).pop()
-  // Round the live timer to 5 minutes; a game left running for hours falls back to the usual length.
-  const [duration, setDuration] = useState(() =>
-    stale ? (last?.duration ?? 60) : Math.max(5, Math.round(startedMs / 60000 / 5) * 5),
-  )
+  // The clock stops when you tap Finish and its minutes become the game length. Only a
+  // timer left running for hours (forgotten) asks for the real length instead.
+  const [duration, setDuration] = useState(() => (stale ? (last?.duration ?? 60) : Math.max(1, Math.round(startedMs / 60000))))
   const [intensity, setIntensity] = useState<Intensity | null>(() => game?.intensity ?? null)
   if (!game) return null
 
@@ -66,15 +65,25 @@ function FinishGame() {
       <p className="eyebrow">Finish your game</p>
       <h1 className="mt-3 font-serif text-5xl font-light leading-tight sm:text-6xl">
         {game.sport}
-        <span className="block italic text-ink-2">{stale ? 'How long did you actually play?' : `About ${fmtMinutes(duration)}.`}</span>
+        <span className="block italic text-ink-2">{stale ? 'How long did you actually play?' : 'Game over.'}</span>
       </h1>
-      <p className="mt-4 max-w-lg text-ink-2">
-        {stale
-          ? `This game was started ${fmtMinutes(Math.round(startedMs / 60000))} ago, so the timer probably kept running. Pick the real length below.`
-          : 'Worked out from when you started. Adjust it if you need to, then tell us how it felt.'}
-      </p>
+      {stale ? (
+        <p className="mt-4 max-w-lg text-ink-2">
+          This game was started {fmtMinutes(Math.round(startedMs / 60000))} ago, so the clock probably kept running. Pick the real
+          length below.
+        </p>
+      ) : (
+        <div className="mt-8 flex items-end gap-4 border-y border-line py-6">
+          <p className="font-serif text-6xl font-light leading-none tabular sm:text-7xl">{fmtElapsed(startedMs)}</p>
+          <p className="pb-1 text-sm text-ink-2">
+            Clock stopped. Saved as
+            <br />
+            your game length: <span className="font-medium text-ink">{fmtMinutes(duration)}</span>
+          </p>
+        </div>
+      )}
       <div className="mt-10 space-y-10">
-        <DurationPicker value={duration} onChange={setDuration} />
+        {stale && <DurationPicker value={duration} onChange={setDuration} />}
         <Chips
           label="How hard was it?"
           options={INTENSITIES.map((i) => ({ id: i.id, label: i.label, sub: i.hint }))}
@@ -94,7 +103,7 @@ function FinishGame() {
   )
 }
 
-const fmtMinutes = (m: number) => (m < 60 ? `${m} minutes` : m % 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m / 60} hour${m === 60 ? '' : 's'}`)
+const fmtMinutes = (m: number) => (m < 60 ? `${m} minute${m === 1 ? '' : 's'}` : m % 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m / 60} hour${m === 60 ? '' : 's'}`)
 
 function DurationPicker({ value, onChange }: { value: number; onChange: (m: number) => void }) {
   return (
