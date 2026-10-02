@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Arrow, BackButton, Button, cx, go, useReducedMotion } from '../components/ui'
+import { Arrow, BackButton, Button, cx, go, replace, useReducedMotion } from '../components/ui'
 import { Wordmark } from '../App'
 import { actions, sortedSessions, uid, useData } from '../lib/store'
 import { moodLabel } from '../lib/meta'
@@ -185,7 +185,7 @@ function ExerciseScreen({ ex }: { ex: Exercise }) {
   return (
     <div className={cx('relative flex min-h-dvh flex-col', dark ? 'bg-forest text-paper' : 'bg-cream text-ink')}>
       <header className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 pt-4 sm:px-6">
-        <BackButton light={dark} onClick={() => go('reset')} />
+        <BackButton light={dark} />
         <Wordmark small light={dark} />
         <span className={cx('text-sm', dark ? 'text-paper/60' : 'text-ink-3')}>{ex.length}</span>
       </header>
@@ -218,14 +218,14 @@ function Finished({ ex, dark }: { ex: Exercise; dark: boolean }) {
       <p className={cx('eyebrow', dark && 'text-sage')}>{ex.title}</p>
       <p className="mt-5 text-5xl leading-tight sm:text-6xl">{lines[ex.id]}</p>
       <div className="mt-12 flex flex-col gap-3 sm:flex-row">
-        <Button variant={dark ? 'light' : 'primary'} size="lg" onClick={() => go('home')}>
+        <Button variant={dark ? 'light' : 'primary'} size="lg" onClick={() => replace('home')}>
           Back home
         </Button>
         <Button
           size="lg"
           variant={dark ? 'primary' : 'ghost'}
           className={dark ? 'border border-paper/30 bg-transparent hover:bg-paper/5' : ''}
-          onClick={() => go('reset')}
+          onClick={() => replace('reset')}
         >
           Reset Room
         </Button>
