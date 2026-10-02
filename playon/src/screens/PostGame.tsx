@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Arrow, Button, cx, go, StarInput, useReducedMotion } from '../components/ui'
 import { actions, getData, sortedSessions, uid } from '../lib/store'
-import { ENERGY_WORDS, MOODS, STANDOUTS, socialLabel } from '../lib/meta'
+import { BODIES, ENERGY_WORDS, MOODS, RESULTS, STANDOUTS, socialLabel } from '../lib/meta'
 import { avg, computeInsights, MIN_SESSIONS } from '../lib/insights'
 import { MILESTONES, milestoneLabel } from '../lib/season'
-import type { ActivitySession, Mood } from '../lib/types'
+import type { ActivitySession, BodyAfter, Mood, Result } from '../lib/types'
 import type { Draft } from './Play'
 
 const STEPS = ['intro', 'energy', 'mood', 'enjoyment', 'standout', 'reflect', 'done'] as const
@@ -17,6 +17,9 @@ export default function PostGame({ draft }: { draft: Draft }) {
   const [enjoyment, setEnjoyment] = useState(0)
   const [standouts, setStandouts] = useState<string[]>([])
   const [reflection, setReflection] = useState('')
+  const [result, setResult] = useState<Result | undefined>(undefined)
+  const [body, setBody] = useState<BodyAfter | undefined>(undefined)
+  const isMatch = draft.sessionType === 'match'
   const [saved, setSaved] = useState<ActivitySession | null>(null)
 
   const step = STEPS[i]
@@ -37,6 +40,8 @@ export default function PostGame({ draft }: { draft: Draft }) {
       moodAfter: mood!,
       standouts,
       reflection: reflection.trim(),
+      ...(isMatch && result ? { result } : {}),
+      ...(body ? { bodyAfter: body } : {}),
     }
     actions.addSession(s)
     setSaved(s)
@@ -142,6 +147,7 @@ export default function PostGame({ draft }: { draft: Draft }) {
                       Going in you said: {ENERGY_WORDS[draft.energyBefore - 1].toLowerCase()}.
                     </p>
                   </div>
+                  <TapRow label="And your body?" options={BODIES} value={body} onChange={setBody} />
                 </>
               )}
 
@@ -149,6 +155,7 @@ export default function PostGame({ draft }: { draft: Draft }) {
                 <>
                   <Label n="Mood" />
                   <H>How do you feel?</H>
+                  {isMatch && <TapRow label="The score" options={RESULTS} value={result} onChange={setResult} />}
                   <div className="mt-10 grid max-w-xl grid-cols-2 gap-3 sm:grid-cols-3" role="radiogroup" aria-label="Mood">
                     {MOODS.map((m) => (
                       <button
@@ -249,6 +256,43 @@ export default function PostGame({ draft }: { draft: Draft }) {
         {step === 'done' && saved && <Complete s={saved} />}
       </div>
     </div>
+  )
+}
+
+/** Optional single-tap row: tap to pick, tap again to clear. */
+function TapRow<T extends string>({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string
+  options: { id: T; label: string }[]
+  value: T | undefined
+  onChange: (v: T | undefined) => void
+}) {
+  return (
+    <fieldset className="mt-10">
+      <legend className="eyebrow mb-3 text-paper/60">
+        {label} <span className="normal-case tracking-normal text-paper/40">(optional)</span>
+      </legend>
+      <div className="flex flex-wrap gap-2">
+        {options.map((o) => (
+          <button
+            key={o.id}
+            type="button"
+            aria-pressed={value === o.id}
+            onClick={() => onChange(value === o.id ? undefined : o.id)}
+            className={cx(
+              'press min-w-20 rounded-full border px-5 py-2.5 text-[15px]',
+              value === o.id ? 'border-sage bg-paper text-forest' : 'border-paper/20 hover:border-paper/50',
+            )}
+          >
+            {o.label}
+          </button>
+        ))}
+      </div>
+    </fieldset>
   )
 }
 

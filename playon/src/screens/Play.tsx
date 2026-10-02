@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Arrow, Button, Chips, cx, go, Scale } from '../components/ui'
-import { getData, useData } from '../lib/store'
+import { getData, sortedSessions, useData } from '../lib/store'
 import { addDays, toLocalInput } from '../lib/dates'
 import { ENERGY_WORDS, INTENSITIES, SESSION_TYPES, SOCIALS } from '../lib/meta'
 import type { ActivitySession, Intensity, SessionType, Social } from '../lib/types'
@@ -37,13 +37,16 @@ function LogForm() {
   const data = useData()
   const user = data.user!
   const sports = [...new Set([...user.sports, ...data.sessions.map((s) => s.sport)])]
-  const lastOf = (sp: string) => [...getData().sessions].reverse().find((s) => s.sport === sp)
+  const lastOf = (sp: string) => sortedSessions(getData()).reverse().find((s) => s.sport === sp)
+  // Most games repeat the last one: start from the last sport, partners and length.
+  const [last] = useState(() => sortedSessions(getData()).pop())
+  const startSport = last?.sport ?? user.primarySport
 
-  const [sport, setSport] = useState(user.primarySport)
+  const [sport, setSport] = useState(startSport)
   const [other, setOther] = useState('')
-  const [duration, setDuration] = useState(lastOf(user.primarySport)?.duration ?? 60)
+  const [duration, setDuration] = useState(last?.duration ?? 60)
   const [type, setType] = useState<SessionType>('match')
-  const [social, setSocial] = useState<Social>(lastOf(user.primarySport)?.socialContext ?? 'friends')
+  const [social, setSocial] = useState<Social>(last?.socialContext ?? 'friends')
   const [intensity, setIntensity] = useState<Intensity>('moderate')
   const [energyBefore, setEnergyBefore] = useState(3)
   const [day, setDay] = useState<'today' | 'yesterday' | 'other'>('today')
